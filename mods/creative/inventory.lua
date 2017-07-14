@@ -123,6 +123,7 @@ function creative.register_tab(name, title, items)
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()
+			local is_mapmaker = minetest.check_player_privs(player_name, "mapmaker")
 			assert(inv)
 
 			if fields.creative_clear then
@@ -169,6 +170,16 @@ function creative.register_tab(name, title, items)
 
 			else for item in pairs(fields) do
 				  if item:find(":") then
+				  	if not is_mapmaker         and
+				  	  (item:find("utilities:") or
+					   item:find("markers:")   or
+					   item:find("kidscode_acl:")) then
+						minetest.chat_send_player(player_name,
+							minetest.colorize("#FF0000",
+								"ERROR: Privilege 'mapmaker' required to get this item"))
+						return
+				  	end
+
 					local can_add = false
 					for i = 1, 8 do
 						if player_inv:get_stack("main", i):is_empty() then
