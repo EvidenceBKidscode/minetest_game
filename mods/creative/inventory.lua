@@ -170,9 +170,11 @@ function creative.register_tab(name, title, items)
 
 			else for item in pairs(fields) do
 				  if item:find(":") then
-				  	if not is_mapmaker         and
-				  	  (item:find("utilities:") or
-					   item:find("markers:")   or
+				  	if not is_mapmaker           and
+				  	  (item:find("utilities:")   or
+					   item:find("markers:")     or
+					   item:find("audioblocks:") or
+					   item:find("nodeedit:")    or
 					   item:find("kidscode_acl:")) then
 						minetest.chat_send_player(player_name,
 							minetest.colorize("#FF0000",
