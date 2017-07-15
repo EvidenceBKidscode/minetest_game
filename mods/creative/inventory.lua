@@ -1,7 +1,7 @@
 local player_inventory = {}
 
-function creative.init_creative_inventory(player)
-	local player_name = player:get_player_name()
+function creative.init_creative_inventory(player_name)
+	print("call init")
 	player_inventory[player_name] = {
 		size = 0,
 		filter = "",
@@ -14,7 +14,7 @@ end
 function creative.update_creative_inventory(player_name, tab_content)
 	local creative_list = {}
 	local inv = player_inventory[player_name] or
-		creative.init_creative_inventory(minetest.get_player_by_name(player_name))
+		creative.init_creative_inventory(player_name)
 
 	for name, def in pairs(tab_content) do
 		if not (def.groups.not_in_creative_inventory == 1) and
@@ -53,9 +53,7 @@ function creative.register_tab(name, title, items)
 		get = function(self, player, context)
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name] or
-				creative.init_creative_inventory(
-					minetest.get_player_by_name(player_name))
-
+				creative.init_creative_inventory(player_name)
 			local ipp = inv.expand and 3*8 or 6*8
 			local start_i = inv.start_i or 0
 			local pagenum = math.floor(start_i / ipp + 1)
