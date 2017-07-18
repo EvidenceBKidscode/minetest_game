@@ -1,7 +1,6 @@
 local player_inventory = {}
 
 function creative.init_creative_inventory(player_name)
-	print("call init")
 	player_inventory[player_name] = {
 		size = 0,
 		filter = "",
