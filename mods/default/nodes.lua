@@ -551,7 +551,7 @@ minetest.register_node("default:sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(2400,4800))
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
 	end,
 
 	on_place = function(itemstack, placer, pointed_thing)
@@ -685,7 +685,7 @@ minetest.register_node("default:junglesapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(2400,4800))
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
 	end,
 
 	on_place = function(itemstack, placer, pointed_thing)
@@ -764,7 +764,7 @@ minetest.register_node("default:pine_sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(2400,4800))
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
 	end,
 
 	on_place = function(itemstack, placer, pointed_thing)
@@ -844,7 +844,7 @@ minetest.register_node("default:acacia_sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(2400,4800))
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
 	end,
 
 	on_place = function(itemstack, placer, pointed_thing)
@@ -922,7 +922,7 @@ minetest.register_node("default:aspen_sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(2400,4800))
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
 	end,
 
 	on_place = function(itemstack, placer, pointed_thing)
@@ -1249,11 +1249,157 @@ for i = 2, 5 do
 	})
 end
 
+<<<<<<< HEAD
 minetest.register_alias("default:bush_stem", "default:tree")
 minetest.register_alias("default:bush_leaves", "default:leaves")
 minetest.register_alias("default:acacia_bush_stem", "default:acacia_tree")
 minetest.register_alias("default:acacia_bush_leaves", "default:acacia_leaves")
 minetest.register_alias("default:silver_sandstone_block", "default:steelblock")
+=======
+
+minetest.register_node("default:bush_stem", {
+	description = "Bush Stem",
+	drawtype = "plantlike",
+	visual_scale = 1.41,
+	tiles = {"default_bush_stem.png"},
+	inventory_image = "default_bush_stem.png",
+	wield_image = "default_bush_stem.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
+	sounds = default.node_sound_wood_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-7 / 16, -0.5, -7 / 16, 7 / 16, 0.5, 7 / 16},
+	},
+})
+
+minetest.register_node("default:bush_leaves", {
+	description = "Bush Leaves",
+	drawtype = "allfaces_optional",
+	waving = 1,
+	tiles = {"default_leaves_simple.png"},
+	paramtype = "light",
+	groups = {snappy = 3, flammable = 2, leaves = 1},
+	drop = {
+		max_items = 1,
+		items = {
+			{items = {"default:bush_sapling"}, rarity = 5},
+			{items = {"default:bush_leaves"}}
+		}
+	},
+	sounds = default.node_sound_leaves_defaults(),
+
+	after_place_node = default.after_place_leaves,
+})
+
+minetest.register_node("default:bush_sapling", {
+	description = "Bush Sapling",
+	drawtype = "plantlike",
+	tiles = {"default_bush_sapling.png"},
+	inventory_image = "default_bush_sapling.png",
+	wield_image = "default_bush_sapling.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	on_timer = default.grow_sapling,
+	selection_box = {
+		type = "fixed",
+		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 2 / 16, 4 / 16}
+	},
+	groups = {snappy = 2, dig_immediate = 3, flammable = 2,
+		attached_node = 1, sapling = 1},
+	sounds = default.node_sound_leaves_defaults(),
+
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
+	end,
+
+	on_place = function(itemstack, placer, pointed_thing)
+		itemstack = default.sapling_on_place(itemstack, placer, pointed_thing,
+			"default:bush_sapling",
+			-- minp, maxp to be checked, relative to sapling pos
+			{x = -1, y = 0, z = -1},
+			{x = 1, y = 1, z = 1},
+			-- maximum interval of interior volume check
+			2)
+
+		return itemstack
+	end,
+})
+
+minetest.register_node("default:acacia_bush_stem", {
+	description = "Acacia Bush Stem",
+	drawtype = "plantlike",
+	visual_scale = 1.41,
+	tiles = {"default_acacia_bush_stem.png"},
+	inventory_image = "default_acacia_bush_stem.png",
+	wield_image = "default_acacia_bush_stem.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
+	sounds = default.node_sound_wood_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-7 / 16, -0.5, -7 / 16, 7 / 16, 0.5, 7 / 16},
+	},
+})
+
+minetest.register_node("default:acacia_bush_leaves", {
+	description = "Acacia Bush Leaves",
+	drawtype = "allfaces_optional",
+	waving = 1,
+	tiles = {"default_acacia_leaves_simple.png"},
+	paramtype = "light",
+	groups = {snappy = 3, flammable = 2, leaves = 1},
+	drop = {
+		max_items = 1,
+		items = {
+			{items = {"default:acacia_bush_sapling"}, rarity = 5},
+			{items = {"default:acacia_bush_leaves"}}
+		}
+	},
+	sounds = default.node_sound_leaves_defaults(),
+
+	after_place_node = default.after_place_leaves,
+})
+
+minetest.register_node("default:acacia_bush_sapling", {
+	description = "Acacia Bush Sapling",
+	drawtype = "plantlike",
+	tiles = {"default_acacia_bush_sapling.png"},
+	inventory_image = "default_acacia_bush_sapling.png",
+	wield_image = "default_acacia_bush_sapling.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	on_timer = default.grow_sapling,
+	selection_box = {
+		type = "fixed",
+		fixed = {-3 / 16, -0.5, -3 / 16, 3 / 16, 2 / 16, 3 / 16}
+	},
+	groups = {snappy = 2, dig_immediate = 3, flammable = 2,
+		attached_node = 1, sapling = 1},
+	sounds = default.node_sound_leaves_defaults(),
+
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(math.random(300, 1500))
+	end,
+
+	on_place = function(itemstack, placer, pointed_thing)
+		itemstack = default.sapling_on_place(itemstack, placer, pointed_thing,
+			"default:acacia_bush_sapling",
+			-- minp, maxp to be checked, relative to sapling pos
+			{x = -1, y = 0, z = -1},
+			{x = 1, y = 1, z = 1},
+			-- maximum interval of interior volume check
+			2)
+
+		return itemstack
+	end,
+})
+
+>>>>>>> e5189760b385313aae8f8f3340bb93330cf99b81
 
 --
 -- Corals
@@ -1573,7 +1719,7 @@ minetest.register_node("default:lava_flowing", {
 -- Tools / "Advanced" crafting / Non-"natural"
 --
 
-local function get_chest_formspec(pos)
+function default.get_chest_formspec(pos)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
 	local formspec =
 		"size[8,9]" ..
@@ -1697,7 +1843,7 @@ function default.register_chest(name, d)
 			end
 			minetest.after(0.2, minetest.show_formspec,
 					clicker:get_player_name(),
-					"default:chest", get_chest_formspec(pos))
+					"default:chest", default.get_chest_formspec(pos))
 			open_chests[clicker:get_player_name()] = { pos = pos,
 					sound = def.sound_close, swap = name }
 		end
@@ -1719,7 +1865,7 @@ function default.register_chest(name, d)
 			minetest.show_formspec(
 				player:get_player_name(),
 				"default:chest_locked",
-				get_chest_formspec(pos)
+				default.get_chest_formspec(pos)
 			)
 		end
 		def.on_skeleton_key_use = function(pos, player, newsecret)
@@ -1764,7 +1910,7 @@ function default.register_chest(name, d)
 			end
 			minetest.after(0.2, minetest.show_formspec,
 					clicker:get_player_name(),
-					"default:chest", get_chest_formspec(pos))
+					"default:chest", default.get_chest_formspec(pos))
 			open_chests[clicker:get_player_name()] = { pos = pos,
 					sound = def.sound_close, swap = name }
 		end

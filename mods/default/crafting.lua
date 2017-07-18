@@ -145,6 +145,9 @@ minetest.register_craft({
 	}
 })
 
+-- Axes
+-- Recipes face left to match appearence in textures and inventory
+
 minetest.register_craft({
 	output = 'default:axe_diamond',
 	recipe = {
