@@ -596,7 +596,7 @@ minetest.register_chatcommand("spawn", {
 		end
 
 		player:set_pos(spawn_pos)
-		minetest.chat_send_player(name, S("Teleported to spawn!"))
+		minetest.chat_send_player(name, "Teleported to spawn!")
 	end,
 })
 
