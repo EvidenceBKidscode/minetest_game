@@ -121,6 +121,7 @@ function creative.register_tab(name, title, items)
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()
 			local is_mapmaker = minetest.check_player_privs(player_name, "mapmaker")
+			local is_teacher = minetest.check_player_privs(player_name, "teacher")
 			assert(inv)
 
 			if fields.creative_clear then
@@ -166,7 +167,7 @@ function creative.register_tab(name, title, items)
 				player_inv:set_list("main", {})
 
 			else for item in pairs(fields) do
-				  if item:find(":") then
+				  if item:find(":") and is_mapmaker and is_teacher then
 				  	if not is_mapmaker           and
 				  	  (item:find("utilities:")   or
 					   item:find("markers:")     or

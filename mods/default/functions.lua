@@ -578,3 +578,25 @@ function default.can_interact_with_node(player, pos)
 
 	return false
 end
+
+
+local spawn_pos = vector.new(0,3,0)
+local static_spawnpoint = minetest.setting_get_pos("static_spawnpoint")
+
+if static_spawnpoint then
+	spawn_pos = static_spawnpoint
+end
+
+minetest.register_chatcommand("spawn", {
+	description = "Teleport you to spawn point.",
+	func = function(name)
+		local player = minetest.get_player_by_name(name)
+		if player == nil then
+			return false
+		end
+
+		player:set_pos(spawn_pos)
+		minetest.chat_send_player(name, S("Teleported to spawn!"))
+	end,
+})
+
