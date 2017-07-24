@@ -167,7 +167,7 @@ function creative.register_tab(name, title, items)
 				player_inv:set_list("main", {})
 
 			else for item in pairs(fields) do
-				  if item:find(":") and is_mapmaker and is_teacher then
+				  if item:find(":") and (is_mapmaker or is_teacher) then
 				  	if not is_mapmaker           and
 				  	  (item:find("utilities:")   or
 					   item:find("markers:")     or
