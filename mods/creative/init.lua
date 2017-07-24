@@ -21,8 +21,8 @@ if creative_mode_cache then
 	-- To speed up digging in creative, hand 'maxlevel' and 'digtime' have been
 	-- increased such that nodes of differing levels have an insignificant
 	-- effect on digtime.
-	local digtime = 0.1
-	local caps = {times = {digtime, digtime, digtime}, uses = 0, maxlevel = 1.5}
+	local digtime = 42
+	local caps = {times = {digtime, digtime, digtime}, uses = 0, maxlevel = 256}
 
 	minetest.register_item(":", {
 		type = "none",
