@@ -67,3 +67,13 @@ function minetest.handle_node_drops(pos, drops, digger)
 		end
 	end
 end
+
+minetest.register_privilege("teacher", {
+	description = "Teacher privilege",
+	give_to_singleplayer = true,
+})
+
+minetest.register_privilege("mapmaker", {
+	description = "Mapmaker privilege",
+	give_to_singleplayer = true,
+})

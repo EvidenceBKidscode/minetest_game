@@ -167,17 +167,13 @@ function creative.register_tab(name, title, items)
 				player_inv:set_list("main", {})
 
 			else for item in pairs(fields) do
-				  if item:find(":") and (is_mapmaker or is_teacher) then
-				  	if not is_mapmaker           and
-				  	  (item:find("utilities:")   or
-					   item:find("markers:")     or
-					   item:find("audioblocks:") or
-					   item:find("nodeedit:")    or
-					   item:find("kidscode_acl:")) then
-						minetest.chat_send_player(player_name,
+				  if item:find(":") then
+				  	if not is_mapmaker and not is_teacher then
+				  		minetest.chat_send_player(player_name,
 							minetest.colorize("#FF0000",
-								"ERROR: Privilege 'mapmaker' required to get this item"))
-						return
+								"ERROR: Privilege 'mapmaker' or 'teacher'" ..
+								" required to get this item"))
+				  		return
 				  	end
 
 					local can_add = false
