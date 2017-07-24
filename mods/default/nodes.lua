@@ -136,9 +136,6 @@ default:dry_grass_3
 default:dry_grass_4
 default:dry_grass_5
 
-default:bush_leaves
-default:acacia_bush_leaves
-default:acacia_bush_sapling
 
 Corals
 ------
