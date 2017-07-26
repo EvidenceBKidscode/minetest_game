@@ -2,6 +2,10 @@
 -- Based on node_ownership
 -- License: LGPLv2+
 
+local version = "1.0"
+local modname = minetest.get_current_modname()
+minetest.log("action", "[" .. modname .. "] version " .. version .. " loaded.")
+
 areas = {}
 
 areas.adminPrivs = {areas=true}
