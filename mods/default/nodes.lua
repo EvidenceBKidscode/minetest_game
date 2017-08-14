@@ -500,7 +500,7 @@ minetest.register_node("default:ice", {
 	tiles = {"default_ice.png"},
 	is_ground_content = false,
 	paramtype = "light",
-	groups = {cracky = 3, puts_out_fire = 1, cools_lava = 1},
+	groups = {cracky = 3, puts_out_fire = 1, cools_lava = 1, slippery = 3},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -509,7 +509,7 @@ minetest.register_node("default:ice", {
 --
 
 minetest.register_node("default:tree", {
-	description = "Tree",
+	description = "Apple Tree",
 	tiles = {"default_tree_top.png", "default_tree_top.png", "default_tree.png"},
 	paramtype2 = "facedir",
 	is_ground_content = false,
@@ -520,7 +520,7 @@ minetest.register_node("default:tree", {
 })
 
 minetest.register_node("default:wood", {
-	description = "Wooden Planks",
+	description = "Apple Wood Planks",
 	paramtype2 = "facedir",
 	place_param2 = 0,
 	tiles = {"default_wood.png"},
@@ -530,7 +530,7 @@ minetest.register_node("default:wood", {
 })
 
 minetest.register_node("default:sapling", {
-	description = "Tree Sapling",
+	description = "Apple Tree Sapling",
 	drawtype = "plantlike",
 	tiles = {"default_sapling.png"},
 	inventory_image = "default_sapling.png",
@@ -566,7 +566,7 @@ minetest.register_node("default:sapling", {
 })
 
 minetest.register_node("default:leaves", {
-	description = "Tree Leaves",
+	description = "Apple Tree Leaves",
 	drawtype = "allfaces_optional",
 	waving = 1,
 	tiles = {"default_leaves.png"},
@@ -2051,7 +2051,7 @@ minetest.register_node("default:ladder_steel", {
 })
 
 default.register_fence("default:fence_wood", {
-	description = "Wooden Fence",
+	description = "Apple Wood Fence",
 	texture = "default_fence_wood.png",
 	inventory_image = "default_fence_overlay.png^default_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
 	wield_image = "default_fence_overlay.png^default_wood.png^default_fence_overlay.png^[makealpha:255,126,126",

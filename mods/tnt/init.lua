@@ -405,12 +405,6 @@ minetest.register_node("tnt:boom", {
 	walkable = false,
 	drop = "",
 	groups = {dig_immediate = 3},
-	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(0.4)
-	end,
-	on_timer = function(pos, elapsed)
-		minetest.remove_node(pos)
-	end,
 	-- unaffected by explosions
 	on_blast = function() end,
 })
@@ -513,15 +507,15 @@ minetest.register_node("tnt:gunpowder_burning", {
 	on_timer = function(pos, elapsed)
 		for dx = -1, 1 do
 		for dz = -1, 1 do
-		for dy = -1, 1 do
-			if not (dx == 0 and dz == 0) then
-				tnt.burn({
-					x = pos.x + dx,
-					y = pos.y + dy,
-					z = pos.z + dz,
-				})
+			if math.abs(dx) + math.abs(dz) == 1 then
+				for dy = -1, 1 do
+					tnt.burn({
+						x = pos.x + dx,
+						y = pos.y + dy,
+						z = pos.z + dz,
+					})
+				end
 			end
-		end
 		end
 		end
 		minetest.remove_node(pos)
