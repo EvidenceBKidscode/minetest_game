@@ -141,7 +141,11 @@ elseif rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 		get = function(self, player, context)
 			local can_worldedit = minetest.check_player_privs(player, {worldedit=true})
 			local fs = orig_get(self, player, context)
-			return fs .. (can_worldedit and "image_button[7,8;1,1;inventory_plus_worldedit_gui.png;worldedit_gui;]" or "")
+			return fs .. (can_worldedit and
+				("image_button[3.3,6.7;1.5,1.5;inventory_plus_worldedit_gui.png;worldedit_gui;]" ..
+				 "label[3.15,8.15;World Editor]" ..
+				 "box[2.95,6.4;2,2.3;#888888]") or
+				 "")
 		end
 	})
 
