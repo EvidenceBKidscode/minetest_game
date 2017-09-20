@@ -70,6 +70,7 @@ local function combine_we_privs(list)
 end
 
 worldedit.register_gui_function("worldedit_gui_about", {
+	type = "default",
 	name = "About",
 	privs = {interact=true},
 	on_select = function(name)
@@ -78,6 +79,7 @@ worldedit.register_gui_function("worldedit_gui_about", {
 })
 
 worldedit.register_gui_function("worldedit_gui_inspect", {
+	type = "advanced",
 	name = "Toggle Inspect",
 	privs = we_privs("inspect"),
 	on_select = function(name)
@@ -86,6 +88,7 @@ worldedit.register_gui_function("worldedit_gui_inspect", {
 })
 
 worldedit.register_gui_function("worldedit_gui_region", {
+	type = "advanced",
 	name = "Get/Set Region",
 	privs = combine_we_privs({"p", "pos1", "pos2", "reset", "mark", "unmark", "volume", "fixedpos"}),
 	get_formspec = function(name)
@@ -166,6 +169,7 @@ worldedit.register_gui_handler("worldedit_gui_region", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_set", {
+	type = "advanced",
 	name = "Set Nodes",
 	privs = we_privs("set"),
 	get_formspec = function(name)
@@ -195,6 +199,7 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_replace", {
+	type = "advanced",
 	name = "Replace Nodes",
 	privs = combine_we_privs({"replace", "replaceinverse"}),
 	get_formspec = function(name)
@@ -238,6 +243,7 @@ worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_sphere_dome", {
+	type = "advanced",
 	name = "Sphere/Dome",
 	privs = combine_we_privs({"hollowsphere", "sphere", "hollowdome", "dome"}),
 	get_formspec = function(name)
@@ -285,6 +291,7 @@ worldedit.register_gui_handler("worldedit_gui_sphere_dome", function(name, field
 end)
 
 worldedit.register_gui_function("worldedit_gui_cylinder", {
+	type = "advanced",
 	name = "Cylinder",
 	privs = combine_we_privs({"hollowcylinder", "cylinder"}),
 	get_formspec = function(name)
@@ -340,6 +347,7 @@ worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_pyramid", {
+	type = "advanced",
 	name = "Pyramid",
 	privs = we_privs("pyramid"),
 	get_formspec = function(name)
@@ -386,6 +394,7 @@ worldedit.register_gui_handler("worldedit_gui_pyramid", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_spiral", {
+	type = "advanced",
 	name = "Spiral",
 	privs = we_privs("spiral"),
 	get_formspec = function(name)
@@ -421,6 +430,7 @@ worldedit.register_gui_handler("worldedit_gui_spiral", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_copy_move", {
+	type = "advanced",
 	name = "Copy/Move",
 	privs = combine_we_privs({"copy", "move"}),
 	get_formspec = function(name)
@@ -455,6 +465,7 @@ worldedit.register_gui_handler("worldedit_gui_copy_move", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_stack", {
+	type = "advanced",
 	name = "Stack",
 	privs = we_privs("stack"),
 	get_formspec = function(name)
@@ -483,6 +494,7 @@ worldedit.register_gui_handler("worldedit_gui_stack", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_stretch", {
+	type = "advanced",
 	name = "Stretch",
 	privs = we_privs("stretch"),
 	get_formspec = function(name)
@@ -508,6 +520,7 @@ worldedit.register_gui_handler("worldedit_gui_stretch", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_transpose", {
+	type = "advanced",
 	name = "Transpose",
 	privs = we_privs("transpose"),
 	get_formspec = function(name)
@@ -540,6 +553,7 @@ worldedit.register_gui_handler("worldedit_gui_transpose", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_flip", {
+	type = "advanced",
 	name = "Flip",
 	privs = we_privs("flip"),
 	get_formspec = function(name)
@@ -566,6 +580,7 @@ worldedit.register_gui_handler("worldedit_gui_flip", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_rotate", {
+	type = "default",
 	name = "Rotate",
 	privs = we_privs("rotate"),
 	get_formspec = function(name)
@@ -599,6 +614,7 @@ worldedit.register_gui_handler("worldedit_gui_rotate", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_orient", {
+	type = "advanced",
 	name = "Orient",
 	privs = we_privs("orient"),
 	get_formspec = function(name)
@@ -625,6 +641,7 @@ worldedit.register_gui_handler("worldedit_gui_orient", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_fixlight", {
+	type = "advanced",
 	name = "Fix Lighting",
 	privs = we_privs("fixlight"),
 	on_select = function(name)
@@ -633,6 +650,7 @@ worldedit.register_gui_function("worldedit_gui_fixlight", {
 })
 
 worldedit.register_gui_function("worldedit_gui_hide", {
+	type = "advanced",
 	name = "Hide Region",
 	privs = we_privs("hide"),
 	on_select = function(name)
@@ -641,6 +659,7 @@ worldedit.register_gui_function("worldedit_gui_hide", {
 })
 
 worldedit.register_gui_function("worldedit_gui_suppress", {
+	type = "default",
 	name = "Suppress Nodes",
 	privs = we_privs("suppress"),
 	get_formspec = function(name)
@@ -670,6 +689,7 @@ worldedit.register_gui_handler("worldedit_gui_suppress", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_highlight", {
+	type = "advanced",
 	name = "Highlight Nodes",
 	privs = we_privs("highlight"),
 	get_formspec = function(name)
@@ -699,6 +719,7 @@ worldedit.register_gui_handler("worldedit_gui_highlight", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_restore", {
+	type = "advanced",
 	name = "Restore Region",
 	privs = we_privs("restore"),
 	on_select = function(name)
@@ -706,36 +727,81 @@ worldedit.register_gui_function("worldedit_gui_restore", {
 	end,
 })
 
+local worldpath = minetest.get_worldpath()
+
+local function scandir()
+	local i, t, popen = 0, {}, io.popen
+	local pfile = popen("ls -a " .. worldpath .. "/schems")
+
+	for filename in pfile:lines() do
+		if filename:find(".we") then
+			local name = filename:match("(.*).we")
+			i = i + 1
+			t[i] = name
+		end
+	end
+
+	pfile:close()
+	return t
+end
+
+local function rm_schem(name)
+	local file = io.popen("rm " .. worldpath .. "/schems/" .. name .. ".we")
+	file:close()
+end
+
 worldedit.register_gui_function("worldedit_gui_save_load", {
-	name = "Save/Load",
+	type = "default",
+	name = "Save / Load",
 	privs = combine_we_privs({"save", "allocate", "load"}),
 	get_formspec = function(name)
 		local filename = gui_filename[name]
+		local schems = scandir()
+
 		return "size[6,4]" .. worldedit.get_formspec_header("worldedit_gui_save_load") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_save_filename;Filename;%s]", minetest.formspec_escape(filename)) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_save_load_submit_save;Save]" ..
+			string.format("field[0.5,1.5;2.5,0.8;worldedit_gui_save_filename;New building:;%s]",
+				minetest.formspec_escape(filename)) ..
+			"label[3,0.7;Buildings:]" ..
+			"dropdown[3,1.15;2.5;worldedit_dd_schems;" .. table.concat(schems, ",") .. ";1]" ..
+			"button[0,2.5;3,0.8;worldedit_gui_save_load_submit_save;Save]" ..
 			"button_exit[3,2.5;3,0.8;worldedit_gui_save_load_submit_allocate;Allocate]" ..
-			"button_exit[0,3.5;3,0.8;worldedit_gui_save_load_submit_load;Load]"
+			"button_exit[0,3.5;3,0.8;worldedit_gui_save_load_submit_load;Load]" ..
+			"button[3,3.5;3,0.8;worldedit_gui_save_load_submit_delete;Delete]"
 	end,
 })
 
 worldedit.register_gui_handler("worldedit_gui_save_load", function(name, fields)
-	if fields.worldedit_gui_save_load_submit_save or fields.worldedit_gui_save_load_submit_allocate or fields.worldedit_gui_save_load_submit_load then
-		gui_filename[name] = tostring(fields.worldedit_gui_save_filename)
+	if fields.worldedit_gui_save_load_submit_save     or
+	   fields.worldedit_gui_save_load_submit_allocate or
+	   fields.worldedit_gui_save_load_submit_load     or
+	   fields.worldedit_gui_save_load_submit_delete   then
+
 		worldedit.show_page(name, "worldedit_gui_save_load")
+
 		if fields.worldedit_gui_save_load_submit_save then
+			gui_filename[name] = tostring(fields.worldedit_gui_save_filename)
 			minetest.chatcommands["/save"].func(name, gui_filename[name])
+			worldedit.show_page(name, "worldedit_gui_save_load")
 		elseif fields.worldedit_gui_save_load_submit_allocate then
+			gui_filename[name] = tostring(fields.worldedit_dd_schems)
 			minetest.chatcommands["/allocate"].func(name, gui_filename[name])
-		else --fields.worldedit_gui_save_load_submit_load
+		elseif fields.worldedit_gui_save_load_submit_load then
+			gui_filename[name] = tostring(fields.worldedit_dd_schems)
 			minetest.chatcommands["/load"].func(name, gui_filename[name])
+		else
+			gui_filename[name] = tostring(fields.worldedit_dd_schems)
+			rm_schem(gui_filename[name])
+			worldedit.show_page(name, "worldedit_gui_save_load")
 		end
+
 		return true
 	end
+
 	return false
 end)
 
 worldedit.register_gui_function("worldedit_gui_cube", {
+	type = "advanced",
 	name = "Cuboid", -- technically the command is misnamed, I know...
 	privs = combine_we_privs({"hollowcube", "cube"}),
 	get_formspec = function(name)
@@ -782,6 +848,7 @@ worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_clearobjects", {
+	type = "advanced",
 	name = "Clear Objects",
 	privs = we_privs("clearobjects"),
 	on_select = function(name)
