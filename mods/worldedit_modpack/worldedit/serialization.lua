@@ -231,13 +231,21 @@ function worldedit.deserialize(origin_pos, value, backup, name)
 	local count = 0
 	local f = {x = 0, y = 0, z = 0}
 
-	if backup and worldedit.pos1[name] and worldedit.pos2[name] then
+	local file_pos = io.open(minetest.get_worldpath() .. "/schems/backup_pos_" .. name, "r")
+	local content = file_pos:read("*a")
+	file_pos:close()
+
+	local pos_markers = minetest.deserialize(content)
+	local pos_marker1 = pos_markers.marker1
+	local pos_marker2 = pos_markers.marker2
+
+	if backup and pos_marker1 and pos_marker2 then
 		for i, entry in ipairs(nodes) do
 			if entry.x > f.x then
 				f.x = entry.x
 			end
 
-			if worldedit.pos1[name].y > worldedit.pos2[name].y then
+			if pos_marker1.y > pos_marker2.y then
 				f.y = entry.y
 			end
 
@@ -246,11 +254,11 @@ function worldedit.deserialize(origin_pos, value, backup, name)
 			end
 		end
 
-		if worldedit.pos1[name].x < worldedit.pos2[name].x then
+		if pos_marker1.x < pos_marker2.x then
 			f.x = 0
 		end
 
-		if worldedit.pos1[name].z < worldedit.pos2[name].z then
+		if pos_marker1.z < pos_marker2.z then
 			f.z = 0
 		end
 	end

@@ -70,7 +70,7 @@ local function save_region(name, param, backup)
 	-- Create directory if it does not already exist
 	mkdir(path)
 
-	local filename = path .. "/" .. (backup and name or param) .. ".we"
+	local filename = path .. "/" .. (backup and "backup_" .. name or param) .. ".we"
 
 	local f = io.open(filename, "r")
 	if f then
@@ -89,13 +89,26 @@ local function save_region(name, param, backup)
 	file2:flush()
 	file2:close()
 
-	if not backup then
+	if backup then
+		local file_pos = io.open(minetest.get_worldpath() .. "/schems/backup_pos_" .. name, "w")
+		local pos = {
+			marker1 = worldedit.pos1[name],
+			marker2 = worldedit.pos2[name],
+		}
+
+		file_pos:write(minetest.serialize(pos))
+		file_pos:close()
+	else
 		worldedit.player_notify(name, count .. " nodes saved")
 	end
 end
 
 local function load_region(name, param, backup)
-	local pos = get_position(name)
+	local file_pos = io.open(minetest.get_worldpath() .. "/schems/backup_pos_" .. name, "r")
+	local content = file_pos:read("*a")
+	file_pos:close()
+
+	local pos = minetest.deserialize(content).marker1
 	if not pos then return end
 
 	if not backup and param == "" then
@@ -110,9 +123,9 @@ local function load_region(name, param, backup)
 
 	--find the file in the world path
 	local testpaths = {
-		minetest.get_worldpath() .. "/schems/" .. (backup and name or param),
-		minetest.get_worldpath() .. "/schems/" .. (backup and name or param) .. ".we",
-		minetest.get_worldpath() .. "/schems/" .. (backup and name or param) .. ".wem",
+		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param),
+		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param) .. ".we",
+		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param) .. ".wem",
 	}
 
 	local file, err
@@ -122,7 +135,8 @@ local function load_region(name, param, backup)
 	end
 
 	if err then
-		worldedit.player_notify(name, "could not open file \"" .. (backup and name or param) .. "\"")
+		worldedit.player_notify(name, "could not open file \"" ..
+			(backup and "backup_" .. name or param) .. "\"")
 		return
 	end
 
