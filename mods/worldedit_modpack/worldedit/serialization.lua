@@ -192,13 +192,14 @@ function worldedit.allocate(origin_pos, value)
 	return worldedit.allocate_with_nodes(origin_pos, nodes)
 end
 
+local huge = math.huge
 
 -- Internal
 function worldedit.allocate_with_nodes(origin_pos, nodes)
-	local huge = math.huge
 	local pos1x, pos1y, pos1z = huge, huge, huge
 	local pos2x, pos2y, pos2z = -huge, -huge, -huge
 	local origin_x, origin_y, origin_z = origin_pos.x, origin_pos.y, origin_pos.z
+
 	for i, entry in ipairs(nodes) do
 		local x, y, z = origin_x + entry.x, origin_y + entry.y, origin_z + entry.z
 		if x < pos1x then pos1x = x end
@@ -208,15 +209,18 @@ function worldedit.allocate_with_nodes(origin_pos, nodes)
 		if y > pos2y then pos2y = y end
 		if z > pos2z then pos2z = z end
 	end
+
 	local pos1 = {x=pos1x, y=pos1y, z=pos1z}
 	local pos2 = {x=pos2x, y=pos2y, z=pos2z}
+
 	return pos1, pos2, #nodes
 end
 
+local add_node, get_meta = minetest.add_node, minetest.get_meta
 
 --- Loads the nodes represented by string `value` at position `origin_pos`.
 -- @return The number of nodes deserialized.
-function worldedit.deserialize(origin_pos, value)
+function worldedit.deserialize(origin_pos, value, backup, name)
 	local nodes = load_schematic(value)
 	if not nodes then return nil end
 
@@ -225,15 +229,45 @@ function worldedit.deserialize(origin_pos, value)
 
 	local origin_x, origin_y, origin_z = origin_pos.x, origin_pos.y, origin_pos.z
 	local count = 0
-	local add_node, get_meta = minetest.add_node, minetest.get_meta
+	local f = {x = 0, y = 0, z = 0}
+
+	if backup and worldedit.pos1[name] and worldedit.pos2[name] then
+		for i, entry in ipairs(nodes) do
+			if entry.x > f.x then
+				f.x = entry.x
+			end
+
+			if worldedit.pos1[name].y > worldedit.pos2[name].y then
+				f.y = entry.y
+			end
+
+			if entry.z > f.z then
+				f.z = entry.z
+			end
+		end
+
+		if worldedit.pos1[name].x < worldedit.pos2[name].x then
+			f.x = 0
+		end
+
+		if worldedit.pos1[name].z < worldedit.pos2[name].z then
+			f.z = 0
+		end
+	end
+
 	for i, entry in ipairs(nodes) do
-		entry.x, entry.y, entry.z = origin_x + entry.x, origin_y + entry.y, origin_z + entry.z
+		entry.x, entry.y, entry.z =
+			origin_x + entry.x - (backup and f.x or 0),
+			origin_y + entry.y - (backup and f.y or 0),
+			origin_z + entry.z - (backup and f.z or 0)
+
 		-- Entry acts as both position and node
 		add_node(entry, entry)
 		if entry.meta then
 			get_meta(entry):from_table(entry.meta)
 		end
 	end
+
 	return #nodes
 end
 

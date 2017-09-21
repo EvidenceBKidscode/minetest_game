@@ -128,4 +128,3 @@ function worldedit.restore(pos1, pos2)
 	end
 	return #nodes
 end
-

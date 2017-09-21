@@ -662,14 +662,8 @@ worldedit.register_gui_function("worldedit_gui_suppress", {
 	type = "default",
 	name = "Suppress Nodes",
 	privs = we_privs("suppress"),
-	get_formspec = function(name)
-		local node = gui_nodename1[name]
-		local nodename = worldedit.normalize_nodename(node)
-		return "size[6.5,3]" .. worldedit.get_formspec_header("worldedit_gui_suppress") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_suppress_node;Name;%s]", minetest.formspec_escape(node)) ..
-			"button[4,1.18;1.5,0.8;worldedit_gui_suppress_search;Search]" ..
-			formspec_node("5.5,1.1", nodename) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_suppress_submit;Suppress Nodes]"
+	on_select = function(name)
+		minetest.chatcommands["/suppress"].func(name)
 	end,
 })
 
@@ -678,10 +672,7 @@ worldedit.register_gui_handler("worldedit_gui_suppress", function(name, fields)
 		gui_nodename1[name] = tostring(fields.worldedit_gui_suppress_node)
 		worldedit.show_page(name, "worldedit_gui_suppress")
 		if fields.worldedit_gui_suppress_submit then
-			local n = worldedit.normalize_nodename(gui_nodename1[name])
-			if n then
-				minetest.chatcommands["/suppress"].func(name, n)
-			end
+			minetest.chatcommands["/suppress"].func(name)
 		end
 		return true
 	end
@@ -771,11 +762,15 @@ worldedit.register_gui_function("worldedit_gui_save_load", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_save_load", function(name, fields)
+	if fields.worldedit_dd_schems then
+		worldedit.show_page(name, "worldedit_gui_save_load")
+		return true
+	end
+
 	if fields.worldedit_gui_save_load_submit_save     or
 	   fields.worldedit_gui_save_load_submit_allocate or
 	   fields.worldedit_gui_save_load_submit_load     or
 	   fields.worldedit_gui_save_load_submit_delete   then
-
 		worldedit.show_page(name, "worldedit_gui_save_load")
 
 		if fields.worldedit_gui_save_load_submit_save then
@@ -788,7 +783,7 @@ worldedit.register_gui_handler("worldedit_gui_save_load", function(name, fields)
 		elseif fields.worldedit_gui_save_load_submit_load then
 			gui_filename[name] = tostring(fields.worldedit_dd_schems)
 			minetest.chatcommands["/load"].func(name, gui_filename[name])
-		else
+		elseif fields.worldedit_gui_save_load_submit_delete then
 			gui_filename[name] = tostring(fields.worldedit_dd_schems)
 			rm_schem(gui_filename[name])
 			worldedit.show_page(name, "worldedit_gui_save_load")
@@ -853,5 +848,14 @@ worldedit.register_gui_function("worldedit_gui_clearobjects", {
 	privs = we_privs("clearobjects"),
 	on_select = function(name)
 		minetest.chatcommands["/clearobjects"].func(name, "")
+	end,
+})
+
+worldedit.register_gui_function("worldedit_gui_undo", {
+	type = "default",
+	name = "Undo",
+	privs = we_privs("undo"),
+	on_select = function(name)
+		minetest.chatcommands["/undo"].func(name, "")
 	end,
 })
