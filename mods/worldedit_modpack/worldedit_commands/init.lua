@@ -10,6 +10,8 @@ if minetest.place_schematic then
 	worldedit.prob_list = {}
 end
 
+local worldpath = minetest.get_worldpath()
+
 dofile(minetest.get_modpath("worldedit_commands") .. "/cuboid.lua")
 dofile(minetest.get_modpath("worldedit_commands") .. "/mark.lua")
 dofile(minetest.get_modpath("worldedit_commands") .. "/hammer.lua")
@@ -66,7 +68,7 @@ local function save_region(name, param, backup)
 
 	local result, count = worldedit.serialize(worldedit.pos1[name], worldedit.pos2[name])
 
-	local path = minetest.get_worldpath() .. "/schems"
+	local path = worldpath .. "/schems"
 	-- Create directory if it does not already exist
 	mkdir(path)
 
@@ -90,7 +92,7 @@ local function save_region(name, param, backup)
 	file2:close()
 
 	if backup then
-		local file_pos = io.open(minetest.get_worldpath() .. "/schems/backup_pos_" .. name, "w")
+		local file_pos = io.open(worldpath .. "/schems/backup_pos_" .. name, "w")
 		local pos = {
 			marker1 = worldedit.pos1[name],
 			marker2 = worldedit.pos2[name],
@@ -104,11 +106,16 @@ local function save_region(name, param, backup)
 end
 
 local function load_region(name, param, backup)
-	local file_pos = io.open(minetest.get_worldpath() .. "/schems/backup_pos_" .. name, "r")
-	local content = file_pos:read("*a")
-	file_pos:close()
+	local pos = get_position(name)
+	if backup then
+		local file_pos = io.open(worldpath .. "/schems/backup_pos_" .. name, "r")
+		if file_pos then
+			local content = file_pos:read("*a")
+			file_pos:close()
+			pos = minetest.deserialize(content).marker1
+		end
+	end
 
-	local pos = minetest.deserialize(content).marker1
 	if not pos then return end
 
 	if not backup and param == "" then
@@ -123,9 +130,9 @@ local function load_region(name, param, backup)
 
 	--find the file in the world path
 	local testpaths = {
-		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param),
-		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param) .. ".we",
-		minetest.get_worldpath() .. "/schems/" .. (backup and "backup_" .. name or param) .. ".wem",
+		worldpath .. "/schems/" .. (backup and "backup_" .. name or param),
+		worldpath .. "/schems/" .. (backup and "backup_" .. name or param) .. ".we",
+		worldpath .. "/schems/" .. (backup and "backup_" .. name or param) .. ".wem",
 	}
 
 	local file, err
@@ -152,7 +159,7 @@ local function load_region(name, param, backup)
 		return
 	end
 
-	local count = worldedit.deserialize(pos, value, true, name)
+	local count = worldedit.deserialize(pos, value, backup, name)
 	worldedit.player_notify(name, count .. " nodes loaded")
 end
 
@@ -1236,7 +1243,7 @@ minetest.register_chatcommand("/allocate", {
 			return
 		end
 
-		local filename = minetest.get_worldpath() .. "/schems/" .. param .. ".we"
+		local filename = worldpath .. "/schems/" .. param .. ".we"
 		local file, err = io.open(filename, "rb")
 		if err ~= nil then
 			worldedit.player_notify(name, "could not open file \"" .. filename .. "\"")
@@ -1319,7 +1326,7 @@ minetest.register_chatcommand("/mtschemcreate", {
 			return
 		end
 
-		local path = minetest.get_worldpath() .. "/schems"
+		local path = worldpath .. "/schems"
 		-- Create directory if it does not already exist
 		mkdir(path)
 
@@ -1353,7 +1360,7 @@ minetest.register_chatcommand("/mtschemplace", {
 		local pos = get_position(name)
 		if pos == nil then return end
 
-		local path = minetest.get_worldpath() .. "/schems/" .. param .. ".mts"
+		local path = worldpath .. "/schems/" .. param .. ".mts"
 		if minetest.place_schematic(pos, path) == nil then
 			worldedit.player_notify(name, "failed to place Minetest schematic", false)
 		else
