@@ -55,7 +55,8 @@ worldedit.register_gui_handler = function(identifier, handler)
 			return true
 		elseif fields.worldedit_dd_schems and
 				not fields.worldedit_gui_save_load_submit_delete and
-				not fields.worldedit_gui_save_load_submit_save then
+				not fields.worldedit_gui_save_load_submit_save   and
+				not fields.worldedit_gui_save_load_submit_load then
 			worldedit.show_page(name, "worldedit_gui_save_load")
 			return true
 		end
@@ -203,7 +204,7 @@ elseif rawget(_G, "teacher_menu") then --fallback button
 	end
 end
 
-local function get_formspec_str(y, columns, width, buttons)
+local function get_formspec_str(y, columns, width, buttons, name)
 	return string.format(
 		"size[%g,%g]", math.max(columns * width, 5),
 			       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
@@ -253,7 +254,7 @@ worldedit.register_gui_function("worldedit_gui", {
 			y = y - height
 		end
 
-		return get_formspec_str(y, columns, width, buttons)
+		return get_formspec_str(y, columns, width, buttons, name)
 	end,
 })
 
@@ -323,7 +324,7 @@ worldedit.register_gui_function("worldedit_gui_forms", {
 			y = y - height
 		end
 
-		return get_formspec_str(y, columns, width, buttons)
+		return get_formspec_str(y, columns, width, buttons, name)
 	end,
 })
 
