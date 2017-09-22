@@ -70,7 +70,7 @@ local function combine_we_privs(list)
 end
 
 worldedit.register_gui_function("worldedit_gui_about", {
-	type = "default",
+	type = "advanced",
 	name = "About",
 	privs = {interact=true},
 	on_select = function(name)
@@ -199,7 +199,7 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_replace", {
-	type = "advanced",
+	type = "default",
 	name = "Replace Nodes",
 	privs = combine_we_privs({"replace", "replaceinverse"}),
 	get_formspec = function(name)
@@ -245,6 +245,7 @@ end)
 worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 	type = "advanced",
 	name = "Sphere/Dome",
+	form = true,
 	privs = combine_we_privs({"hollowsphere", "sphere", "hollowdome", "dome"}),
 	get_formspec = function(name)
 		local node, radius = gui_nodename1[name], gui_distance2[name]
@@ -293,6 +294,7 @@ end)
 worldedit.register_gui_function("worldedit_gui_cylinder", {
 	type = "advanced",
 	name = "Cylinder",
+	form = true,
 	privs = combine_we_privs({"hollowcylinder", "cylinder"}),
 	get_formspec = function(name)
 		local node, axis, length = gui_nodename1[name], gui_axis1[name], gui_distance1[name]
@@ -349,6 +351,7 @@ end)
 worldedit.register_gui_function("worldedit_gui_pyramid", {
 	type = "advanced",
 	name = "Pyramid",
+	form = true,
 	privs = we_privs("pyramid"),
 	get_formspec = function(name)
 		local node, axis, length = gui_nodename1[name], gui_axis1[name], gui_distance1[name]
@@ -396,6 +399,7 @@ end)
 worldedit.register_gui_function("worldedit_gui_spiral", {
 	type = "advanced",
 	name = "Spiral",
+	form = true,
 	privs = we_privs("spiral"),
 	get_formspec = function(name)
 		local node, length, height, space = gui_nodename1[name], gui_distance1[name], gui_distance2[name], gui_distance3[name]
@@ -431,7 +435,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_copy_move", {
 	type = "advanced",
-	name = "Copy/Move",
+	name = "Copy / Move",
 	privs = combine_we_privs({"copy", "move"}),
 	get_formspec = function(name)
 		local axis = gui_axis1[name] or 4
@@ -743,7 +747,7 @@ end
 
 worldedit.register_gui_function("worldedit_gui_save_load", {
 	type = "default",
-	name = "Save / Load",
+	name = "Copy / Paste",
 	privs = combine_we_privs({"save", "allocate", "load"}),
 	get_formspec = function(name)
 		local filename = gui_filename[name]
@@ -792,6 +796,7 @@ end)
 worldedit.register_gui_function("worldedit_gui_cube", {
 	type = "advanced",
 	name = "Cuboid", -- technically the command is misnamed, I know...
+	form = true,
 	privs = combine_we_privs({"hollowcube", "cube"}),
 	get_formspec = function(name)
 		local width, height, length = gui_distance1[name], gui_distance2[name], gui_distance3[name]
@@ -847,7 +852,7 @@ worldedit.register_gui_function("worldedit_gui_clearobjects", {
 
 worldedit.register_gui_function("worldedit_gui_undo", {
 	type = "default",
-	name = "Undo",
+	name = "Cancel Action",
 	privs = we_privs("undo"),
 	on_select = function(name)
 		minetest.chatcommands["/undo"].func(name, "")

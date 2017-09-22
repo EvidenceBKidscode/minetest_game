@@ -211,13 +211,13 @@ worldedit.register_gui_function("worldedit_gui", {
 		--create a form with all the buttons arranged in a grid
 		local buttons, x, y, index = {}, 0, 2, 0
 		local width, height = 3, 0.8
-		local columns = 5
+		local columns = mode[name] == "default" and 5 or 3
 
 		for i = 1, #identifiers do
 			local identifier = identifiers[i]
 			if identifier ~= "worldedit_gui" then
 				local entry = worldedit.pages[identifier]
-				if entry.type ~= mode[name] then
+				if entry.type ~= mode[name] and not entry.form then
 					buttons[#buttons + 1] =
 						string.format((entry.get_formspec and "button" or "button_exit") ..
 						"[%g,%g;%g,%g;%s;%s]",
@@ -238,11 +238,12 @@ worldedit.register_gui_function("worldedit_gui", {
 
 		return string.format(
 			"size[%g,%g]", math.max(columns * width, 5),
-				       math.max(y + 0.5, (mode[name] == "default" and 5 or 2.5))) ..
-			"image[" .. (columns * (width / 2) - 1) .. ",-0.2;1.5,1.5;worldedit_hammer.png]" ..
-			"label[" .. (columns * (width / 2) - 6) .. ",1;" ..
+				       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
+			"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
+			"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
+				minetest.wrap_text(
 				"Use the hammer from your inventory to select an area,"..
-				" then choose one of these functionalities" .. "]" ..
+				" then choose one of these functionalities...", 50, false) .. "]" ..
 			"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
 			"label[2,0;WorldEdit GUI]" ..
 			table.concat(buttons) ..
@@ -279,6 +280,83 @@ worldedit.register_gui_handler("worldedit_gui", function(name, fields)
 
 				return true
 			end
+		end
+	end
+
+	return false
+end)
+
+worldedit.register_gui_function("worldedit_gui_forms", {
+	type = "default",
+	name = "Forms",
+	privs = {worldedit=true},
+	get_formspec = function(name)
+		--create a form with all the buttons arranged in a grid
+		local buttons, x, y, index = {}, 0, 2, 0
+		local width, height = 3, 0.8
+		local columns = mode[name] == "default" and 5 or 3
+
+		for i = 1, #identifiers do
+			local identifier = identifiers[i]
+			if identifier ~= "worldedit_gui" then
+				local entry = worldedit.pages[identifier]
+				if entry.form then
+					buttons[#buttons + 1] =
+						string.format((entry.get_formspec and "button" or "button_exit") ..
+						"[%g,%g;%g,%g;%s;%s]",
+						x, y, width, height, identifier, minetest.formspec_escape(entry.name))
+
+					index, x = index + 1, x + width
+					if index == columns then --row is full
+						x, y = 0, y + height
+						index = 0
+					end
+				end
+			end
+		end
+
+		if index == 0 then --empty row
+			y = y - height
+		end
+
+		return string.format(
+			"size[%g,%g]", math.max(columns * width, 5),
+				       math.max(y + 0.5, (mode[name] == "default" and 5 or 2.5))) ..
+			"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
+			"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
+				minetest.wrap_text(
+				"Use the hammer from your inventory to select an area,"..
+				" then choose one of these functionalities...", 50, false) .. "]" ..
+			"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
+			"label[2,0;WorldEdit GUI]" ..
+			table.concat(buttons) ..
+			"button[" .. (math.max(columns * width, 5) - 2) ..
+				",0;2,0.5;worldedit_gui_advanced;" ..
+				(mode[name] == "default" and "Basic" or "Advanced") .. "]"
+	end,
+})
+
+worldedit.register_gui_handler("worldedit_gui_forms", function(name, fields)
+	for identifier, entry in pairs(worldedit.pages) do --check for WorldEdit GUI main formspec button selection
+		if fields[identifier] and identifier ~= "worldedit_gui" then
+			--ensure player has permission to perform action
+			local has_privs, missing_privs = minetest.check_player_privs(name, entry.privs)
+			if not has_privs then
+				worldedit.player_notify(name,
+					"you are not allowed to use this function (missing privileges: " ..
+					table.concat(missing_privs, ", ") .. ")")
+				return false
+			end
+
+			if entry.on_select then
+				entry.on_select(name)
+			end
+
+			if entry.get_formspec then
+				worldedit.show_page(name, identifier)
+			end
+
+			return true
 		end
 	end
 
