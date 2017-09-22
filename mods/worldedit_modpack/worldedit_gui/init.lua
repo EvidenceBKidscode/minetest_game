@@ -52,6 +52,7 @@ worldedit.register_gui_handler = function(identifier, handler)
 		local name = player:get_player_name()
 		if fields.worldedit_gui then
 			worldedit.show_page(name, "worldedit_gui")
+			return true
 		elseif fields.worldedit_dd_schems and
 				not fields.worldedit_gui_save_load_submit_delete and
 				not fields.worldedit_gui_save_load_submit_save then
