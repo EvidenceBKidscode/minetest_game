@@ -203,6 +203,23 @@ elseif rawget(_G, "teacher_menu") then --fallback button
 	end
 end
 
+local function get_formspec_str(y, columns, width, buttons)
+	return string.format(
+		"size[%g,%g]", math.max(columns * width, 5),
+			       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
+		"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
+		"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
+			minetest.wrap_text(
+			"Use the hammer from your inventory to select an area,"..
+			" then choose one of these functionalities...", 50, false) .. "]" ..
+		"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
+		"label[2,0;WorldEdit GUI]" ..
+		table.concat(buttons) ..
+		"button[" .. (math.max(columns * width, 5) - 2) ..
+			",0;2,0.5;worldedit_gui_advanced;" ..
+			(mode[name] == "default" and "Basic" or "Advanced") .. "]"
+end
+
 worldedit.register_gui_function("worldedit_gui", {
 	type = "default",
 	name = "WorldEdit GUI",
@@ -236,20 +253,7 @@ worldedit.register_gui_function("worldedit_gui", {
 			y = y - height
 		end
 
-		return string.format(
-			"size[%g,%g]", math.max(columns * width, 5),
-				       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
-			"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
-			"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
-				minetest.wrap_text(
-				"Use the hammer from your inventory to select an area,"..
-				" then choose one of these functionalities...", 50, false) .. "]" ..
-			"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
-			"label[2,0;WorldEdit GUI]" ..
-			table.concat(buttons) ..
-			"button[" .. (math.max(columns * width, 5) - 2) ..
-				",0;2,0.5;worldedit_gui_advanced;" ..
-				(mode[name] == "default" and "Basic" or "Advanced") .. "]"
+		return get_formspec_str(y, columns, width, buttons)
 	end,
 })
 
@@ -319,20 +323,7 @@ worldedit.register_gui_function("worldedit_gui_forms", {
 			y = y - height
 		end
 
-		return string.format(
-			"size[%g,%g]", math.max(columns * width, 5),
-				       math.max(y + 0.5, (mode[name] == "default" and 5 or 2.5))) ..
-			"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
-			"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
-				minetest.wrap_text(
-				"Use the hammer from your inventory to select an area,"..
-				" then choose one of these functionalities...", 50, false) .. "]" ..
-			"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
-			"label[2,0;WorldEdit GUI]" ..
-			table.concat(buttons) ..
-			"button[" .. (math.max(columns * width, 5) - 2) ..
-				",0;2,0.5;worldedit_gui_advanced;" ..
-				(mode[name] == "default" and "Basic" or "Advanced") .. "]"
+		return get_formspec_str(y, columns, width, buttons)
 	end,
 })
 
