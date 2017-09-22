@@ -762,11 +762,6 @@ worldedit.register_gui_function("worldedit_gui_save_load", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_save_load", function(name, fields)
-	if fields.worldedit_dd_schems then
-		worldedit.show_page(name, "worldedit_gui_save_load")
-		return true
-	end
-
 	if fields.worldedit_gui_save_load_submit_save     or
 	   fields.worldedit_gui_save_load_submit_allocate or
 	   fields.worldedit_gui_save_load_submit_load     or
