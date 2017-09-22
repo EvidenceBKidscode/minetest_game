@@ -49,10 +49,19 @@ Example:
 worldedit.register_gui_handler = function(identifier, handler)
 	local enabled = true
 	minetest.register_on_player_receive_fields(function(player, formname, fields)
+		local name = player:get_player_name()
+		if fields.worldedit_gui then
+			worldedit.show_page(name, "worldedit_gui")
+		elseif fields.worldedit_dd_schems and
+				not fields.worldedit_gui_save_load_submit_delete and
+				not fields.worldedit_gui_save_load_submit_save then
+			worldedit.show_page(name, "worldedit_gui_save_load")
+			return true
+		end
+
 		if not enabled then return false end
 		enabled = false
 		minetest.after(0.2, function() enabled = true end)
-		local name = player:get_player_name()
 
 		--ensure the player has permission to perform the action
 		local entry = worldedit.pages[identifier]
@@ -85,7 +94,7 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 			local can_worldedit = minetest.check_player_privs(player, {worldedit=true})
 			local fs = orig_get(self, player, context)
 
-			if teachers[player:get_player_name()].current_tab == "user_settings" then	
+			if teachers[player:get_player_name()].current_tab == "world" then	
 				return fs .. (can_worldedit and
 					("image_button[3.3,6.7;1.5,1.5;inventory_plus_worldedit_gui.png;worldedit_gui;]" ..
 					 "label[3.15,8.15;World Editor]" ..

@@ -766,7 +766,6 @@ worldedit.register_gui_handler("worldedit_gui_save_load", function(name, fields)
 	   fields.worldedit_gui_save_load_submit_allocate or
 	   fields.worldedit_gui_save_load_submit_load     or
 	   fields.worldedit_gui_save_load_submit_delete   then
-		worldedit.show_page(name, "worldedit_gui_save_load")
 
 		if fields.worldedit_gui_save_load_submit_save then
 			gui_filename[name] = tostring(fields.worldedit_gui_save_filename)
