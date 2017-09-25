@@ -110,14 +110,12 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 
 	--show the form when the button is pressed and hide it when done
 	minetest.register_on_player_receive_fields(function(player, formname, fields)
-		if fields.worldedit_gui then --main page
+		if fields.worldedit_gui or fields.worldedit_gui_exit_ then --main page
 			worldedit.show_page(player:get_player_name(), "worldedit_gui")
 			return true
 		elseif fields.worldedit_gui_exit then --return to original page
-			sfinv.set_page(player, "teacher_menu")
-			return true
-		elseif fields.worldedit_gui_exit_ then --return to original page
-			worldedit.show_page(player:get_player_name(), "worldedit_gui")
+			teachers[player:get_player_name()].current_tab = "world"
+			sfinv.set_player_inventory_formspec(player, sfinv.get_or_create_context(player))
 			return true
 		end
 		return false
