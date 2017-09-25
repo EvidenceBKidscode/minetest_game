@@ -66,7 +66,7 @@ function worldedit.serialize(pos1, pos2)
 			pos.z = pos1.z
 			while pos.z <= pos2.z do
 				local node = get_node(pos)
-				if node.name ~= "air" and node.name ~= "ignore" then
+				if node.name ~= "ignore" then
 					count = count + 1
 					local meta = get_meta(pos):to_table()
 

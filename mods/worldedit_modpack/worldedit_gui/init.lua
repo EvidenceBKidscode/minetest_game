@@ -116,6 +116,9 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 		elseif fields.worldedit_gui_exit then --return to original page
 			sfinv.set_page(player, "teacher_menu")
 			return true
+		elseif fields.worldedit_gui_exit_ then --return to original page
+			worldedit.show_page(player:get_player_name(), "worldedit_gui")
+			return true
 		end
 		return false
 	end)
@@ -204,7 +207,7 @@ elseif rawget(_G, "teacher_menu") then --fallback button
 	end
 end
 
-local function get_formspec_str(y, columns, width, buttons, name)
+local function get_formspec_str(main, y, columns, width, buttons, name)
 	return string.format(
 		"size[%g,%g]", math.max(columns * width, 5),
 			       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
@@ -213,7 +216,7 @@ local function get_formspec_str(y, columns, width, buttons, name)
 			minetest.wrap_text(
 			"Use the hammer from your inventory to select an area,"..
 			" then choose one of these functionalities...", 50, false) .. "]" ..
-		"button[0,0;2,0.5;worldedit_gui_exit;< Back]" ..
+		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") .. ";< Back]" ..
 		"label[2,0;WorldEdit GUI]" ..
 		table.concat(buttons) ..
 		"button[" .. (math.max(columns * width, 5) - 2) ..
@@ -254,7 +257,7 @@ worldedit.register_gui_function("worldedit_gui", {
 			y = y - height
 		end
 
-		return get_formspec_str(y, columns, width, buttons, name)
+		return get_formspec_str(true, y, columns, width, buttons, name)
 	end,
 })
 
@@ -324,7 +327,7 @@ worldedit.register_gui_function("worldedit_gui_forms", {
 			y = y - height
 		end
 
-		return get_formspec_str(y, columns, width, buttons, name)
+		return get_formspec_str(false, y, columns, width, buttons, name)
 	end,
 })
 
