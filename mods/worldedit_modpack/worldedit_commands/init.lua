@@ -1069,7 +1069,6 @@ minetest.register_chatcommand("/rotate", {
 	description = "Rotate the current WorldEdit region around the axis <axis> by angle <angle> (90 degree increment)",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local found, _, axis, angle = param:find("^([xyz%?])%s+([+-]?%d+)$")
 		if axis == "?" then axis = worldedit.player_axis(name) end
