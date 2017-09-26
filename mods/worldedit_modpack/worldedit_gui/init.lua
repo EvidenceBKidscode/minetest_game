@@ -22,11 +22,15 @@ The `on_select` function must not call `worldedit.show_page`
 ]]
 
 worldedit.pages = {} --mapping of identifiers to options
+worldedit.items = {}
+
 local identifiers = {} --ordered list of identifiers
 local mode = {}
 
 minetest.register_on_joinplayer(function(player)
-	mode[player:get_player_name()] = "advanced"
+	local name = player:get_player_name()
+	mode[name] = "advanced"
+	worldedit.items[name] = {}
 end)
 
 worldedit.register_gui_function = function(identifier, options)
@@ -50,14 +54,9 @@ worldedit.register_gui_handler = function(identifier, handler)
 	local enabled = true
 	minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local name = player:get_player_name()
+
 		if fields.worldedit_gui then
 			worldedit.show_page(name, "worldedit_gui")
-			return true
-		elseif fields.worldedit_dd_schems and
-				not fields.worldedit_gui_save_load_submit_delete and
-				not fields.worldedit_gui_save_load_submit_save   and
-				not fields.worldedit_gui_save_load_submit_load then
-			worldedit.show_page(name, "worldedit_gui_save_load")
 			return true
 		end
 
@@ -110,11 +109,17 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 
 	--show the form when the button is pressed and hide it when done
 	minetest.register_on_player_receive_fields(function(player, formname, fields)
+		local player_name = player:get_player_name()
+
 		if fields.worldedit_gui or fields.worldedit_gui_exit_ then --main page
-			worldedit.show_page(player:get_player_name(), "worldedit_gui")
+			worldedit.show_page(player_name, "worldedit_gui")
 			return true
 		elseif fields.worldedit_gui_exit then --return to original page
-			teachers[player:get_player_name()].current_tab = "world"
+			if not teachers[player_name] then
+				teachers[player_name] = {}
+			end
+
+			teachers[player_name].current_tab = "world"
 			sfinv.set_player_inventory_formspec(player, sfinv.get_or_create_context(player))
 			return true
 		end

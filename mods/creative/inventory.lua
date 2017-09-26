@@ -117,6 +117,7 @@ function creative.register_tab(name, title, items)
 		end,
 
 		on_player_receive_fields = function(self, player, context, fields)
+			if self.name ~= "creative:all" then return end
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()

@@ -623,7 +623,6 @@ minetest.register_chatcommand("/hollowcube", {
 	description = "Add a hollow cube with its ground level centered at WorldEdit position 1 with dimensions <width> x <height> x <length>, composed of <node>.",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, w, h, l, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.cube(worldedit.pos1[name], tonumber(w), tonumber(h), tonumber(l), node, true)
@@ -636,7 +635,6 @@ minetest.register_chatcommand("/cube", {
 	description = "Add a cube with its ground level centered at WorldEdit position 1 with dimensions <width> x <height> x <length>, composed of <node>.",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, w, h, l, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.cube(worldedit.pos1[name], tonumber(w), tonumber(h), tonumber(l), node)
@@ -664,7 +662,6 @@ minetest.register_chatcommand("/hollowsphere", {
 	description = "Add hollow sphere centered at WorldEdit position 1 with radius <radius>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.sphere(worldedit.pos1[name], tonumber(radius), node, true)
@@ -677,7 +674,6 @@ minetest.register_chatcommand("/sphere", {
 	description = "Add sphere centered at WorldEdit position 1 with radius <radius>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.sphere(worldedit.pos1[name], tonumber(radius), node)
@@ -705,7 +701,6 @@ minetest.register_chatcommand("/hollowdome", {
 	description = "Add hollow dome centered at WorldEdit position 1 with radius <radius>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.dome(worldedit.pos1[name], tonumber(radius), node, true)
@@ -718,7 +713,6 @@ minetest.register_chatcommand("/dome", {
 	description = "Add dome centered at WorldEdit position 1 with radius <radius>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.dome(worldedit.pos1[name], tonumber(radius), node)
@@ -753,7 +747,6 @@ minetest.register_chatcommand("/hollowcylinder", {
 	description = "Add hollow cylinder at WorldEdit position 1 along the x/y/z/? axis with length <length>, base radius <radius1> (and top radius [radius2]), composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		-- two radii
 		local found, _, axis, length, radius1, radius2, nodename = param:find("^([xyz%?])%s+([+-]?%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		if found == nil then
@@ -777,7 +770,6 @@ minetest.register_chatcommand("/cylinder", {
 	description = "Add cylinder at WorldEdit position 1 along the x/y/z/? axis with length <length>, base radius <radius1> (and top radius [radius2]), composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		-- two radii
 		local found, _, axis, length, radius1, radius2, nodename = param:find("^([xyz%?])%s+([+-]?%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		if found == nil then
@@ -817,7 +809,6 @@ minetest.register_chatcommand("/hollowpyramid", {
 	description = "Add hollow pyramid centered at WorldEdit position 1 along the x/y/z/? axis with height <height>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, axis, height, nodename = param:find("^([xyz%?])%s+([+-]?%d+)%s+(.+)$")
 		height = tonumber(height)
 		if axis == "?" then
@@ -835,7 +826,6 @@ minetest.register_chatcommand("/pyramid", {
 	description = "Add pyramid centered at WorldEdit position 1 along the x/y/z/? axis with height <height>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, axis, height, nodename = param:find("^([xyz%?])%s+([+-]?%d+)%s+(.+)$")
 		height = tonumber(height)
 		if axis == "?" then
@@ -853,7 +843,6 @@ minetest.register_chatcommand("/spiral", {
 	description = "Add spiral centered at WorldEdit position 1 with side length <length>, height <height>, space between walls <space>, composed of <node>",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, length, height, space, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.spiral(worldedit.pos1[name], tonumber(length), tonumber(height), tonumber(space), node)
@@ -880,7 +869,6 @@ minetest.register_chatcommand("/copy", {
 	description = "Copy the current WorldEdit region along the x/y/z/? axis by <amount> nodes",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, axis, amount = param:find("^([xyz%?])%s+([+-]?%d+)$")
 		if found == nil then
 			worldedit.player_notify(name, "invalid usage: " .. param)
@@ -906,7 +894,6 @@ minetest.register_chatcommand("/move", {
 	description = "Move the current WorldEdit region along the x/y/z/? axis by <amount> nodes",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local found, _, axis, amount = param:find("^([xyz%?])%s+([+-]?%d+)$")
 		if found == nil then
@@ -935,7 +922,6 @@ minetest.register_chatcommand("/stack", {
 	description = "Stack the current WorldEdit region along the x/y/z/? axis <count> times",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local found, _, axis, repetitions = param:find("^([xyz%?])%s+([+-]?%d+)$")
 		repetitions = tonumber(repetitions)
 		if axis == "?" then
@@ -962,7 +948,6 @@ minetest.register_chatcommand("/stack2", {
 	description = "Stack the current WorldEdit region <count> times by offset <x>, <y>, <z>",
 	privs = {worldedit=true},
 	func = function(name, param)
-		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		if pos1 == nil or pos2 == nil then
 			worldedit.player_notify(name, "Select a position first!")
@@ -999,7 +984,6 @@ minetest.register_chatcommand("/stretch", {
 	description = "Scale the current WorldEdit positions and region by a factor of <stretchx>, <stretchy>, <stretchz> along the X, Y, and Z axes, repectively, with position 1 as the origin",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local found, _, stretchx, stretchy, stretchz = param:find("^(%d+)%s+(%d+)%s+(%d+)$")
 		stretchx, stretchy, stretchz = tonumber(stretchx), tonumber(stretchy), tonumber(stretchz)
@@ -1034,7 +1018,6 @@ minetest.register_chatcommand("/transpose", {
 	description = "Transpose the current WorldEdit region along the x/y/z/? and x/y/z/? axes",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local found, _, axis1, axis2 = param:find("^([xyz%?])%s+([xyz%?])$")
 		if axis1 == "?" then axis1 = worldedit.player_axis(name) end
@@ -1068,7 +1051,6 @@ minetest.register_chatcommand("/flip", {
 	description = "Flip the current WorldEdit region along the x/y/z/? axis",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		if param == "?" then param = worldedit.player_axis(name) end
 		local count = worldedit.flip(worldedit.pos1[name], worldedit.pos2[name], param)
 		worldedit.player_notify(name, count .. " nodes flipped")
@@ -1144,7 +1126,6 @@ minetest.register_chatcommand("/fixlight", {
 	description = "Fix the lighting in the current WorldEdit region",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
-		save_region(name, param, true)
 		local count = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes updated")
 	end),
