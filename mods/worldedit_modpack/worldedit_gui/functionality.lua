@@ -259,7 +259,6 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 			if worldedit.items[name].pagenum > pagemax then
 				worldedit.items[name].pagenum = 1
 			end
-
 		elseif fields.worldedit_gui_set_items_prev then
 			worldedit.items[name].pagenum = pagenum - 1
 			if worldedit.items[name].pagenum <= 0 then
@@ -291,32 +290,98 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 	privs = combine_we_privs({"replace", "replaceinverse"}),
 	get_formspec = function(name)
 		local search, replace = gui_nodename1[name], gui_nodename2[name]
-		local search_nodename, replace_nodename = worldedit.normalize_nodename(search), worldedit.normalize_nodename(replace)
-		return "size[6.5,4]" .. worldedit.get_formspec_header("worldedit_gui_replace") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_replace_search;Name;%s]", minetest.formspec_escape(search)) ..
-			"button[4,1.18;1.5,0.8;worldedit_gui_replace_search_search;Search]" ..
-			formspec_node("5.5,1.1", search_nodename) ..
-			string.format("field[0.5,2.5;4,0.8;worldedit_gui_replace_replace;Name;%s]", minetest.formspec_escape(replace)) ..
-			"button[4,2.18;1.5,0.8;worldedit_gui_replace_replace_search;Search]" ..
-			formspec_node("5.5,2.1", replace_nodename) ..
-			"button_exit[0,3.5;3,0.8;worldedit_gui_replace_submit;Replace Nodes]" ..
-			"button_exit[3.5,3.5;3,0.8;worldedit_gui_replace_submit_inverse;Replace Inverse]"
+		local search_nodename, replace_nodename =
+			worldedit.normalize_nodename(search), worldedit.normalize_nodename(replace)
+		local pagenum = worldedit.items[name].pagenum or 1
+		local filter = worldedit.items[name].filter or ""
+		local items_list = get_items_list(filter, pagenum, name, "replace")
+		local pagemax = worldedit.items[name].pagemax or 1
+
+		return "size[8,7]" .. worldedit.get_formspec_header("worldedit_gui_replace") ..
+			items_list ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_replace_filter;Filter;%s]",
+				minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.8;4,0.8;worldedit_gui_replace_node;Replace;%s]",
+				minetest.formspec_escape(search)) ..
+			"button[2.9,4.18;0.8,0.8;worldedit_gui_replace_search;?]" ..
+			"button[3.6,4.18;0.8,0.8;worldedit_gui_replace_search_clear;X]" ..
+			"button[5.5,4.08;0.8,1;worldedit_gui_replace_prev;<]" ..
+			"label[6.2,4.28;" ..
+				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
+			"button[7.2,4.08;0.8,1;worldedit_gui_replace_next;>]" ..
+			string.format("field[4.3,5.8;4,0.8;worldedit_gui_replace_replace;By;%s]",
+				minetest.formspec_escape(replace)) ..
+			"field_close_on_enter[worldedit_gui_replace_filter;false]" ..
+			"button_exit[1,6.5;3,0.8;worldedit_gui_replace_submit;Replace Nodes]" ..
+			"button_exit[4,6.5;3,0.8;worldedit_gui_replace_submit_inverse;Replace Inverse]"
 	end,
 })
 
+local replace_last = {}
+
 worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
-	if fields.worldedit_gui_replace_search_search or fields.worldedit_gui_replace_replace_search
-	or fields.worldedit_gui_replace_submit or fields.worldedit_gui_replace_submit_inverse then
-		gui_nodename1[name] = tostring(fields.worldedit_gui_replace_search)
+	for field in pairs(fields) do
+		if field:find("worldedit_gui_replace_[%w_]+:[%w_]+_inv") then
+			local item = field:match("worldedit_gui_replace_([%w_]+:[%w_]+)_inv")
+
+			replace_last[name] = replace_last[name] or ""
+			if replace_last[name] == "" or replace_last[name] == 2 then
+				replace_last[name] = 1
+				gui_nodename1[name] = item
+			elseif replace_last[name] == 1 then
+				replace_last[name] = 2
+				gui_nodename2[name] = item
+			end
+
+			worldedit.show_page(name, "worldedit_gui_replace")
+			return true
+		end
+	end
+
+	if fields.worldedit_gui_replace_search or
+	   fields.key_enter_field == "worldedit_gui_replace_filter" then
+		worldedit.items[name].pagenum = 1
+		worldedit.items[name].filter = fields.worldedit_gui_replace_filter
+		worldedit.show_page(name, "worldedit_gui_replace")
+		return true
+
+	elseif fields.worldedit_gui_replace_submit         or
+	       fields.worldedit_gui_replace_submit_inverse or
+	       fields.worldedit_gui_replace_search_clear   or
+	       fields.worldedit_gui_replace_next           or
+	       fields.worldedit_gui_replace_prev           then
+		local pagenum = worldedit.items[name].pagenum or 1
+		local pagemax = worldedit.items[name].pagemax or 1
+
+		if fields.worldedit_gui_replace_search_clear then
+			worldedit.items[name].pagenum = 1
+		end
+
+		if fields.worldedit_gui_replace_next then
+			worldedit.items[name].pagenum = pagenum + 1
+			if worldedit.items[name].pagenum > pagemax then
+				worldedit.items[name].pagenum = 1
+			end
+		elseif fields.worldedit_gui_replace_prev then
+			worldedit.items[name].pagenum = pagenum - 1
+			if worldedit.items[name].pagenum <= 0 then
+				worldedit.items[name].pagenum = pagemax
+			end
+		end
+
+		gui_nodename1[name] = tostring(fields.worldedit_gui_replace_node)
+		worldedit.items[name].filter = fields.worldedit_gui_replace_search_clear and "" or
+					       fields.worldedit_gui_replace_filter
 		gui_nodename2[name] = tostring(fields.worldedit_gui_replace_replace)
 		worldedit.show_page(name, "worldedit_gui_replace")
 
-		local submit = nil
+		local submit
 		if fields.worldedit_gui_replace_submit then
 			submit = "replace"
 		elseif fields.worldedit_gui_replace_submit_inverse then
 			submit = "replaceinverse"
 		end
+
 		if submit then
 			local n1 = worldedit.normalize_nodename(gui_nodename1[name])
 			local n2 = worldedit.normalize_nodename(gui_nodename2[name])
@@ -324,8 +389,10 @@ worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
 				minetest.chatcommands["/"..submit].func(name, string.format("%s %s", n1, n2))
 			end
 		end
+
 		return true
 	end
+
 	return false
 end)
 
