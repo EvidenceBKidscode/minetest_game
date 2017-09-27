@@ -26,15 +26,21 @@ setmetatable(gui_count3,     {__index = function() return "4" end})
 setmetatable(gui_angle,     {__index = function() return 90 end})
 setmetatable(gui_filename,  {__index = function() return "building" end})
 
-local axis_indices = {["X axis"]=1, ["Y axis"]=2, ["Z axis"]=3, ["Look direction"]=4}
-local axis_values = {"x", "y", "z", "?"}
-setmetatable(axis_indices, {__index = function () return 4 end})
-setmetatable(axis_values, {__index = function () return "?" end})
+worldedit.axis_indices = {["X axis"]=1, ["Y axis"]=2, ["Z axis"]=3, ["Look direction"]=4}
+worldedit.axis_values = {"x", "y", "z", "?"}
+setmetatable(worldedit.axis_indices, {__index = function () return 4 end})
+setmetatable(worldedit.axis_values, {__index = function () return "?" end})
 
-local angle_indices = {["90 degrees"]=1, ["180 degrees"]=2, ["270 degrees"]=3}
-local angle_values = {90, 180, 270}
-setmetatable(angle_indices, {__index = function () return 1 end})
-setmetatable(angle_values, {__index = function () return 90 end})
+local axis_indices = worldedit.axis_indices
+local axis_values = worldedit.axis_values
+
+worldedit.angle_indices = {["90 degrees"]=1, ["180 degrees"]=2, ["270 degrees"]=3}
+worldedit.angle_values = {90, 180, 270}
+setmetatable(worldedit.angle_indices, {__index = function () return 1 end})
+setmetatable(worldedit.angle_values, {__index = function () return 90 end})
+
+local angle_indices = worldedit.angle_indices
+local angle_values = worldedit.angle_values
 
 -- given multiple sets of privileges, produces a single set of privs that would have the same effect as requiring all of them at the same time
 local combine_privs = function(...)
@@ -123,7 +129,7 @@ worldedit.register_gui_function("worldedit_gui_inspect", {
 
 worldedit.register_gui_function("worldedit_gui_region", {
 	type = "advanced",
-	name = "Get/Set Region",
+	name = "Get / Set Region",
 	privs = combine_we_privs({"p", "pos1", "pos2", "reset", "mark", "unmark", "volume", "fixedpos"}),
 	get_formspec = function(name)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
@@ -573,7 +579,7 @@ worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
 		worldedit.items[name].filter = fields.worldedit_gui_cylinder_search_clear and "" or
 					       fields.worldedit_gui_cylinder_filter
 
-		gui_axis1[name] = axis_indices[fields.worldedit_gui_cylinder_axis]
+		gui_axis1[name] = worldedit.axis_indices[fields.worldedit_gui_cylinder_axis]
 		gui_distance1[name] = tostring(fields.worldedit_gui_cylinder_length)
 		gui_distance2[name] = tostring(fields.worldedit_gui_cylinder_radius1)
 		gui_distance3[name] = tostring(fields.worldedit_gui_cylinder_radius2)
@@ -625,7 +631,7 @@ worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
 	end
 
 	if fields.worldedit_gui_cylinder_axis then
-		gui_axis1[name] = axis_indices[fields.worldedit_gui_cylinder_axis]
+		gui_axis1[name] = worldedit.axis_indices[fields.worldedit_gui_cylinder_axis]
 		worldedit.show_page(name, "worldedit_gui_cylinder")
 		return true
 	end
@@ -1018,8 +1024,16 @@ worldedit.register_gui_handler("worldedit_gui_rotate", function(name, fields)
 	if fields.worldedit_gui_rotate_submit then
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_rotate_axis]
 		gui_angle[name] = angle_indices[fields.worldedit_gui_rotate_angle]
+
+		print(axis_values[gui_axis1[name]])
+		print(angle_values[gui_angle[name]])
+
 		worldedit.show_page(name, "worldedit_gui_rotate")
-		minetest.chatcommands["/rotate"].func(name, string.format("%s %s", axis_values[gui_axis1[name]], angle_values[gui_angle[name]]))
+		minetest.chatcommands["/rotate"].func(name,
+			string.format("%s %s",
+				axis_values[gui_axis1[name]],
+				angle_values[gui_angle[name]]
+			))
 		return true
 	end
 	if fields.worldedit_gui_rotate_axis then
@@ -1237,7 +1251,6 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_cube_next;>]" ..
-			"button[4,1.18;1.5,0.8;worldedit_gui_cube_search;Search]" ..
 			string.format("field[0.3,6.8;2,1;worldedit_gui_cube_width;Width;%s]",
 				minetest.formspec_escape(width)) ..
 			string.format("field[2.3,6.8;2,1;worldedit_gui_cube_height;Height;%s]",

@@ -12,6 +12,8 @@ end
 
 local worldpath = minetest.get_worldpath()
 
+local last_action = {}
+
 dofile(minetest.get_modpath("worldedit_commands") .. "/cuboid.lua")
 dofile(minetest.get_modpath("worldedit_commands") .. "/mark.lua")
 dofile(minetest.get_modpath("worldedit_commands") .. "/hammer.lua")
@@ -105,7 +107,23 @@ local function save_region(name, param, backup)
 	end
 end
 
-local function load_region(name, param, backup)
+local last_rotation = {}
+
+local function load_region(name, param, backup, action)
+	if action == "rotate" then
+		local axis, angle = last_rotation[name]:match("(.*) (.*)")
+		--axis = worldedit.axis_indices[axis]
+
+		local new_angle = 180
+		new_angle = (angle == "90" and 270) or (angle == "270" and 90) or new_angle
+		--new_angle = worldedit.angle_indices[new_angle]
+		--print(worldedit.axis_values[axis])
+		--print(worldedit.angle_values[new_angle])
+
+		minetest.chatcommands["/rotate"].func(name, string.format("%s %s", axis, new_angle))
+		return
+	end
+
 	local pos = get_position(name)
 	if backup then
 		local file_pos = io.open(worldpath .. "/schems/backup_pos_" .. name, "r")
@@ -1069,6 +1087,9 @@ minetest.register_chatcommand("/rotate", {
 	description = "Rotate the current WorldEdit region around the axis <axis> by angle <angle> (90 degree increment)",
 	privs = {worldedit=true},
 	func = safe_region(function(name, param)
+		last_action[name] = "rotate"
+		last_rotation[name] = param
+
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local found, _, axis, angle = param:find("^([xyz%?])%s+([+-]?%d+)$")
 		if axis == "?" then axis = worldedit.player_axis(name) end
@@ -1404,6 +1425,6 @@ minetest.register_chatcommand("/undo", {
 	description = "Undo last action",
 	privs = {worldedit=true},
 	func = function(name, param)
-		load_region(name, param, true)
+		load_region(name, param, true, last_action[name])
 	end,
 })
