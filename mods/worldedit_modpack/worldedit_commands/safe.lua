@@ -22,13 +22,11 @@ local function safe_region(callback, nodes_needed)
 		--check if the operation applies to a safe number of nodes
 		local count = nodes_needed(name, param)
 		if count == nil then return end --invalid command
-		if worldedit._override_safe_regions or count < 10000 then
-			return callback(name, param)
-		end
 
 		--save callback to call later
-		safe_region_callback[name], safe_region_param[name] = callback, param
-		worldedit.player_notify(name, "WARNING: this operation could affect up to " .. count .. " nodes; type //y to continue or //n to cancel")
+		--safe_region_callback[name], safe_region_param[name] = callback, param
+		return callback(name, param)
+		--worldedit.player_notify(name, "WARNING: this operation could affect up to " .. count .. " nodes; type //y to continue or //n to cancel")
 	end
 end
 

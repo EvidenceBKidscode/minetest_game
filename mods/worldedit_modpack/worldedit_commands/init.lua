@@ -512,6 +512,7 @@ minetest.register_chatcommand("/deleteblocks", {
 		save_region(name, param, true)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local success = minetest.delete_area(pos1, pos2)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		if success then
 			worldedit.player_notify(name, "Area deleted.")
 		else
@@ -602,6 +603,7 @@ minetest.register_chatcommand("/replace", {
 		local norm_replace_node = worldedit.normalize_nodename(replace_node)
 		local count = worldedit.replace(worldedit.pos1[name], worldedit.pos2[name],
 				norm_search_node, norm_replace_node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes replaced")
 	end, check_replace),
 })
@@ -617,6 +619,7 @@ minetest.register_chatcommand("/replaceinverse", {
 		local norm_replace_node = worldedit.normalize_nodename(replace_node)
 		local count = worldedit.replace(worldedit.pos1[name], worldedit.pos2[name],
 				norm_search_node, norm_replace_node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes replaced")
 	end, check_replace),
 })
@@ -644,6 +647,7 @@ minetest.register_chatcommand("/hollowcube", {
 		local found, _, w, h, l, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.cube(worldedit.pos1[name], tonumber(w), tonumber(h), tonumber(l), node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_cube),
 })
@@ -656,6 +660,7 @@ minetest.register_chatcommand("/cube", {
 		local found, _, w, h, l, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.cube(worldedit.pos1[name], tonumber(w), tonumber(h), tonumber(l), node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_cube),
 })
@@ -683,6 +688,7 @@ minetest.register_chatcommand("/hollowsphere", {
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.sphere(worldedit.pos1[name], tonumber(radius), node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_sphere),
 })
@@ -695,6 +701,7 @@ minetest.register_chatcommand("/sphere", {
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.sphere(worldedit.pos1[name], tonumber(radius), node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_sphere),
 })
@@ -722,6 +729,7 @@ minetest.register_chatcommand("/hollowdome", {
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.dome(worldedit.pos1[name], tonumber(radius), node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_dome),
 })
@@ -734,6 +742,7 @@ minetest.register_chatcommand("/dome", {
 		local found, _, radius, nodename = param:find("^(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.dome(worldedit.pos1[name], tonumber(radius), node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_dome),
 })
@@ -779,6 +788,7 @@ minetest.register_chatcommand("/hollowcylinder", {
 		end
 		local node = get_node(name, nodename)
 		local count = worldedit.cylinder(worldedit.pos1[name], axis, length, tonumber(radius1), tonumber(radius2), node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_cylinder),
 })
@@ -802,6 +812,7 @@ minetest.register_chatcommand("/cylinder", {
 		end
 		local node = get_node(name, nodename)
 		local count = worldedit.cylinder(worldedit.pos1[name], axis, length, tonumber(radius1), tonumber(radius2), node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_cylinder),
 })
@@ -835,6 +846,7 @@ minetest.register_chatcommand("/hollowpyramid", {
 		end
 		local node = get_node(name, nodename)
 		local count = worldedit.pyramid(worldedit.pos1[name], axis, height, node, true)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_pyramid),
 })
@@ -852,6 +864,7 @@ minetest.register_chatcommand("/pyramid", {
 		end
 		local node = get_node(name, nodename)
 		local count = worldedit.pyramid(worldedit.pos1[name], axis, height, node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end, check_pyramid),
 })
@@ -864,6 +877,7 @@ minetest.register_chatcommand("/spiral", {
 		local found, _, length, height, space, nodename = param:find("^(%d+)%s+(%d+)%s+(%d+)%s+(.+)$")
 		local node = get_node(name, nodename)
 		local count = worldedit.spiral(worldedit.pos1[name], tonumber(length), tonumber(height), tonumber(space), node)
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes added")
 	end,
 	function(name, param)
@@ -1193,6 +1207,7 @@ minetest.register_chatcommand("/suppress", {
 	func = safe_region(function(name, param)
 		save_region(name, param, true)
 		local count = worldedit.set(worldedit.pos1[name], worldedit.pos2[name], "air")
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		worldedit.player_notify(name, count .. " nodes deleted")
 	end, check_region),
 })
@@ -1426,5 +1441,6 @@ minetest.register_chatcommand("/undo", {
 	privs = {worldedit=true},
 	func = function(name, param)
 		load_region(name, param, true, last_action[name])
+		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 	end,
 })
