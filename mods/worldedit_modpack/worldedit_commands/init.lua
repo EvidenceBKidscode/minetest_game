@@ -1,3 +1,5 @@
+local S = utils.gettext
+
 minetest.register_privilege("worldedit", "Can use WorldEdit commands")
 
 worldedit.set_pos = {}
@@ -34,7 +36,7 @@ end
 local function get_position(name) --position 1 retrieval function for when not using `safe_region`
 	local pos1 = worldedit.pos1[name]
 	if pos1 == nil then
-		worldedit.player_notify(name, "no position 1 selected")
+		worldedit.player_notify(name, S("no position 1 selected"))
 	end
 	return pos1
 end
@@ -43,7 +45,7 @@ end
 local function get_node(name, nodename)
 	local node = worldedit.normalize_nodename(nodename)
 	if not node then
-		worldedit.player_notify(name, "invalid node name: " .. nodename)
+		worldedit.player_notify(name, S("invalid node name: @1", nodename))
 		return nil
 	end
 	return node
@@ -59,12 +61,12 @@ end
 
 local function save_region(name, param, backup)
 	if not backup and param == "" then
-		worldedit.player_notify(name, "invalid usage: " .. param)
+		worldedit.player_notify(name, S("invalid usage: @1", param))
 		return
 	end
 
 	if not backup and not check_filename(param) then
-		worldedit.player_notify(name, "Disallowed file name: " .. param)
+		worldedit.player_notify(name, S("Disallowed file name: @1", param))
 		return
 	end
 
@@ -85,7 +87,7 @@ local function save_region(name, param, backup)
 	local file2, err = io.open(filename, "wb")
 
 	if err then
-		worldedit.player_notify(name, "Could not save file to \"" .. filename .. "\"")
+		worldedit.player_notify(name, S("Could not save file to \"@1\"", filename))
 		return
 	end
 
@@ -103,7 +105,7 @@ local function save_region(name, param, backup)
 		file_pos:write(minetest.serialize(pos))
 		file_pos:close()
 	else
-		worldedit.player_notify(name, count .. " nodes saved")
+		worldedit.player_notify(name, S("@1 nodes saved", count))
 	end
 end
 
@@ -137,7 +139,7 @@ local function load_region(name, param, backup, action)
 	if not pos then return end
 
 	if not backup and param == "" then
-		worldedit.player_notify(name, "invalid usage: " .. param)
+		worldedit.player_notify(name, S("invalid usage: @1", param))
 		return
 	end
 
@@ -170,15 +172,15 @@ local function load_region(name, param, backup, action)
 
 	local version = worldedit.read_header(value)
 	if version == 0 then
-		worldedit.player_notify(name, "File is invalid!")
+		worldedit.player_notify(name, S("File is invalid!"))
 		return
 	elseif version > worldedit.LATEST_SERIALIZATION_VERSION then
-		worldedit.player_notify(name, "File was created with newer version of WorldEdit!")
+		worldedit.player_notify(name, S("File was created with newer version of WorldEdit!"))
 		return
 	end
 
 	local count = worldedit.deserialize(pos, value, backup, name)
-	worldedit.player_notify(name, count .. " nodes loaded")
+	worldedit.player_notify(name, S("@1 nodes loaded", count))
 end
 
 -- normalizes node "description" `nodename`, returning a string (or nil)
@@ -262,7 +264,7 @@ minetest.register_chatcommand("/help", {
 		end
 
 		if not minetest.check_player_privs(name, "worldedit") then
-			return false, "You are not allowed to use any WorldEdit commands."
+			return false, S("You are not allowed to use any WorldEdit commands.")
 		end
 		if param == "" then
 			local msg = ""
@@ -359,7 +361,7 @@ minetest.register_chatcommand("/mark", {
 	func = function(name, param)
 		worldedit.mark_pos1(name)
 		worldedit.mark_pos2(name)
-		worldedit.player_notify(name, "region marked")
+		worldedit.player_notify(name, S("region marked"))
 	end,
 })
 
@@ -375,7 +377,7 @@ minetest.register_chatcommand("/unmark", {
 		worldedit.mark_pos2(name)
 		worldedit.pos1[name] = pos1
 		worldedit.pos2[name] = pos2
-		worldedit.player_notify(name, "region unmarked")
+		worldedit.player_notify(name, S("region unmarked"))
 	end,
 })
 
@@ -388,7 +390,7 @@ minetest.register_chatcommand("/pos1", {
 		pos.x, pos.y, pos.z = math.floor(pos.x + 0.5), math.floor(pos.y + 0.5), math.floor(pos.z + 0.5)
 		worldedit.pos1[name] = pos
 		worldedit.mark_pos1(name)
-		worldedit.player_notify(name, "position 1 set to " .. minetest.pos_to_string(pos))
+		worldedit.player_notify(name, S("position 1 set to @1", minetest.pos_to_string(pos)))
 	end,
 })
 
@@ -401,7 +403,7 @@ minetest.register_chatcommand("/pos2", {
 		pos.x, pos.y, pos.z = math.floor(pos.x + 0.5), math.floor(pos.y + 0.5), math.floor(pos.z + 0.5)
 		worldedit.pos2[name] = pos
 		worldedit.mark_pos2(name)
-		worldedit.player_notify(name, "position 2 set to " .. minetest.pos_to_string(pos))
+		worldedit.player_notify(name, S("position 2 set to @1", minetest.pos_to_string(pos)))
 	end,
 })
 
@@ -412,26 +414,26 @@ minetest.register_chatcommand("/p", {
 	func = function(name, param)
 		if param == "set" then --set both WorldEdit positions
 			worldedit.set_pos[name] = "pos1"
-			worldedit.player_notify(name, "select positions by punching two nodes")
+			worldedit.player_notify(name, S("select positions by punching two nodes"))
 		elseif param == "set1" then --set WorldEdit position 1
 			worldedit.set_pos[name] = "pos1only"
-			worldedit.player_notify(name, "select position 1 by punching a node")
+			worldedit.player_notify(name, S("select position 1 by punching a node"))
 		elseif param == "set2" then --set WorldEdit position 2
 			worldedit.set_pos[name] = "pos2"
-			worldedit.player_notify(name, "select position 2 by punching a node")
+			worldedit.player_notify(name, S("select position 2 by punching a node"))
 		elseif param == "get" then --display current WorldEdit positions
 			if worldedit.pos1[name] ~= nil then
 				worldedit.player_notify(name, "position 1: " .. minetest.pos_to_string(worldedit.pos1[name]))
 			else
-				worldedit.player_notify(name, "position 1 not set")
+				worldedit.player_notify(name, S("position 1 not set"))
 			end
 			if worldedit.pos2[name] ~= nil then
 				worldedit.player_notify(name, "position 2: " .. minetest.pos_to_string(worldedit.pos2[name]))
 			else
-				worldedit.player_notify(name, "position 2 not set")
+				worldedit.player_notify(name, S("position 2 not set"))
 			end
 		else
-			worldedit.player_notify(name, "unknown subcommand: " .. param)
+			worldedit.player_notify(name, S("unknown subcommand: @1", param))
 		end
 	end,
 })
@@ -443,18 +445,18 @@ minetest.register_chatcommand("/fixedpos", {
 	func = function(name, param)
 		local found, _, flag, x, y, z = param:find("^(set[12])%s+([+-]?%d+)%s+([+-]?%d+)%s+([+-]?%d+)$")
 		if found == nil then
-			worldedit.player_notify(name, "invalid usage: " .. param)
+			worldedit.player_notify(name, S("invalid usage: @1", param))
 			return
 		end
 		local pos = {x=tonumber(x), y=tonumber(y), z=tonumber(z)}
 		if flag == "set1" then
 			worldedit.pos1[name] = pos
 			worldedit.mark_pos1(name)
-			worldedit.player_notify(name, "position 1 set to " .. minetest.pos_to_string(pos))
+			worldedit.player_notify(name, S("position 1 set to @1", minetest.pos_to_string(pos)))
 		else --flag == "set2"
 			worldedit.pos2[name] = pos
 			worldedit.mark_pos2(name)
-			worldedit.player_notify(name, "position 2 set to " .. minetest.pos_to_string(pos))
+			worldedit.player_notify(name, S("position 2 set to @1", minetest.pos_to_string(pos)))
 		end
 	end,
 })
@@ -466,17 +468,17 @@ minetest.register_on_punchnode(function(pos, node, puncher)
 			worldedit.pos1[name] = pos
 			worldedit.mark_pos1(name)
 			worldedit.set_pos[name] = "pos2" --set position 2 on the next invocation
-			worldedit.player_notify(name, "position 1 set to " .. minetest.pos_to_string(pos))
+			worldedit.player_notify(name, S("position 1 set to @1", minetest.pos_to_string(pos)))
 		elseif worldedit.set_pos[name] == "pos1only" then --setting position 1 only
 			worldedit.pos1[name] = pos
 			worldedit.mark_pos1(name)
 			worldedit.set_pos[name] = nil --finished setting positions
-			worldedit.player_notify(name, "position 1 set to " .. minetest.pos_to_string(pos))
+			worldedit.player_notify(name, S("position 1 set to @1", minetest.pos_to_string(pos)))
 		elseif worldedit.set_pos[name] == "pos2" then --setting position 2
 			worldedit.pos2[name] = pos
 			worldedit.mark_pos2(name)
 			worldedit.set_pos[name] = nil --finished setting positions
-			worldedit.player_notify(name, "position 2 set to " .. minetest.pos_to_string(pos))
+			worldedit.player_notify(name, S("position 2 set to @1", minetest.pos_to_string(pos)))
 		elseif worldedit.set_pos[name] == "prob" then --setting Minetest schematic node probabilities
 			worldedit.prob_pos[name] = pos
 			minetest.show_formspec(puncher:get_player_name(), "prob_val_enter", "field[text;;]")
@@ -491,7 +493,7 @@ minetest.register_chatcommand("/volume", {
 	func = function(name, param)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		if pos1 == nil or pos2 == nil then
-			worldedit.player_notify(name, "no region selected")
+			worldedit.player_notify(name, S("no region selected"))
 			return nil
 		end
 
@@ -514,9 +516,9 @@ minetest.register_chatcommand("/deleteblocks", {
 		local success = minetest.delete_area(pos1, pos2)
 		local count2 = worldedit.fixlight(worldedit.pos1[name], worldedit.pos2[name])
 		if success then
-			worldedit.player_notify(name, "Area deleted.")
+			worldedit.player_notify(name, S("Area deleted."))
 		else
-			worldedit.player_notify(name, "There was an error during deletion of the area.")
+			worldedit.player_notify(name, S("There was an error during deletion of the area."))
 		end
 	end),
 })
@@ -531,7 +533,7 @@ minetest.register_chatcommand("/set", {
 		if not node then return end
 
 		local count = worldedit.set(worldedit.pos1[name], worldedit.pos2[name], node)
-		worldedit.player_notify(name, count .. " nodes set")
+		worldedit.player_notify(name, S("@1 nodes set", count))
 	end, check_region),
 })
 

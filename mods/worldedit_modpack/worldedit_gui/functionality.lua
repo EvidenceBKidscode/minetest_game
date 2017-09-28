@@ -1,3 +1,5 @@
+local S = utils.gettext
+
 --saved state for each player
 local gui_nodename1 = {} --mapping of player names to node names
 local gui_nodename2 = {} --mapping of player names to node names
@@ -26,7 +28,7 @@ setmetatable(gui_count3,     {__index = function() return "4" end})
 setmetatable(gui_angle,     {__index = function() return 90 end})
 setmetatable(gui_filename,  {__index = function() return "building" end})
 
-worldedit.axis_indices = {["X axis"]=1, ["Y axis"]=2, ["Z axis"]=3, ["Look direction"]=4}
+worldedit.axis_indices = {[S("X axis")]=1, [S("Y axis")]=2, [S("Z axis")]=3, [S("Look direction")]=4}
 worldedit.axis_values = {"x", "y", "z", "?"}
 setmetatable(worldedit.axis_indices, {__index = function () return 4 end})
 setmetatable(worldedit.axis_values, {__index = function () return "?" end})
@@ -34,7 +36,7 @@ setmetatable(worldedit.axis_values, {__index = function () return "?" end})
 local axis_indices = worldedit.axis_indices
 local axis_values = worldedit.axis_values
 
-worldedit.angle_indices = {["90 degrees"]=1, ["180 degrees"]=2, ["270 degrees"]=3}
+worldedit.angle_indices = {[S("90 degrees")]=1, [S("180 degrees")]=2, [S("270 degrees")]=3}
 worldedit.angle_values = {90, 180, 270}
 setmetatable(worldedit.angle_indices, {__index = function () return 1 end})
 setmetatable(worldedit.angle_values, {__index = function () return 90 end})
@@ -58,8 +60,8 @@ end
 
 -- display node (or unknown_node image otherwise) at specified pos in formspec
 local formspec_node = function(pos, nodename)
-	return nodename and string.format("item_image[%s;1,1;%s]", pos, nodename)
-		or string.format("image[%s;1,1;worldedit_gui_unknown.png]", pos)
+	return nodename and string.format("item_image[%s;1,1;%s]", pos, nodename) or
+			    string.format("image[%s;1,1;worldedit_gui_unknown.png]", pos)
 end
 
 -- two further priv helpers
@@ -111,7 +113,7 @@ end
 
 worldedit.register_gui_function("worldedit_gui_about", {
 	type = "advanced",
-	name = "About",
+	name = S("About"),
 	privs = {interact=true},
 	on_select = function(name)
 		minetest.chatcommands["/about"].func(name, "")
@@ -120,7 +122,7 @@ worldedit.register_gui_function("worldedit_gui_about", {
 
 worldedit.register_gui_function("worldedit_gui_inspect", {
 	type = "advanced",
-	name = "Toggle Inspect",
+	name = S("Toggle Inspect"),
 	privs = we_privs("inspect"),
 	on_select = function(name)
 		minetest.chatcommands["/inspect"].func(name, worldedit.inspect[name] and "disable" or "enable")
@@ -129,30 +131,38 @@ worldedit.register_gui_function("worldedit_gui_inspect", {
 
 worldedit.register_gui_function("worldedit_gui_region", {
 	type = "advanced",
-	name = "Get / Set Region",
+	name = S("Get / Set Region"),
 	privs = combine_we_privs({"p", "pos1", "pos2", "reset", "mark", "unmark", "volume", "fixedpos"}),
 	get_formspec = function(name)
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		return "size[9,7]" .. worldedit.get_formspec_header("worldedit_gui_region") ..
-			"button_exit[0,1;3,0.8;worldedit_gui_p_get;Get Positions]" ..
-			"button_exit[3,1;3,0.8;worldedit_gui_p_set1;Choose Position 1]" ..
-			"button_exit[6,1;3,0.8;worldedit_gui_p_set2;Choose Position 2]" ..
-			"button_exit[0,2;3,0.8;worldedit_gui_pos1;Position 1 Here]" ..
-			"button_exit[3,2;3,0.8;worldedit_gui_pos2;Position 2 Here]" ..
-			"button_exit[6,2;3,0.8;worldedit_gui_reset;Reset Region]" ..
-			"button_exit[0,3;3,0.8;worldedit_gui_mark;Mark Region]" ..
-			"button_exit[3,3;3,0.8;worldedit_gui_unmark;Unmark Region]" ..
-			"button_exit[6,3;3,0.8;worldedit_gui_volume;Region Volume]" ..
-			"label[0,4.7;Position 1]" ..
-			string.format("field[2,5;1.5,0.8;worldedit_gui_fixedpos_pos1x;X ;%s]", pos1 and pos1.x or "") ..
-			string.format("field[3.5,5;1.5,0.8;worldedit_gui_fixedpos_pos1y;Y ;%s]", pos1 and pos1.y or "") ..
-			string.format("field[5,5;1.5,0.8;worldedit_gui_fixedpos_pos1z;Z ;%s]", pos1 and pos1.z or "") ..
-			"button_exit[6.5,4.68;2.5,0.8;worldedit_gui_fixedpos_pos1_submit;Set Position 1]" ..
-			"label[0,6.2;Position 2]" ..
-			string.format("field[2,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2x;X ;%s]", pos2 and pos2.x or "") ..
-			string.format("field[3.5,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2y;Y ;%s]", pos2 and pos2.y or "") ..
-			string.format("field[5,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2z;Z ;%s]", pos2 and pos2.z or "") ..
-			"button_exit[6.5,6.18;2.5,0.8;worldedit_gui_fixedpos_pos2_submit;Set Position 2]"
+			"button_exit[0,1;3,0.8;worldedit_gui_p_get;" .. S("Get Positions") .. "]" ..
+			"button_exit[3,1;3,0.8;worldedit_gui_p_set1;" .. S("Choose Position 1") .. "]" ..
+			"button_exit[6,1;3,0.8;worldedit_gui_p_set2;" .. S("Choose Position 2") .. "]" ..
+			"button_exit[0,2;3,0.8;worldedit_gui_pos1;" .. S("Position 1 Here") .. "]" ..
+			"button_exit[3,2;3,0.8;worldedit_gui_pos2;" .. S("Position 2 Here") .. "]" ..
+			"button_exit[6,2;3,0.8;worldedit_gui_reset;" .. S("Reset Region") .. "]" ..
+			"button_exit[0,3;3,0.8;worldedit_gui_mark;" .. S("Mark Region") .. "]" ..
+			"button_exit[3,3;3,0.8;worldedit_gui_unmark;" .. S("Unmark Region") .. "]" ..
+			"button_exit[6,3;3,0.8;worldedit_gui_volume;" .. S("Region Volume") .. "]" ..
+			"label[0,4.7;" .. S("Position 1") .. "]" ..
+			string.format("field[2,5;1.5,0.8;worldedit_gui_fixedpos_pos1x;X ;%s]",
+				pos1 and pos1.x or "") ..
+			string.format("field[3.5,5;1.5,0.8;worldedit_gui_fixedpos_pos1y;Y ;%s]",
+				pos1 and pos1.y or "") ..
+			string.format("field[5,5;1.5,0.8;worldedit_gui_fixedpos_pos1z;Z ;%s]",
+				pos1 and pos1.z or "") ..
+			"button_exit[6.5,4.68;2.5,0.8;worldedit_gui_fixedpos_pos1_submit;" ..
+				S("Set Position 1") .. "]" ..
+			"label[0,6.2;" .. S("Position 2") .. "]" ..
+			string.format("field[2,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2x;X ;%s]",
+				pos2 and pos2.x or "") ..
+			string.format("field[3.5,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2y;Y ;%s]",
+				pos2 and pos2.y or "") ..
+			string.format("field[5,6.5;1.5,0.8;worldedit_gui_fixedpos_pos2z;Z ;%s]",
+				pos2 and pos2.z or "") ..
+			"button_exit[6.5,6.18;2.5,0.8;worldedit_gui_fixedpos_pos2_submit;" ..
+				S("Set Position 2") .. "]"
 	end,
 })
 
@@ -210,7 +220,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_set", {
 	type = "advanced",
-	name = "Set Nodes",
+	name = S("Set Nodes"),
 	privs = we_privs("set"),
 	get_formspec = function(name)
 		local node = gui_nodename1[name]
@@ -221,9 +231,9 @@ worldedit.register_gui_function("worldedit_gui_set", {
 		local pagemax = worldedit.items[name].pagemax or 1
 		
 		return "size[8,6]" .. worldedit.get_formspec_header("worldedit_gui_set") ..
-			string.format("field[0.3,4.6;3,0.8;worldedit_gui_set_filter;Filter;%s]",
+			string.format("field[0.3,4.6;3,0.8;worldedit_gui_set_filter;" .. S("Filter") .. ";%s]",
 				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.82;3,0.8;worldedit_gui_set_node;Name;%s]",
+			string.format("field[0.3,5.82;3,0.8;worldedit_gui_set_node;" .. S("Name") .. ";%s]",
 				minetest.formspec_escape(node)) ..
 			"button[3,4.28;0.8,0.8;worldedit_gui_set_search;?]" ..
 			"button[3.7,4.28;0.8,0.8;worldedit_gui_set_search_clear;X]" ..
@@ -233,7 +243,7 @@ worldedit.register_gui_function("worldedit_gui_set", {
 			"label[6.2,4.38;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.18;0.8,1;worldedit_gui_set_items_next;>]" ..
-			"button_exit[3,5.5;3,0.8;worldedit_gui_set_submit;Set Nodes]"
+			"button_exit[3,5.5;3,0.8;worldedit_gui_set_submit;" .. S("Set Nodes") .. "]"
 	end,
 })
 
@@ -292,7 +302,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_replace", {
 	type = "default",
-	name = "Replace Nodes",
+	name = S("Replace Nodes"),
 	privs = combine_we_privs({"replace", "replaceinverse"}),
 	get_formspec = function(name)
 		local search, replace = gui_nodename1[name], gui_nodename2[name]
@@ -305,21 +315,23 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 
 		return "size[8,7]" .. worldedit.get_formspec_header("worldedit_gui_replace") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_replace_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.8;4,0.8;worldedit_gui_replace_node;Replace;%s]",
-				minetest.formspec_escape(search)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_replace_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.8;4,0.8;worldedit_gui_replace_node;" ..
+				S("Replace") .. ";%s]", minetest.formspec_escape(search)) ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_replace_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_replace_search_clear;X]" ..
 			"button[5.5,4.08;0.8,1;worldedit_gui_replace_prev;<]" ..
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_replace_next;>]" ..
-			string.format("field[4.3,5.8;4,0.8;worldedit_gui_replace_replace;By;%s]",
-				minetest.formspec_escape(replace)) ..
+			string.format("field[4.3,5.8;4,0.8;worldedit_gui_replace_replace;" ..
+				S("By") .. ";%s]", minetest.formspec_escape(replace)) ..
 			"field_close_on_enter[worldedit_gui_replace_filter;false]" ..
-			"button_exit[1,6.5;3,0.8;worldedit_gui_replace_submit;Replace Nodes]" ..
-			"button_exit[4,6.5;3,0.8;worldedit_gui_replace_submit_inverse;Replace Inverse]"
+			"button_exit[1,6.5;3,0.8;worldedit_gui_replace_submit;" ..
+				S("Replace Nodes") .. "]" ..
+			"button_exit[4,6.5;3,0.8;worldedit_gui_replace_submit_inverse;" ..
+				S("Replace Inverse") .. "]"
 	end,
 })
 
@@ -404,7 +416,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 	type = "advanced",
-	name = "Sphere / Dome",
+	name = S("Sphere / Dome"),
 	form = true,
 	privs = combine_we_privs({"hollowsphere", "sphere", "hollowdome", "dome"}),
 	get_formspec = function(name)
@@ -416,8 +428,8 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 		local pagemax = worldedit.items[name].pagemax or 1
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_sphere_dome") ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_sphere_dome_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_sphere_dome_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
 			items_list ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_sphere_dome_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_sphere_dome_search_clear;X]" ..
@@ -425,15 +437,19 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_sphere_dome_next;>]" ..
-			string.format("field[0.3,5.7;3,0.8;worldedit_gui_sphere_dome_node;Name;%s]",
-				minetest.formspec_escape(node)) ..
-			string.format("field[3.2,5.7;2,0.8;worldedit_gui_sphere_dome_radius;Radius;%s]",
-				minetest.formspec_escape(radius)) ..
+			string.format("field[0.3,5.7;3,0.8;worldedit_gui_sphere_dome_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
+			string.format("field[3.2,5.7;2,0.8;worldedit_gui_sphere_dome_radius;" ..
+				S("Radius") .. ";%s]", minetest.formspec_escape(radius)) ..
 			"field_close_on_enter[worldedit_gui_sphere_dome_filter;false]" ..
-			"button_exit[0.7,6.5;3,0.8;worldedit_gui_sphere_dome_submit_hollow;Hollow Sphere]" ..
-			"button_exit[4.2,6.5;3,0.8;worldedit_gui_sphere_dome_submit_solid;Solid Sphere]" ..
-			"button_exit[0.7,7.5;3,0.8;worldedit_gui_sphere_dome_submit_hollow_dome;Hollow Dome]" ..
-			"button_exit[4.2,7.5;3,0.8;worldedit_gui_sphere_dome_submit_solid_dome;Solid Dome]"
+			"button_exit[0.7,6.5;3,0.8;worldedit_gui_sphere_dome_submit_hollow;" ..
+				S("Hollow Sphere") .. "]" ..
+			"button_exit[4.2,6.5;3,0.8;worldedit_gui_sphere_dome_submit_solid;" ..
+				S("Solid Sphere") .. "]" ..
+			"button_exit[0.7,7.5;3,0.8;worldedit_gui_sphere_dome_submit_hollow_dome;" ..
+				S("Hollow Dome") .. "]" ..
+			"button_exit[4.2,7.5;3,0.8;worldedit_gui_sphere_dome_submit_solid_dome;"..
+				S("Solid Dome") .. "]"
 	end,
 })
 
@@ -515,7 +531,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_cylinder", {
 	type = "advanced",
-	name = "Cylinder",
+	name = S("Cylinder"),
 	form = true,
 	privs = combine_we_privs({"hollowcylinder", "cylinder"}),
 	get_formspec = function(name)
@@ -529,27 +545,30 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_cylinder") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cylinder_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.6;4,0.8;worldedit_gui_cylinder_node;Name;%s]",
-				minetest.formspec_escape(node)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cylinder_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.6;4,0.8;worldedit_gui_cylinder_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_cylinder_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_cylinder_search_clear;X]" ..
 			"button[5.5,4.08;0.8,1;worldedit_gui_cylinder_prev;<]" ..
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_cylinder_next;>]" ..
-			string.format("field[0.3,6.9;2,0.8;worldedit_gui_cylinder_length;Length;%s]",
-				minetest.formspec_escape(length)) ..
-			string.format("field[2.2,6.9;2,0.8;worldedit_gui_cylinder_radius1;Base Radius;%s]",
-				minetest.formspec_escape(radius1)) ..
-			string.format("field[4.1,6.9;2,0.8;worldedit_gui_cylinder_radius2;Top Radius;%s]",
-				minetest.formspec_escape(radius2)) ..
+			string.format("field[0.3,6.9;2,0.8;worldedit_gui_cylinder_length;" ..
+				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
+			string.format("field[2.2,6.9;2,0.8;worldedit_gui_cylinder_radius1;"..
+				S("Base Radius") .. ";%s]", minetest.formspec_escape(radius1)) ..
+			string.format("field[4.1,6.9;2,0.8;worldedit_gui_cylinder_radius2;" ..
+				S("Top Radius") .. ";%s]", minetest.formspec_escape(radius2)) ..
 			string.format("dropdown[5.7,6.55;2.4;worldedit_gui_cylinder_axis;" ..
-				"X axis,Y axis,Z axis,Look direction;%d]", axis) ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
 			"field_close_on_enter[worldedit_gui_cylinder_filter;false]" ..
-			"button_exit[1,7.5;3,0.8;worldedit_gui_cylinder_submit_hollow;Hollow Cylinder]" ..
-			"button_exit[4,7.5;3,0.8;worldedit_gui_cylinder_submit_solid;Solid Cylinder]"
+			"button_exit[1,7.5;3,0.8;worldedit_gui_cylinder_submit_hollow;" ..
+				S("Hollow Cylinder") .. "]" ..
+			"button_exit[4,7.5;3,0.8;worldedit_gui_cylinder_submit_solid;" ..
+				S("Solid Cylinder") .. "]"
 	end,
 })
 
@@ -641,7 +660,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_pyramid", {
 	type = "advanced",
-	name = "Pyramid",
+	name = S("Pyramid"),
 	form = true,
 	privs = we_privs("pyramid"),
 	get_formspec = function(name)
@@ -654,23 +673,26 @@ worldedit.register_gui_function("worldedit_gui_pyramid", {
 
 		return "size[8,7]" .. worldedit.get_formspec_header("worldedit_gui_pyramid") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_pyramid_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.8;3.5,0.8;worldedit_gui_pyramid_node;Name;%s]",
-				minetest.formspec_escape(node)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_pyramid_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.8;3.5,0.8;worldedit_gui_pyramid_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_pyramid_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_pyramid_search_clear;X]" ..
 			"button[5.5,4.08;0.8,1;worldedit_gui_pyramid_prev;<]" ..
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_pyramid_next;>]" ..
-			string.format("field[3.8,5.8;2,0.8;worldedit_gui_pyramid_length;Length;%s]",
-				minetest.formspec_escape(length)) ..
+			string.format("field[3.8,5.8;2,0.8;worldedit_gui_pyramid_length;" ..
+				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
 			string.format("dropdown[5.5,5.45;2.5;worldedit_gui_pyramid_axis;" ..
-				"X axis,Y axis,Z axis,Look direction;%d]", axis) ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
 			"field_close_on_enter[worldedit_gui_pyramid_filter;false]" ..
-			"button_exit[1,6.5;3,0.8;worldedit_gui_pyramid_submit_hollow;Hollow Pyramid]" ..
-			"button_exit[4,6.5;3,0.8;worldedit_gui_pyramid_submit_solid;Solid Pyramid]"
+			"button_exit[1,6.5;3,0.8;worldedit_gui_pyramid_submit_hollow;" ..
+				S("Hollow Pyramid") .. "]" ..
+			"button_exit[4,6.5;3,0.8;worldedit_gui_pyramid_submit_solid;" ..
+				S("Solid Pyramid") .. "]"
 	end,
 })
 
@@ -754,7 +776,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_spiral", {
 	type = "advanced",
-	name = "Spiral",
+	name = S("Spiral"),
 	form = true,
 	privs = we_privs("spiral"),
 	get_formspec = function(name)
@@ -768,24 +790,24 @@ worldedit.register_gui_function("worldedit_gui_spiral", {
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_spiral") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_spiral_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.6;3.5,0.8;worldedit_gui_spiral_node;Name;%s]",
-				minetest.formspec_escape(node)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_spiral_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.6;3.5,0.8;worldedit_gui_spiral_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_spiral_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_spiral_search_clear;X]" ..
 			"button[5.5,4.08;0.8,1;worldedit_gui_spiral_prev;<]" ..
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_spiral_next;>]" ..
-			string.format("field[0.3,6.8;2,0.8;worldedit_gui_spiral_length;Side Length;%s]",
-				minetest.formspec_escape(length)) ..
-			string.format("field[2.3,6.8;2,0.8;worldedit_gui_spiral_height;Height;%s]",
-				minetest.formspec_escape(height)) ..
-			string.format("field[4.3,6.8;2,0.8;worldedit_gui_spiral_space;Wall Spacing;%s]",
-				minetest.formspec_escape(space)) ..
+			string.format("field[0.3,6.8;2,0.8;worldedit_gui_spiral_length;" ..
+				S("Side Length") .. ";%s]", minetest.formspec_escape(length)) ..
+			string.format("field[2.3,6.8;2,0.8;worldedit_gui_spiral_height;" ..
+				S("Height") .. ";%s]", minetest.formspec_escape(height)) ..
+			string.format("field[4.3,6.8;2,0.8;worldedit_gui_spiral_space;" ..
+				S("Wall Spacing") .. ";%s]", minetest.formspec_escape(space)) ..
 			"field_close_on_enter[worldedit_gui_spiral_filter;false]" ..
-			"button_exit[2.5,7.5;3,0.8;worldedit_gui_spiral_submit;Spiral]"
+			"button_exit[2.5,7.5;3,0.8;worldedit_gui_spiral_submit;" .. S("Spiral") .. "]"
 	end,
 })
 
@@ -859,16 +881,21 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_copy_move", {
 	type = "advanced",
-	name = "Copy / Move",
+	name = S("Copy / Move"),
 	privs = combine_we_privs({"copy", "move"}),
 	get_formspec = function(name)
 		local axis = gui_axis1[name] or 4
 		local amount = gui_distance1[name] or "10"
 		return "size[6.5,3]" .. worldedit.get_formspec_header("worldedit_gui_copy_move") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_copy_move_amount;Amount;%s]", minetest.formspec_escape(amount)) ..
-			string.format("dropdown[4,1.18;2.5;worldedit_gui_copy_move_axis;X axis,Y axis,Z axis,Look direction;%d]", axis) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_copy_move_copy;Copy Region]" ..
-			"button_exit[3.5,2.5;3,0.8;worldedit_gui_copy_move_move;Move Region]"
+			string.format("field[0.5,1.5;4,0.8;worldedit_gui_copy_move_amount;" ..
+				S("Amount") .. ";%s]", minetest.formspec_escape(amount)) ..
+			string.format("dropdown[4,1.18;2.5;worldedit_gui_copy_move_axis;" ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_copy_move_copy;" ..
+				S("Copy Region") .. "]" ..
+			"button_exit[3.5,2.5;3,0.8;worldedit_gui_copy_move_move;" ..
+				S("Move Region") .. "]"
 	end,
 })
 
@@ -884,24 +911,29 @@ worldedit.register_gui_handler("worldedit_gui_copy_move", function(name, fields)
 		end
 		return true
 	end
+
 	if fields.worldedit_gui_copy_move_axis then
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_copy_move_axis] or 4
 		worldedit.show_page(name, "worldedit_gui_copy_move")
 		return true
 	end
+
 	return false
 end)
 
 worldedit.register_gui_function("worldedit_gui_stack", {
 	type = "advanced",
-	name = "Stack",
+	name = S("Stack"),
 	privs = we_privs("stack"),
 	get_formspec = function(name)
 		local axis, count = gui_axis1[name], gui_count1[name]
 		return "size[6.5,3]" .. worldedit.get_formspec_header("worldedit_gui_stack") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_stack_count;Count;%s]", minetest.formspec_escape(count)) ..
-			string.format("dropdown[4,1.18;2.5;worldedit_gui_stack_axis;X axis,Y axis,Z axis,Look direction;%d]", axis) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_stack_submit;Stack]"
+			string.format("field[0.5,1.5;4,0.8;worldedit_gui_stack_count;" ..
+				S("Count") .. ";%s]", minetest.formspec_escape(count)) ..
+			string.format("dropdown[4,1.18;2.5;worldedit_gui_stack_axis;" ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_stack_submit;" .. S("Stack") .. "]"
 	end,
 })
 
@@ -913,25 +945,31 @@ worldedit.register_gui_handler("worldedit_gui_stack", function(name, fields)
 		minetest.chatcommands["/stack"].func(name, string.format("%s %s", axis_values[gui_axis1[name]], gui_count1[name]))
 		return true
 	end
+
 	if fields.worldedit_gui_stack_axis then
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_stack_axis]
 		worldedit.show_page(name, "worldedit_gui_stack")
 		return true
 	end
+
 	return false
 end)
 
 worldedit.register_gui_function("worldedit_gui_stretch", {
 	type = "advanced",
-	name = "Stretch",
+	name = S("Stretch"),
 	privs = we_privs("stretch"),
 	get_formspec = function(name)
 		local stretchx, stretchy, stretchz = gui_count1[name], gui_count2[name], gui_count3[name]
 		return "size[5,5]" .. worldedit.get_formspec_header("worldedit_gui_stretch") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_stretch_x;Stretch X;%s]", minetest.formspec_escape(stretchx)) ..
-			string.format("field[0.5,2.5;4,0.8;worldedit_gui_stretch_y;Stretch Y;%s]", minetest.formspec_escape(stretchy)) ..
-			string.format("field[0.5,3.5;4,0.8;worldedit_gui_stretch_z;Stretch Z;%s]", minetest.formspec_escape(stretchz)) ..
-			"button_exit[0,4.5;3,0.8;worldedit_gui_stretch_submit;Stretch]"
+			string.format("field[0.5,1.5;4,0.8;worldedit_gui_stretch_x;" ..
+				S("Stretch X") .. ";%s]", minetest.formspec_escape(stretchx)) ..
+			string.format("field[0.5,2.5;4,0.8;worldedit_gui_stretch_y;" ..
+				S("Stretch Y") .. ";%s]", minetest.formspec_escape(stretchy)) ..
+			string.format("field[0.5,3.5;4,0.8;worldedit_gui_stretch_z;" ..
+				S("Stretch Z") .. ";%s]", minetest.formspec_escape(stretchz)) ..
+			"button_exit[0,4.5;3,0.8;worldedit_gui_stretch_submit;" ..
+				S("Stretch") .. "]"
 	end,
 })
 
@@ -941,7 +979,8 @@ worldedit.register_gui_handler("worldedit_gui_stretch", function(name, fields)
 		gui_count2[name] = tostring(fields.worldedit_gui_stretch_y)
 		gui_count3[name] = tostring(fields.worldedit_gui_stretch_z)
 		worldedit.show_page(name, "worldedit_gui_stretch")
-		minetest.chatcommands["/stretch"].func(name, string.format("%s %s %s", gui_count1[name], gui_count2[name], gui_count3[name]))
+		minetest.chatcommands["/stretch"].func(name,
+			string.format("%s %s %s", gui_count1[name], gui_count2[name], gui_count3[name]))
 		return true
 	end
 	return false
@@ -949,14 +988,19 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_transpose", {
 	type = "advanced",
-	name = "Transpose",
+	name = S("Transpose"),
 	privs = we_privs("transpose"),
 	get_formspec = function(name)
 		local axis1, axis2 = gui_axis1[name], gui_axis2[name]
 		return "size[5.5,3]" .. worldedit.get_formspec_header("worldedit_gui_transpose") ..
-			string.format("dropdown[0,1;2.5;worldedit_gui_transpose_axis1;X axis,Y axis,Z axis,Look direction;%d]", axis1) ..
-			string.format("dropdown[3,1;2.5;worldedit_gui_transpose_axis2;X axis,Y axis,Z axis,Look direction;%d]", axis2) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_transpose_submit;Transpose]"
+			string.format("dropdown[0,1;2.5;worldedit_gui_transpose_axis1;"..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis1) ..
+			string.format("dropdown[3,1;2.5;worldedit_gui_transpose_axis2;" ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis2) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_transpose_submit;" ..
+				S("Transpose") .. "]"
 	end,
 })
 
@@ -964,7 +1008,8 @@ worldedit.register_gui_handler("worldedit_gui_transpose", function(name, fields)
 	if fields.worldedit_gui_transpose_submit then
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_transpose_axis1]
 		worldedit.show_page(name, "worldedit_gui_transpose")
-		minetest.chatcommands["/transpose"].func(name, string.format("%s %s", axis_values[gui_axis1[name]], axis_values[gui_axis2[name]]))
+		minetest.chatcommands["/transpose"].func(name, string.format("%s %s",
+			axis_values[gui_axis1[name]], axis_values[gui_axis2[name]]))
 		return true
 	end
 	if fields.worldedit_gui_transpose_axis1 then
@@ -982,13 +1027,15 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_flip", {
 	type = "advanced",
-	name = "Flip",
+	name = S("Flip"),
 	privs = we_privs("flip"),
 	get_formspec = function(name)
 		local axis = gui_axis1[name]
 		return "size[5,3]" .. worldedit.get_formspec_header("worldedit_gui_flip") ..
-			string.format("dropdown[0,1;2.5;worldedit_gui_flip_axis;X axis,Y axis,Z axis,Look direction;%d]", axis) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_flip_submit;Flip]"
+			string.format("dropdown[0,1;2.5;worldedit_gui_flip_axis;" ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_flip_submit;" .. S("Flip") .. "]"
 	end,
 })
 
@@ -1009,14 +1056,18 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_rotate", {
 	type = "default",
-	name = "Rotate",
+	name = S("Rotate"),
 	privs = we_privs("rotate"),
 	get_formspec = function(name)
 		local axis, angle = gui_axis1[name], gui_angle[name]
 		return "size[5.5,3]" .. worldedit.get_formspec_header("worldedit_gui_rotate") ..
-			string.format("dropdown[0,1;2.5;worldedit_gui_rotate_angle;90 degrees,180 degrees,270 degrees;%s]", angle) ..
-			string.format("dropdown[3,1;2.5;worldedit_gui_rotate_axis;X axis,Y axis,Z axis,Look direction;%d]", axis) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_rotate_submit;Rotate]"
+			string.format("dropdown[0,1;2.5;worldedit_gui_rotate_angle;"..
+				S("90 degrees") .. "," .. S("180 degrees") .. "," .. S("270 degrees") ..
+				";%s]", angle) ..
+			string.format("dropdown[2.5,1;3;worldedit_gui_rotate_axis;" ..
+				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
+				S("Look direction") .. ";%d]", axis) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_rotate_submit;" .. S("Rotate") .. "]"
 	end,
 })
 
@@ -1051,13 +1102,15 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_orient", {
 	type = "advanced",
-	name = "Orient",
+	name = S("Orient"),
 	privs = we_privs("orient"),
 	get_formspec = function(name)
 		local angle = gui_angle[name]
 		return "size[5,3]" .. worldedit.get_formspec_header("worldedit_gui_orient") ..
-			string.format("dropdown[0,1;2.5;worldedit_gui_orient_angle;90 degrees,180 degrees,270 degrees;%s]", angle) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_orient_submit;Orient]"
+			string.format("dropdown[0,1;2.5;worldedit_gui_orient_angle;" ..
+				S("90 degrees") .. "," .. S("180 degrees") .. "," .. S("270 degrees") ..
+				";%s]", angle) ..
+			"button_exit[0,2.5;3,0.8;worldedit_gui_orient_submit;" .. S("Orient") .. "]"
 	end,
 })
 
@@ -1078,7 +1131,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_fixlight", {
 	type = "advanced",
-	name = "Fix Lighting",
+	name = S("Fix Lighting"),
 	privs = we_privs("fixlight"),
 	on_select = function(name)
 		minetest.chatcommands["/fixlight"].func(name, "")
@@ -1087,7 +1140,7 @@ worldedit.register_gui_function("worldedit_gui_fixlight", {
 
 worldedit.register_gui_function("worldedit_gui_hide", {
 	type = "advanced",
-	name = "Hide Region",
+	name = S("Hide Region"),
 	privs = we_privs("hide"),
 	on_select = function(name)
 		minetest.chatcommands["/hide"].func(name, "")
@@ -1096,7 +1149,7 @@ worldedit.register_gui_function("worldedit_gui_hide", {
 
 worldedit.register_gui_function("worldedit_gui_suppress", {
 	type = "default",
-	name = "Suppress Nodes",
+	name = S("Suppress Nodes"),
 	privs = we_privs("suppress"),
 	on_select = function(name)
 		minetest.chatcommands["/suppress"].func(name)
@@ -1117,16 +1170,18 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_highlight", {
 	type = "advanced",
-	name = "Highlight Nodes",
+	name = S("Highlight Nodes"),
 	privs = we_privs("highlight"),
 	get_formspec = function(name)
 		local node = gui_nodename1[name]
 		local nodename = worldedit.normalize_nodename(node)
 		return "size[6.5,3]" .. worldedit.get_formspec_header("worldedit_gui_highlight") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_highlight_node;Name;%s]", minetest.formspec_escape(node)) ..
-			"button[4,1.18;1.5,0.8;worldedit_gui_highlight_search;Search]" ..
+			string.format("field[0.5,1.5;4,0.8;worldedit_gui_highlight_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
+			"button[4,1.18;1.5,0.8;worldedit_gui_highlight_search;" .. S("Search") .. "]" ..
 			formspec_node("5.5,1.1", nodename) ..
-			"button_exit[0,2.5;3,0.8;worldedit_gui_highlight_submit;Highlight Nodes]"
+			"button_exit[0,2.5;3,0.8;worldedit_gui_highlight_submit;" ..
+				S("Highlight Nodes") .. "]"
 	end,
 })
 
@@ -1179,21 +1234,22 @@ end
 
 worldedit.register_gui_function("worldedit_gui_save_load", {
 	type = "default",
-	name = "Copy / Paste",
+	name = S("Copy / Paste"),
 	privs = combine_we_privs({"save", "allocate", "load"}),
 	get_formspec = function(name)
 		local filename = gui_filename[name]
 		local schems = scandir()
 
 		return "size[6,4]" .. worldedit.get_formspec_header("worldedit_gui_save_load") ..
-			string.format("field[0.5,1.5;2.5,0.8;worldedit_gui_save_filename;New building:;%s]",
-				minetest.formspec_escape(filename)) ..
-			"label[3,0.7;Buildings:]" ..
-			"dropdown[3,1.15;2.5;worldedit_dd_schems;" .. table.concat(schems, ",") .. ";1]" ..
-			"button[0,2.5;3,0.8;worldedit_gui_save_load_submit_save;Save]" ..
-			"button_exit[3,2.5;3,0.8;worldedit_gui_save_load_submit_allocate;Allocate]" ..
-			"button_exit[0,3.5;3,0.8;worldedit_gui_save_load_submit_load;Load]" ..
-			"button[3,3.5;3,0.8;worldedit_gui_save_load_submit_delete;Delete]"
+			string.format("field[0.3,1.5;3,0.8;worldedit_gui_save_filename;" ..
+				S("New building") .. ":;%s]", minetest.formspec_escape(filename)) ..
+			"label[3,0.7;" .. S("Buildings") .. ":]" ..
+			"dropdown[3,1.15;3;worldedit_dd_schems;" .. table.concat(schems, ",") .. ";1]" ..
+			"button[0,2.5;3,0.8;worldedit_gui_save_load_submit_save;" .. S("Save") .. "]" ..
+			"button_exit[3,2.5;3,0.8;worldedit_gui_save_load_submit_allocate;" ..
+				S("Allocate") .. "]" ..
+			"button_exit[0,3.5;3,0.8;worldedit_gui_save_load_submit_load;" .. S("Load") .. "]" ..
+			"button[3,3.5;3,0.8;worldedit_gui_save_load_submit_delete;" .. S("Delete") .. "]"
 	end,
 })
 
@@ -1227,7 +1283,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_cube", {
 	type = "advanced",
-	name = "Cuboid", -- technically the command is misnamed, I know...
+	name = S("Cuboid"), -- technically the command is misnamed, I know...
 	form = true,
 	privs = combine_we_privs({"hollowcube", "cube"}),
 	get_formspec = function(name)
@@ -1241,25 +1297,27 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_cube") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cube_filter;Filter;%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.7;3.5,0.8;worldedit_gui_cube_node;Name;%s]",
-				minetest.formspec_escape(node)) ..
+			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cube_filter;" ..
+				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.7;3.5,0.8;worldedit_gui_cube_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			"button[2.9,4.18;0.8,0.8;worldedit_gui_cube_search;?]" ..
 			"button[3.6,4.18;0.8,0.8;worldedit_gui_cube_search_clear;X]" ..
 			"button[5.5,4.08;0.8,1;worldedit_gui_cube_prev;<]" ..
 			"label[6.2,4.28;" ..
 				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
 			"button[7.2,4.08;0.8,1;worldedit_gui_cube_next;>]" ..
-			string.format("field[0.3,6.8;2,1;worldedit_gui_cube_width;Width;%s]",
-				minetest.formspec_escape(width)) ..
-			string.format("field[2.3,6.8;2,1;worldedit_gui_cube_height;Height;%s]",
-				minetest.formspec_escape(height)) ..
-			string.format("field[4.3,6.8;2,1;worldedit_gui_cube_length;Length;%s]",
-				minetest.formspec_escape(length)) ..
+			string.format("field[0.3,6.8;2,1;worldedit_gui_cube_width;" ..
+				S("Width") .. ";%s]", minetest.formspec_escape(width)) ..
+			string.format("field[2.3,6.8;2,1;worldedit_gui_cube_height;" ..
+				S("Height") .. ";%s]", minetest.formspec_escape(height)) ..
+			string.format("field[4.3,6.8;2,1;worldedit_gui_cube_length;" ..
+				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
 			"field_close_on_enter[worldedit_gui_cube_filter;false]" ..
-			"button_exit[1,7.5;3,1;worldedit_gui_cube_submit_hollow;Hollow Cuboid]" ..
-			"button_exit[4,7.5;3,1;worldedit_gui_cube_submit_solid;Solid Cuboid]"
+			"button_exit[1,7.5;3,1;worldedit_gui_cube_submit_hollow;" ..
+				S("Hollow Cuboid") .. "]" ..
+			"button_exit[4,7.5;3,1;worldedit_gui_cube_submit_solid;" ..
+				S("Solid Cuboid") .. "]"
 	end,
 })
 
@@ -1325,7 +1383,8 @@ worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
 		if submit then
 			local n = worldedit.normalize_nodename(gui_nodename1[name])
 			if n then
-				local args = string.format("%s %s %s %s", gui_distance1[name], gui_distance2[name], gui_distance3[name], n)
+				local args = string.format("%s %s %s %s",
+					gui_distance1[name], gui_distance2[name], gui_distance3[name], n)
 				minetest.chatcommands["/"..submit].func(name, args)
 			end
 		end
@@ -1336,6 +1395,7 @@ worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
 	return false
 end)
 
+--[[
 worldedit.register_gui_function("worldedit_gui_clearobjects", {
 	type = "advanced",
 	name = "Clear Objects",
@@ -1344,10 +1404,11 @@ worldedit.register_gui_function("worldedit_gui_clearobjects", {
 		minetest.chatcommands["/clearobjects"].func(name, "")
 	end,
 })
+]]
 
 worldedit.register_gui_function("worldedit_gui_undo", {
 	type = "default",
-	name = "Cancel Action",
+	name = S("Cancel Action"),
 	privs = we_privs("undo"),
 	on_select = function(name)
 		minetest.chatcommands["/undo"].func(name, "")

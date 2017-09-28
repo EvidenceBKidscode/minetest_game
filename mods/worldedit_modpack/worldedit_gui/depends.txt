@@ -3,3 +3,4 @@ worldedit_commands
 sfinv?
 creative?
 teacher_menu?
+utils?

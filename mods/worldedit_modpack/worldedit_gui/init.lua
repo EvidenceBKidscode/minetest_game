@@ -1,4 +1,5 @@
 worldedit = worldedit or {}
+local S = utils.gettext
 
 --[[
 Example:
@@ -75,7 +76,7 @@ end
 
 worldedit.get_formspec_header = function(identifier)
 	local entry = worldedit.pages[identifier] or {}
-	return "button[0,0;2,0.5;worldedit_gui;< Back]" ..
+	return "button[0,0;2,0.5;worldedit_gui;< " .. S("Back") .. "]" ..
 		string.format("label[2,0;WorldEdit GUI > %s]", entry.name or "")
 end
 
@@ -97,10 +98,8 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 
 			if teachers[player:get_player_name()].current_tab == "world" then	
 				return fs .. (can_worldedit and
-					("image_button[3.3,6.7;1.5,1.5;inventory_plus_worldedit_gui.png;worldedit_gui;]" ..
-					 "label[3.15,8.15;World Editor]" ..
-					 "box[2.95,6.4;2,2.3;#888888]") or
-					 "")
+					("image_button[6.6,7.45;1.5,1.5;inventory_plus_worldedit_gui.png;worldedit_gui;]" ..
+					 "tooltip[worldedit_gui;" .. S("World Editor") .. "]") or "")
 			end
 
 			return fs
@@ -215,16 +214,18 @@ local function get_formspec_str(main, y, columns, width, buttons, name)
 		"size[%g,%g]", math.max(columns * width, 5),
 			       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
 		"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
-		"label[" .. (columns * (width / 2) - 3) .. ",1;" ..
+		"label[" .. (mode[name] == "default" and 3.5 or 0.5) .. ",1;" ..
 			minetest.wrap_text(
-			"Use the hammer from your inventory to select an area,"..
-			" then choose one of these functionalities...", 50, false) .. "]" ..
-		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") .. ";< Back]" ..
+			S("Use the hammer from your inventory to select an area, " ..
+			  "then choose one of these functionalities..."),
+			70, false) .. "]" ..
+		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") ..
+			";< " .. S("Back") .. "]" ..
 		"label[2,0;WorldEdit GUI]" ..
 		table.concat(buttons) ..
 		"button[" .. (math.max(columns * width, 5) - 2) ..
 			",0;2,0.5;worldedit_gui_advanced;" ..
-			(mode[name] == "default" and "Basic" or "Advanced") .. "]"
+			(mode[name] == "default" and S("Basic") or S("Advanced")) .. "]"
 end
 
 worldedit.register_gui_function("worldedit_gui", {
@@ -276,8 +277,8 @@ worldedit.register_gui_handler("worldedit_gui", function(name, fields)
 				local has_privs, missing_privs = minetest.check_player_privs(name, entry.privs)
 				if not has_privs then
 					worldedit.player_notify(name,
-						"you are not allowed to use this function (missing privileges: " ..
-						table.concat(missing_privs, ", ") .. ")")
+						S("you are not allowed to use this function (missing privileges: @1)",
+						  table.concat(missing_privs, ", ")))
 					return false
 				end
 
@@ -299,7 +300,7 @@ end)
 
 worldedit.register_gui_function("worldedit_gui_forms", {
 	type = "default",
-	name = "Forms",
+	name = S("Forms"),
 	privs = {worldedit=true},
 	get_formspec = function(name)
 		--create a form with all the buttons arranged in a grid
@@ -341,8 +342,8 @@ worldedit.register_gui_handler("worldedit_gui_forms", function(name, fields)
 			local has_privs, missing_privs = minetest.check_player_privs(name, entry.privs)
 			if not has_privs then
 				worldedit.player_notify(name,
-					"you are not allowed to use this function (missing privileges: " ..
-					table.concat(missing_privs, ", ") .. ")")
+					S("you are not allowed to use this function (missing privileges: @1)",
+					  table.concat(missing_privs, ", ")))
 				return false
 			end
 

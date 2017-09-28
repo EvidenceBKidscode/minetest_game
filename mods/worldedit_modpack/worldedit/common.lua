@@ -5,8 +5,9 @@
 -- `pos1` is less than or equal to the corresponding component of `pos2`.
 -- Returns the new positions.
 function worldedit.sort_pos(pos1, pos2)
-	pos1 = {x=pos1.x, y=pos1.y, z=pos1.z}
-	pos2 = {x=pos2.x, y=pos2.y, z=pos2.z}
+	pos1 = pos1 and {x=pos1.x, y=pos1.y, z=pos1.z} or vector.new()
+	pos2 = pos2 and {x=pos2.x, y=pos2.y, z=pos2.z} or vector.new()
+
 	if pos1.x > pos2.x then
 		pos2.x, pos1.x = pos1.x, pos2.x
 	end
