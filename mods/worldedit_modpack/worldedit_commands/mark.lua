@@ -72,7 +72,7 @@ worldedit.mark_region = function(name)
 		end
 
 		local thickness = 0.2
-		local sizex, sizey, sizez = (1 + pos2.x - pos1.x) / 2, (1 + pos2.y - pos1.y) / 2, (1 + pos2.z - pos1.z) / 2
+		local sizex, sizey, sizez = (1.2 + pos2.x - pos1.x) / 2, (1.2 + pos2.y - pos1.y) / 2, (1.2 + pos2.z - pos1.z) / 2
 
 		--make area stay loaded
 		local manip = minetest.get_voxel_manip()
@@ -81,8 +81,8 @@ worldedit.mark_region = function(name)
 		local markers = {}
 
 		--XY plane markers
-		for _, z in ipairs({pos1.z - 0.5, pos2.z + 0.5}) do
-			local marker = minetest.add_entity({x=pos1.x + sizex - 0.5, y=pos1.y + sizey - 0.5, z=z}, "worldedit:region_cube")
+		for _, z in ipairs({pos1.z - 0.6, pos2.z + 0.6}) do
+			local marker = minetest.add_entity({x=pos1.x + sizex - 0.6, y=pos1.y + sizey - 0.6, z=z}, "worldedit:region_cube")
 			if marker ~= nil then
 				marker:set_properties({
 					visual_size={x=sizex * 2, y=sizey * 2},
@@ -94,8 +94,8 @@ worldedit.mark_region = function(name)
 		end
 
 		--YZ plane markers
-		for _, x in ipairs({pos1.x - 0.5, pos2.x + 0.5}) do
-			local marker = minetest.add_entity({x=x, y=pos1.y + sizey - 0.5, z=pos1.z + sizez - 0.5}, "worldedit:region_cube")
+		for _, x in ipairs({pos1.x - 0.6, pos2.x + 0.6}) do
+			local marker = minetest.add_entity({x=x, y=pos1.y + sizey - 0.6, z=pos1.z + sizez - 0.6}, "worldedit:region_cube")
 			if marker ~= nil then
 				marker:set_properties({
 					visual_size={x=sizez * 2, y=sizey * 2},
