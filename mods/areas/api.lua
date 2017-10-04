@@ -69,7 +69,11 @@ end
 
 -- Checks if the area is unprotected or owned by you
 function areas:canInteract(pos, name)
-	if minetest.check_player_privs(name, self.adminPrivs) then
+	local meta = minetest.get_meta(pos)
+	local destructible = meta:get_string("destructible")
+
+	if minetest.check_player_privs(name, self.adminPrivs) or
+			destructible == "true" then
 		return true
 	end
 	local owned = false
