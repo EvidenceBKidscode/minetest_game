@@ -1438,11 +1438,12 @@ if minetest.get_modpath("areas") then
 			area_datas[name] = area_datas[name] or {}
 			local area_name = area_datas[name].last_name or ""
 			local player_name = area_datas[name].last_player_name or ""
-			local names = {}
+			local names = ""
 
 			for k, v in pairs(areas.areas) do
-				names[k] = v.name .. " (" .. k .. ") - " .. v.owner
+				names = names .. v.name .. " (" .. k .. ") - " .. v.owner .. ","
 			end
+			names = names:sub(1,-2)
 
 			return "size[8,4.5]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
@@ -1450,8 +1451,7 @@ if minetest.get_modpath("areas") then
 				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
 					S("Player name") .. ";%s]", minetest.formspec_escape(player_name)) ..
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
-				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
-					table.concat(names, ",") .. ";1]" ..
+				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" .. names .. ";1]" ..
 				"button[0,3.8;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
 				"button[2.66,3.8;2.5,1;worldedit_gui_protect_add_owner;" .. S("Add owner") .. "]" ..
 				"button[5.33,3.8;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
