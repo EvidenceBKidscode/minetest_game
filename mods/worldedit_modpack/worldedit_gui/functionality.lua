@@ -1520,16 +1520,22 @@ if minetest.get_modpath("areas") then
 				end
 			end
 
-			areas:remove(id)
-			areas:save()
+			if id then
+				areas:remove(id)
+				areas:save()
 
-			minetest.chat_send_player(name,
-				minetest.colorize("#FFFF00",
-					S("The area '" .. area_name .. "' has been removed")))
+				minetest.chat_send_player(name,
+					minetest.colorize("#FFFF00",
+						S("The area '" .. area_name .. "' has been removed")))
 
-			worldedit.show_page(name, "worldedit_gui_protect")
+				worldedit.show_page(name, "worldedit_gui_protect")
 
-			return true
+				return true
+			else
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Select an area first")))
+				return false
+			end
 		end
 
 		return false
