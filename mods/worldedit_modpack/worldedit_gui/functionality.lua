@@ -1076,9 +1076,6 @@ worldedit.register_gui_handler("worldedit_gui_rotate", function(name, fields)
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_rotate_axis]
 		gui_angle[name] = angle_indices[fields.worldedit_gui_rotate_angle]
 
-		print(axis_values[gui_axis1[name]])
-		print(angle_values[gui_angle[name]])
-
 		worldedit.show_page(name, "worldedit_gui_rotate")
 		minetest.chatcommands["/rotate"].func(name,
 			string.format("%s %s",
@@ -1414,3 +1411,127 @@ worldedit.register_gui_function("worldedit_gui_undo", {
 		minetest.chatcommands["/undo"].func(name, "")
 	end,
 })
+
+local function area_check_pos(pos1, pos2, name)
+	if not pos1 then
+		minetest.chat_send_player(name,
+			minetest.colorize("#FF0000", S("ERROR: Missing position 1")))
+		return false
+	end
+
+	if not pos2 then
+		minetest.chat_send_player(name,
+			minetest.colorize("#FF0000", S("ERROR: Missing position 2")))
+		return false
+	end
+
+	return true
+end
+
+if minetest.get_modpath("areas") then
+	local area_datas = {}
+	worldedit.register_gui_function("worldedit_gui_protect", {
+		type = "default",
+		name = S("Area Protection"),
+		privs = {areas=true},
+		get_formspec = function(name)
+			area_datas[name] = area_datas[name] or {}
+			local area_name = area_datas[name].last_name or ""
+			local player_name = area_datas[name].last_player_name or ""
+			local names = {}
+
+			for k, v in pairs(areas.areas) do
+				names[k] = v.name .. " (" .. k .. ") - " .. v.owner
+			end
+
+			return "size[8,4.5]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
+				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
+					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
+				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
+					S("Player name") .. ";%s]", minetest.formspec_escape(player_name)) ..
+				"label[0,2.1;" .. S("Areas:") .. "]" ..
+				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
+					table.concat(names, ",") .. ";1]" ..
+				"button[0,3.8;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
+				"button[2.66,3.8;2.5,1;worldedit_gui_protect_add_owner;" .. S("Add owner") .. "]" ..
+				"button[5.33,3.8;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
+		end,
+	})
+
+	worldedit.register_gui_handler("worldedit_gui_protect", function(name, fields)
+		local area_name, pos1, pos2
+		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
+
+		if fields.worldedit_gui_protect_submit then
+			if not area_check_pos(pos1, pos2, name) then
+				return false
+			end
+
+			if area_name == "" then
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Area name required")))
+				return false
+			end
+
+			area_name = fields.worldedit_gui_protect_name
+			area_datas[name].last_name = fields.worldedit_gui_protect_name
+
+			local id = areas:add(name, area_name, pos1, pos2)
+			areas:save()
+
+			minetest.chat_send_player(name,
+				minetest.colorize("#FFFF00",
+					S("The area '" .. area_name .. "' has been protected")))
+
+			worldedit.show_page(name, "worldedit_gui_protect")
+
+			return true
+
+		elseif fields.worldedit_gui_protect_add_owner then
+			if not area_check_pos(pos1, pos2, name) then
+				return false
+			end
+
+			local player_name = fields.worldedit_gui_protect_player_name
+			if player_name == "" then
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Player name required")))
+				return false
+			end
+
+			area_name = fields.worldedit_gui_protect_areas
+
+			local id = areas:add(player_name, area_name, pos1, pos2)
+			areas:save()
+
+			minetest.chat_send_player(name,
+				minetest.colorize("#FFFF00",
+					S("Player '" .. player_name ..
+						"' added to ownership of area '" .. area_name .. "'")))
+			return true
+
+		elseif fields.worldedit_gui_protect_remove then
+			area_name = fields.worldedit_gui_protect_areas:match("^(.*)%s%(")
+			local id
+
+			for k, v in pairs(areas.areas) do
+				if area_name == v.name then
+					id = k
+				end
+			end
+
+			areas:remove(id)
+			areas:save()
+
+			minetest.chat_send_player(name,
+				minetest.colorize("#FFFF00",
+					S("The area '" .. area_name .. "' has been removed")))
+
+			worldedit.show_page(name, "worldedit_gui_protect")
+
+			return true
+		end
+
+		return false
+	end)
+end

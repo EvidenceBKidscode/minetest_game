@@ -236,7 +236,7 @@ worldedit.register_gui_function("worldedit_gui", {
 		--create a form with all the buttons arranged in a grid
 		local buttons, x, y, index = {}, 0, 2, 0
 		local width, height = 3, 0.8
-		local columns = mode[name] == "default" and 5 or 3
+		local columns = mode[name] == "default" and 5 or 4
 
 		for i = 1, #identifiers do
 			local identifier = identifiers[i]

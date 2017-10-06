@@ -1,5 +1,6 @@
 worldedit
 worldedit_commands
+areas?
 sfinv?
 creative?
 teacher_menu?
