@@ -172,12 +172,21 @@ function creative.register_tab(name, title, items)
 
 			else for item in pairs(fields) do
 				  if item:find(":") then
-				  	if worldname:sub(1,6) ~= "build_" and
-				  			not is_mapmaker and not is_teacher then
-				  		minetest.chat_send_player(player_name,
-							minetest.colorize("#FF0000",
-								"ERROR: Privilege 'mapmaker' or 'teacher'" ..
-								" required to get this item"))
+				  	if not is_mapmaker and not is_teacher then
+				  		if worldname:sub(1,6) ~= "build_" then
+					  		minetest.chat_send_player(player_name,
+								minetest.colorize("#FF0000",
+									"ERROR: Privilege 'mapmaker' or 'teacher'" ..
+									" required to get this item"))
+
+					  	elseif worldname == "coding_schools" or
+								worldname == "science_factory" then
+					  	       minetest.chat_send_player(player_name,
+								minetest.colorize("#FF0000",
+									"ERROR: You cannot use any other item " ..
+									"on this map except the kidsbot"))
+					  	end
+
 				  		return
 				  	end
 
