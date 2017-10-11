@@ -15,6 +15,13 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	minetest.after(0, add_text, player)
+
+	local is_mapmaker = minetest.check_player_privs(player, "mapmaker")
+	local is_teacher = minetest.check_player_privs(player, "teacher")
+
+	if is_teacher or is_mapmaker then
+		player:hud_set_hotbar_itemcount(16)
+	end
 end)
 
 minetest.register_globalstep(function(dtime)
