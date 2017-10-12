@@ -70,7 +70,7 @@ minetest.register_globalstep(function(dtime)
 		local text, color, font_size = "", 0xFFFFFF, 22
 		for _, area in pairs(areas:getAreasAtPos(pos)) do
 			text  = area.text
-			color = code_colors[area.color:match("%w+")]
+			color = code_colors[(area.color and area.color:match("%w+"))]
 			font_size = area.font_size
 		end
 
