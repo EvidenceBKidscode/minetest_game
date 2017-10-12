@@ -77,7 +77,7 @@ end
 
 --- Add a area.
 -- @return The new area's ID.
-function areas:add(owner, name, pos1, pos2, parent, text, color, font_size)
+function areas:add(owner, name, pos1, pos2, parent, text, lang, color, font_size)
 	local id = findFirstUnusedIndex(self.areas)
 	self.areas[id] = {
 		name   = name,
@@ -85,10 +85,12 @@ function areas:add(owner, name, pos1, pos2, parent, text, color, font_size)
 		pos2   = pos2,
 		owner  = owner,
 		parent = parent,
-		text   = text,
+		text   = {},
 		color  = color,
 		font_size = font_size,
 	}
+
+	self.areas[id].text[lang] = text
 
 	-- Add to AreaStore
 	if self.store then

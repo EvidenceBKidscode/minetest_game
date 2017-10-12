@@ -1441,7 +1441,10 @@ if minetest.get_modpath("areas") then
 		"pink",
 	}
 
-	local function save_area(fields, name, area_name, pos1, pos2, text, color, font_size)
+	local LANG = minetest.settings:get("language")
+	LANG = LANG ~= "" and LANG or "en"
+
+	local function save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
 		if not area_check_pos(pos1, pos2, name) then
 			return false
 		end
@@ -1455,7 +1458,7 @@ if minetest.get_modpath("areas") then
 		area_name = fields.worldedit_gui_protect_name
 		area_datas[name].last_name = fields.worldedit_gui_protect_name
 
-		local id = areas:add(name, area_name, pos1, pos2, nil, text, color, font_size)
+		local id = areas:add(name, area_name, pos1, pos2, nil, text, lang, color, font_size)
 		areas:save()
 
 		minetest.chat_send_player(name,
@@ -1480,9 +1483,10 @@ if minetest.get_modpath("areas") then
 			area_datas[name] = area_datas[name] or {}
 			local area_name = area_datas[name].last_name or ""
 			local player_name = area_datas[name].last_player_name or ""
-			local dd_idx = area_datas[name].last_dd_idx or 1
-			local color = areas.areas[dd_idx].color or "white"
-			local current_font_size = areas.areas[dd_idx].font_size or 22
+			local dd_idx = area_datas[name] and area_datas[name].last_dd_idx or 1
+			local color = areas.areas[dd_idx] and areas.areas[dd_idx].color or "white"
+			local current_font_size = areas.areas[dd_idx] and areas.areas[dd_idx].font_size or 22
+			local lang = area_datas[name].last_lang or "en"
 
 			local names = ""
 			for k, v in pairs(areas.areas) do
@@ -1514,6 +1518,13 @@ if minetest.get_modpath("areas") then
 			end
 
 			local langs = {"EN", "FR"}
+			local lang_idx = 1
+
+			for k, v in pairs(langs) do
+				if v == lang:upper() then
+					lang_idx = k
+				end
+			end
 
 			return "size[8,9]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
@@ -1524,13 +1535,14 @@ if minetest.get_modpath("areas") then
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
 					names .. ";" .. dd_idx .. "]" ..
 				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" .. S("Display Text:") .. ";" ..
-					(areas.areas[dd_idx] and areas.areas[dd_idx].text or "") .. "]" ..
+					(areas.areas[dd_idx] and
+					 areas.areas[dd_idx].text[lang] or "") .. "]" ..
 				"dropdown[0,7.4;2;worldedit_gui_protect_text_color; " ..
 					colors_str .. ";" .. color_idx .. "]" ..
-				"dropdown[2,7.4;2;worldedit_gui_protect_text_size;" ..
+				"dropdown[2,7.4;1.5;worldedit_gui_protect_text_size;" ..
 					table.concat(font_sizes, ",") .. ";" .. font_size_idx .. "]" ..
-				"dropdown[2,7.4;2;worldedit_gui_protect_text_size;" ..
-					table.concat(langs, ",") .. ";" .. font_size_idx .. "]" ..
+				"dropdown[3.5,7.4;1.5;worldedit_gui_protect_text_lang;" ..
+					table.concat(langs, ",") .. ";" .. lang_idx .. "]" ..
 				"button[5.5,7.32;2.5,1;worldedit_gui_protect_save_text;" .. S("Save") .. "]" ..
 				"button[0,8.4;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
 				"button[2.66,8.4;2.5,1;worldedit_gui_protect_add_owner;" .. S("Add owner") .. "]" ..
@@ -1548,6 +1560,9 @@ if minetest.get_modpath("areas") then
 			      fields.worldedit_gui_protect_text_color:lower()
 		local font_size = fields.worldedit_gui_protect_text_size and
 				  tonumber(fields.worldedit_gui_protect_text_size)
+		local lang = fields.worldedit_gui_protect_text_lang and
+			     fields.worldedit_gui_protect_text_lang:lower() or "en"
+
 
 		if fields.worldedit_gui_protect_areas then
 			area_datas[name].last_dd_idx = dd_idx
@@ -1557,10 +1572,19 @@ if minetest.get_modpath("areas") then
 			end
 		end
 
+		if fields.worldedit_gui_protect_text_lang then
+			area_datas[name].last_lang = lang
+			if reload_page(fields) then
+				worldedit.show_page(name, "worldedit_gui_protect")
+				return true
+			end
+		end
+
 		if fields.worldedit_gui_protect_save_text then
 			if areas.areas[dd_idx] then
 				area_name = fields.worldedit_gui_protect_name
-				areas.areas[dd_idx].text = text
+				areas.areas[dd_idx].text = areas.areas[dd_idx].text or {}
+				areas.areas[dd_idx].text[lang] = text
 				areas.areas[dd_idx].color = color
 				areas.areas[dd_idx].font_size = font_size
 				areas:save()
@@ -1596,7 +1620,7 @@ if minetest.get_modpath("areas") then
 
 			area_name = fields.worldedit_gui_protect_areas
 
-			local id = areas:add(player_name, area_name, pos1, pos2, nil, text, color, font_size)
+			local id = areas:add(player_name, area_name, pos1, pos2, nil, text, lang, color, font_size)
 			areas:save()
 
 			minetest.chat_send_player(name,

@@ -14,6 +14,9 @@ local code_colors = {
 	pink   = 0xFF69B4,
 }
 
+local LANG = minetest.settings:get("language")
+LANG = LANG ~= "" and LANG or "en"
+
 minetest.register_globalstep(function(dtime)
 	local players = minetest.get_connected_players()
 	for i = 1, #players do
@@ -69,8 +72,8 @@ minetest.register_globalstep(function(dtime)
 
 		local text, color, font_size = "", 0xFFFFFF, 22
 		for _, area in pairs(areas:getAreasAtPos(pos)) do
-			text  = area.text
-			color = code_colors[(area.color and area.color:match("%w+"))]
+			text  = area.text[LANG]
+			color = code_colors[area.color]
 			font_size = area.font_size
 		end
 
@@ -99,10 +102,10 @@ minetest.register_globalstep(function(dtime)
 			player:hud_change(hud_text.areasText, "text", text or "")
 			hud_text.oldText = text
 		elseif hud_text.oldColor ~= color then
-			player:hud_change(hud_text.areasText, "number", color)
+			player:hud_change(hud_text.areasText, "number", color or 0xFFFFFF)
 			hud_text.oldColor = color
 		elseif hud_text.oldFontSize ~= font_size then
-			player:hud_change(hud_text.areasText, "font_size", font_size)
+			player:hud_change(hud_text.areasText, "font_size", font_size or 22)
 			hud_text.oldFontSize = font_size
 		end
 	end
