@@ -1513,6 +1513,8 @@ if minetest.get_modpath("areas") then
 				end
 			end
 
+			local langs = {"EN", "FR"}
+
 			return "size[8,9]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
 					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
@@ -1527,6 +1529,8 @@ if minetest.get_modpath("areas") then
 					colors_str .. ";" .. color_idx .. "]" ..
 				"dropdown[2,7.4;2;worldedit_gui_protect_text_size;" ..
 					table.concat(font_sizes, ",") .. ";" .. font_size_idx .. "]" ..
+				"dropdown[2,7.4;2;worldedit_gui_protect_text_size;" ..
+					table.concat(langs, ",") .. ";" .. font_size_idx .. "]" ..
 				"button[5.5,7.32;2.5,1;worldedit_gui_protect_save_text;" .. S("Save") .. "]" ..
 				"button[0,8.4;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
 				"button[2.66,8.4;2.5,1;worldedit_gui_protect_add_owner;" .. S("Add owner") .. "]" ..

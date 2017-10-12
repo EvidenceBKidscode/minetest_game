@@ -96,7 +96,7 @@ minetest.register_globalstep(function(dtime)
 			hud_text.oldFontSize = font_size
 			return
 		elseif hud_text.oldText ~= text then
-			player:hud_change(hud_text.areasText, "text", text)
+			player:hud_change(hud_text.areasText, "text", text or "")
 			hud_text.oldText = text
 		elseif hud_text.oldColor ~= color then
 			player:hud_change(hud_text.areasText, "number", color)
