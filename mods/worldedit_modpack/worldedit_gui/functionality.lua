@@ -1487,6 +1487,8 @@ if minetest.get_modpath("areas") then
 			local color = areas.areas[dd_idx] and areas.areas[dd_idx].color or "white"
 			local current_font_size = areas.areas[dd_idx] and areas.areas[dd_idx].font_size or 22
 			local lang = area_datas[name].last_lang or "en"
+			local text = (areas.areas[dd_idx] and areas.areas[dd_idx].text and
+				      areas.areas[dd_idx].text[lang]) or ""
 
 			local names = ""
 			for k, v in pairs(areas.areas) do
@@ -1534,9 +1536,8 @@ if minetest.get_modpath("areas") then
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
 					names .. ";" .. dd_idx .. "]" ..
-				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" .. S("Display Text:") .. ";" ..
-					(areas.areas[dd_idx] and
-					 areas.areas[dd_idx].text[lang] or "") .. "]" ..
+				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" ..
+					S("Display Text:") .. ";" .. text .. "]" ..
 				"dropdown[0,7.4;2;worldedit_gui_protect_text_color; " ..
 					colors_str .. ";" .. color_idx .. "]" ..
 				"dropdown[2,7.4;1.5;worldedit_gui_protect_text_size;" ..
