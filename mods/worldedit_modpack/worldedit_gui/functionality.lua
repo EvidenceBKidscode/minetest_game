@@ -1491,12 +1491,13 @@ if minetest.get_modpath("areas") then
 				      areas.areas[dd_idx].text[lang]) or ""
 			local last_selected_area = area_datas[name].last_selected_area or ""
 			local area_idx = 1
-
+			
 			local names = ""
 			for k, v in pairs(areas.areas) do
-				local s = v.name .. " (" .. k .. ") - " .. v.owner
+				local s = v.name .. " \\[" .. k .. "\\] (" .. v.owner .. ")"
 				names = names .. s .. ","
-				if last_selected_area == s then
+
+				if last_selected_area == s:gsub("\\", "") then
 					area_idx = k
 				end
 
@@ -1563,7 +1564,7 @@ if minetest.get_modpath("areas") then
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local text = fields.worldedit_gui_protect_text
 		local dd_idx = fields.worldedit_gui_protect_areas and
-			       tonumber(fields.worldedit_gui_protect_areas:match("%((%d+)%)%s%-"))
+			       tonumber(fields.worldedit_gui_protect_areas:match("%[(%d+)%]%s%("))
 		local color = fields.worldedit_gui_protect_text_color and
 			      fields.worldedit_gui_protect_text_color:lower()
 		local font_size = fields.worldedit_gui_protect_text_size and
