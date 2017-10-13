@@ -72,9 +72,9 @@ minetest.register_globalstep(function(dtime)
 
 		local text, color, font_size = "", 0xFFFFFF, 22
 		for _, area in pairs(areas:getAreasAtPos(pos)) do
-			text  = area.text[LANG]
-			color = code_colors[area.color]
-			font_size = area.font_size
+			text  = area.text and area.text[LANG] or ""
+			color = code_colors[(area.color and area.color or "white")]
+			font_size = area.font_size and area.font_size or 22
 			break
 		end
 
