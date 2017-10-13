@@ -1491,6 +1491,7 @@ if minetest.get_modpath("areas") then
 				      areas.areas[dd_idx].text[lang]) or ""
 			local last_selected_area = area_datas[name].last_selected_area or ""
 			local area_idx = 1
+			local x = 1
 			
 			local names = ""
 			for k, v in pairs(areas.areas) do
@@ -1498,9 +1499,9 @@ if minetest.get_modpath("areas") then
 				names = names .. s .. ","
 
 				if last_selected_area == s:gsub("\\", "") then
-					area_idx = k
+					area_idx = x
 				end
-
+				x = x + 1
 			end
 			names = names:sub(1,-2)
 
