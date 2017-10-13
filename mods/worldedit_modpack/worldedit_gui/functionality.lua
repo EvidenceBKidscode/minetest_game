@@ -1595,14 +1595,14 @@ if minetest.get_modpath("areas") then
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
 			else
-				save_area(fields, name, area_name, pos1, pos2, text, color, font_size)
+				save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
 			end
 		end
 
 		if fields.worldedit_gui_protect_submit then
-			save_area(fields, name, area_name, pos1, pos2, text, color, font_size)
+			save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
 			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
 
@@ -1627,6 +1627,8 @@ if minetest.get_modpath("areas") then
 				minetest.colorize("#FFFF00",
 					S("Player '" .. player_name ..
 						"' added to ownership of area '" .. area_name .. "'")))
+
+			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
 
 		elseif fields.worldedit_gui_protect_remove then

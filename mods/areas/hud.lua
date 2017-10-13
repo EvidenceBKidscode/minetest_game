@@ -75,6 +75,7 @@ minetest.register_globalstep(function(dtime)
 			text  = area.text[LANG]
 			color = code_colors[area.color]
 			font_size = area.font_size
+			break
 		end
 
 		local hud_text = areas.hud_text[name]
