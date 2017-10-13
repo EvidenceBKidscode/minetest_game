@@ -1489,10 +1489,17 @@ if minetest.get_modpath("areas") then
 			local lang = area_datas[name].last_lang or "en"
 			local text = (areas.areas[dd_idx] and areas.areas[dd_idx].text and
 				      areas.areas[dd_idx].text[lang]) or ""
+			local last_selected_area = area_datas[name].last_selected_area or ""
+			local area_idx = 1
 
 			local names = ""
 			for k, v in pairs(areas.areas) do
-				names = names .. v.name .. " (" .. k .. ") - " .. v.owner .. ","
+				local s = v.name .. " (" .. k .. ") - " .. v.owner
+				names = names .. s .. ","
+				if last_selected_area == s then
+					area_idx = k
+				end
+
 			end
 			names = names:sub(1,-2)
 
@@ -1535,7 +1542,7 @@ if minetest.get_modpath("areas") then
 					S("Player name") .. ";%s]", minetest.formspec_escape(player_name)) ..
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
-					names .. ";" .. dd_idx .. "]" ..
+					names .. ";" .. area_idx .. "]" ..
 				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" ..
 					S("Display Text:") .. ";" .. text .. "]" ..
 				"dropdown[0,7.4;2;worldedit_gui_protect_text_color; " ..
@@ -1566,7 +1573,7 @@ if minetest.get_modpath("areas") then
 
 
 		if fields.worldedit_gui_protect_areas then
-			area_datas[name].last_dd_idx = dd_idx
+			area_datas[name].last_selected_area = fields.worldedit_gui_protect_areas
 			if reload_page(fields) then
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
