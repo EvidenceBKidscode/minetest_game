@@ -35,7 +35,7 @@ minetest.register_on_joinplayer(function(player)
 
 	local is_teacher = minetest.check_player_privs(name, "teacher")
 	if is_teacher then
-		minetest.set_player_privs(name, {worledit = true})
+		minetest.set_player_privs(name, {worldedit = true})
 	end
 end)
 
