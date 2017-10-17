@@ -32,6 +32,11 @@ minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	mode[name] = "advanced"
 	worldedit.items[name] = {}
+
+	local is_teacher = minetest.check_player_privs(name, "teacher")
+	if is_teacher then
+		minetest.set_player_privs(name, {worledit = true})
+	end
 end)
 
 worldedit.register_gui_function = function(identifier, options)
@@ -94,8 +99,7 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 	sfinv.override_page("teacher_menu", {
 		get = function(self, player, context)
 			local player_name = player:get_player_name()
-			local can_worldedit = minetest.check_player_privs(player_name, "worldedit") or
-					      minetest.check_player_privs(player_name, "teacher")
+			local can_worldedit = minetest.check_player_privs(player_name, "worldedit")
 			local fs = orig_get(self, player, context)
 
 			if teachers[player_name].current_tab == "world" then	
