@@ -11,7 +11,7 @@ minetest.register_on_protection_violation(function(pos, name)
 	if not areas:canInteract(pos, name) then
 		local owners = areas:getNodeOwners(pos)
 		minetest.chat_send_player(name,
-			("This area is protected by %s."):format(,
+			("This area is protected by %s."):format(
 				table.concat(owners, ", ")))
 	end
 end)
