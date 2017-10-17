@@ -93,10 +93,12 @@ if rawget(_G, "sfinv") and minetest.get_modpath("teacher_menu") then
 	local orig_get = sfinv.pages["teacher_menu"].get
 	sfinv.override_page("teacher_menu", {
 		get = function(self, player, context)
-			local can_worldedit = minetest.check_player_privs(player, {worldedit=true})
+			local player_name = player:get_player_name()
+			local can_worldedit = minetest.check_player_privs(player_name, "worldedit") or
+					      minetest.check_player_privs(player_name, "teacher")
 			local fs = orig_get(self, player, context)
 
-			if teachers[player:get_player_name()].current_tab == "world" then	
+			if teachers[player_name].current_tab == "world" then	
 				return fs .. (can_worldedit and
 					("image_button[6.6,7.45;1.5,1.5;inventory_plus_worldedit_gui.png;worldedit_gui;]" ..
 					 "tooltip[worldedit_gui;" .. S("World Editor") .. "]") or "")
