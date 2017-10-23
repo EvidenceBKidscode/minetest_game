@@ -337,6 +337,9 @@ function doors.register(name, def)
 			on_place_node(pos, minetest.get_node(pos),
 				placer, node, itemstack, pointed_thing)
 
+			local timer = minetest.get_node_timer(pos)
+			timer:start(1)
+
 			return itemstack
 		end
 	})
@@ -421,6 +424,25 @@ function doors.register(name, def)
 
 	def.on_destruct = function(pos)
 		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+	end
+
+	def.on_timer = function(pos)
+		if minetest.get_modpath("kidsbot") then
+			local meta = minetest.get_meta(pos)
+			local lever_id = meta:get_string("lever_id")
+			local ids = {}
+
+			for id in lever_id:gmatch("%d+") do
+				if bot_levers[tonumber(id)] and
+				   bot_levers[tonumber(id)].state == "off" then
+					return true
+				end
+			end
+
+			doors.get(pos):open()
+
+			return true
+		end
 	end
 
 	def.drawtype = "mesh"
