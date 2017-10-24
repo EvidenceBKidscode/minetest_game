@@ -430,7 +430,9 @@ function doors.register(name, def)
 		if minetest.get_modpath("kidsbot") then
 			local meta = minetest.get_meta(pos)
 			local lever_id = meta:get_string("lever_id")
-			local ids = {}
+			if lever_id == "" then
+				return true
+			end
 
 			for id in lever_id:gmatch("%d+") do
 				if bot_levers[tonumber(id)] and
