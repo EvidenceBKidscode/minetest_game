@@ -2,6 +2,8 @@
 
 areas.hud = {}
 areas.hud_text = {}
+areas.hud_timer = {}
+areas.hud_timeout = {}
 
 local code_colors = {
 	white  = 0xFFFFFF,
@@ -16,6 +18,8 @@ local code_colors = {
 
 local LANG = minetest.settings:get("language")
 LANG = LANG ~= "" and LANG or "en"
+
+local t = {}
 
 minetest.register_globalstep(function(dtime)
 	local players = minetest.get_connected_players()
@@ -34,16 +38,24 @@ minetest.register_globalstep(function(dtime)
 
 			for i, area in pairs(areas:getExternalHudEntries(pos)) do
 				local str = ""
-				if area.name then str = area.name .. " " end
-				if area.id then str = str.."["..area.id.."] " end
-				if area.owner then str = str.."("..area.owner..")" end
+				if area.name then
+					str = area.name .. " "
+				end
+
+				if area.id then
+					str = str .. "[" .. area.id .. "] "
+				end
+
+				if area.owner then
+					str = str .. "(" .. area.owner .. ")"
+				end
+
 				table.insert(areaStrings, str)
 			end
 
 			local areaString = "Areas:"
 			if #areaStrings > 0 then
-				areaString = areaString.."\n"..
-					table.concat(areaStrings, "\n")
+				areaString = areaString .. "\n" .. table.concat(areaStrings, "\n")
 			end
 
 			local hud = areas.hud[name]
@@ -70,16 +82,40 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 
-		local text, color, font_size = "", 0xFFFFFF, 22
+		local area_name, text, color, font_size, timer = "", "", 0xFFFFFF, 22, ""
 		for _, area in pairs(areas:getAreasAtPos(pos)) do
+			area_name = area.name
 			text  = area.text and area.text[LANG] or ""
 			color = code_colors[(area.color and area.color or "white")]
 			font_size = area.font_size and area.font_size or 22
+			timer = area.timer
 			break
 		end
 
 		local hud_text = areas.hud_text[name]
-		if not hud_text then
+		local hud_timer = areas.hud_timer[name]
+
+		if not hud_timer then
+			hud_timer = {}
+			areas.hud_timer[name] = hud_timer
+
+			hud_timer.areasTimer = player:hud_add({
+				hud_elem_type = "text",
+				name      = "Area Timer",
+				number    = 0xFFFFFF,
+				position  = {x = 0.8,  y = 0.1},
+				offset    = {x = 8,    y = -8},
+				alignment = {x = 1,    y =  1},
+				scale     = {x = 200,  y = 60},
+				text      = "Time remaining: " .. timer .. "s",
+			})
+
+			hud_timer.oldTimer = area_name
+			areas.hud_timeout[name] = {
+				[area_name] = timer
+			}
+			return
+		elseif not hud_text then
 			hud_text = {}
 			areas.hud_text[name] = hud_text
 
@@ -108,6 +144,33 @@ minetest.register_globalstep(function(dtime)
 		elseif hud_text.oldFontSize ~= font_size then
 			player:hud_change(hud_text.areasText, "font_size", font_size or 22)
 			hud_text.oldFontSize = font_size
+		elseif hud_timer.oldTimer ~= area_name then
+			if timer and timer ~= "" then
+				areas.hud_timeout[name][area_name] =
+					areas.hud_timeout[name][area_name] and
+					areas.hud_timeout[name][area_name] or tonumber(timer)
+			end
+
+			if areas.hud_timeout[name][area_name] then
+				player:hud_change(hud_timer.areasTimer, "text",
+					"Time remaining: " .. areas.hud_timeout[name][area_name] .. "s")
+			end
+			hud_timer.oldTimer = area_name
+		end
+
+		t[name] = (t[name] or 0) + dtime
+
+		if areas.hud_timeout[name][area_name] and timer ~= "" then
+			if t[name] >= 1 and tonumber(areas.hud_timeout[name][area_name]) > 0 then
+				areas.hud_timeout[name][area_name] =
+					tonumber(areas.hud_timeout[name][area_name]) - 1
+				t[name] = 0
+			end
+
+			player:hud_change(hud_timer.areasTimer, "text",
+				"Time remaining: " .. areas.hud_timeout[name][area_name] .. "s")
+		else
+			player:hud_change(hud_timer.areasTimer, "text",  "")
 		end
 	end
 end)
@@ -118,4 +181,3 @@ minetest.register_on_leaveplayer(function(player)
 		areas.hud[name] = nil
 	end
 end)
-

@@ -77,8 +77,20 @@ end
 
 --- Add a area.
 -- @return The new area's ID.
-function areas:add(owner, name, pos1, pos2, parent, text, lang, color, font_size)
+function areas:add(datas)
+	local owner = datas.name
+	local name = datas.area_name
+	local pos1 = datas.pos1
+	local pos2 = datas.pos2
+	local parent = datas.parent
+	local text = datas.text
+	local lang = datas.lang
+	local color = datas.color
+	local font_size = datas.font_size
+	local timer = datas.timer
+
 	local id = findFirstUnusedIndex(self.areas)
+
 	self.areas[id] = {
 		name   = name,
 		pos1   = pos1,
@@ -87,6 +99,7 @@ function areas:add(owner, name, pos1, pos2, parent, text, lang, color, font_size
 		parent = parent,
 		text   = {},
 		color  = color,
+		timer  = timer,
 		font_size = font_size,
 	}
 

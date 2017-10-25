@@ -1444,7 +1444,18 @@ if minetest.get_modpath("areas") then
 	local LANG = minetest.settings:get("language")
 	LANG = LANG ~= "" and LANG or "en"
 
-	local function save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
+	local function save_area(fields, datas)
+		local name = datas.name
+		local area_name = datas.area_name
+		local pos1 = datas.pos1
+		local pos2 = datas.pos2
+		local parent = datas.parent
+		local text = datas.text
+		local lang = datas.lang
+		local color = datas.color:gsub("^%s", "")
+		local font_size = datas.font_size
+		local timer = datas.timer
+
 		if not area_check_pos(pos1, pos2, name) then
 			return false
 		end
@@ -1458,7 +1469,7 @@ if minetest.get_modpath("areas") then
 		area_name = fields.worldedit_gui_protect_name
 		area_datas[name].last_name = fields.worldedit_gui_protect_name
 
-		local id = areas:add(name, area_name, pos1, pos2, nil, text, lang, color, font_size)
+		local id = areas:add(datas)
 		areas:save()
 
 		minetest.chat_send_player(name,
@@ -1490,6 +1501,7 @@ if minetest.get_modpath("areas") then
 			local text = (areas.areas[dd_idx] and areas.areas[dd_idx].text and
 				      areas.areas[dd_idx].text[lang]) or ""
 			local last_selected_area = area_datas[name].last_selected_area or ""
+			local timer = areas.areas[dd_idx] and areas.areas[dd_idx].timer or ""
 			local area_idx = 1
 			local x = 1
 			
@@ -1545,6 +1557,8 @@ if minetest.get_modpath("areas") then
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
 					names .. ";" .. area_idx .. "]" ..
+				"field[4.3,2.82;4,1;worldedit_gui_protect_chrono;"
+					.. S("Timer (seconds)") .. ";" .. timer .. "]" ..
 				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" ..
 					S("Display Text:") .. ";" .. text .. "]" ..
 				"dropdown[0,7.4;2;worldedit_gui_protect_text_color; " ..
@@ -1561,7 +1575,7 @@ if minetest.get_modpath("areas") then
 	})
 
 	worldedit.register_gui_handler("worldedit_gui_protect", function(name, fields)
-		local area_name, pos1, pos2
+		local area_name = fields.worldedit_gui_protect_name
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 		local text = fields.worldedit_gui_protect_text
 		local dd_idx = fields.worldedit_gui_protect_areas and
@@ -1572,10 +1586,13 @@ if minetest.get_modpath("areas") then
 				  tonumber(fields.worldedit_gui_protect_text_size)
 		local lang = fields.worldedit_gui_protect_text_lang and
 			     fields.worldedit_gui_protect_text_lang:lower() or "en"
-
+		local timer = (fields.worldedit_gui_protect_chrono and
+			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
+			       tonumber(fields.worldedit_gui_protect_chrono) or ""
 
 		if fields.worldedit_gui_protect_areas then
 			area_datas[name].last_selected_area = fields.worldedit_gui_protect_areas
+			area_datas[name].last_dd_idx = dd_idx or 1
 			if reload_page(fields) then
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
@@ -1590,29 +1607,43 @@ if minetest.get_modpath("areas") then
 			end
 		end
 
+		local datas = {
+			name = name,
+			area_name = area_name,
+			pos1 = pos1,
+			pos2 = pos2,
+			parent = nil,
+			text = text,
+			lang = lang,
+			color = color,
+			font_size = font_size,
+			timer = timer,
+		}
+
 		if fields.worldedit_gui_protect_save_text then
 			if areas.areas[dd_idx] then
-				area_name = fields.worldedit_gui_protect_name
 				areas.areas[dd_idx].text = areas.areas[dd_idx].text or {}
 				areas.areas[dd_idx].text[lang] = text
 				areas.areas[dd_idx].color = color
 				areas.areas[dd_idx].font_size = font_size
+				areas.areas[dd_idx].timer = timer
+
 				areas:save()
 
 				minetest.chat_send_player(name,
-					minetest.colorize("#FFFF00", S("Text saved")))
+					minetest.colorize("#FFFF00", S("Data saved")))
 
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
 			else
-				save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
+				save_area(fields, datas)
 				worldedit.show_page(name, "worldedit_gui_protect")
 				return true
 			end
 		end
 
 		if fields.worldedit_gui_protect_submit then
-			save_area(fields, name, area_name, pos1, pos2, text, lang, color, font_size)
+			save_area(fields, datas)
 			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
 
@@ -1629,14 +1660,16 @@ if minetest.get_modpath("areas") then
 			end
 
 			area_name = fields.worldedit_gui_protect_areas
+			datas.name = player_name
+			datas.text = nil
 
-			local id = areas:add(player_name, area_name, pos1, pos2, nil, text, lang, color, font_size)
+			local id = areas:add(datas)
 			areas:save()
 
 			minetest.chat_send_player(name,
 				minetest.colorize("#FFFF00",
 					S("Player '" .. player_name ..
-						"' added to ownership of area '" .. area_name .. "'")))
+					  "' added to ownership of area '" .. area_name .. "'")))
 
 			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
@@ -1646,7 +1679,7 @@ if minetest.get_modpath("areas") then
 			local id
 
 			for k, v in pairs(areas.areas) do
-				if area_name == v.name then
+				if area_name == v.name .. " [" .. k .. "]" then
 					id = k
 				end
 			end
