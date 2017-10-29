@@ -107,7 +107,7 @@ minetest.register_globalstep(function(dtime)
 				offset    = {x = 8,    y = -8},
 				alignment = {x = 1,    y =  1},
 				scale     = {x = 200,  y = 60},
-				text      = "Time remaining: " .. timer .. "s",
+				text      = timer and "Time remaining: " .. timer .. "s" or "",
 			})
 
 			hud_timer.oldTimer = area_name
