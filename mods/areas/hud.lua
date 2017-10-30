@@ -161,9 +161,9 @@ minetest.register_globalstep(function(dtime)
 		t[name] = (t[name] or 0) + dtime
 
 		if areas.hud_timeout[name][area_name] and timer ~= "" then
-			if t[name] >= 1 and tonumber(areas.hud_timeout[name][area_name]) > 0 then
-				areas.hud_timeout[name][area_name] =
-					tonumber(areas.hud_timeout[name][area_name]) - 1
+			local number = areas.hud_timeout[name][area_name]
+			if t[name] >= 1 and number and number > 0 then
+				areas.hud_timeout[name][area_name] = tonumber(number) - 1
 				t[name] = 0
 			end
 
