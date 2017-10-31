@@ -103,7 +103,7 @@ minetest.register_globalstep(function(dtime)
 				hud_elem_type = "text",
 				name      = "Area Timer",
 				number    = 0xFFFFFF,
-				position  = {x = 0.8,  y = 0.1},
+				position  = {x = 0.8,  y = 0.2},
 				offset    = {x = 8,    y = -8},
 				alignment = {x = 1,    y =  1},
 				scale     = {x = 200,  y = 60},
@@ -155,15 +155,16 @@ minetest.register_globalstep(function(dtime)
 				player:hud_change(hud_timer.areasTimer, "text",
 					"Time remaining: " .. areas.hud_timeout[name][area_name] .. "s")
 			end
+
 			hud_timer.oldTimer = area_name
 		end
 
 		t[name] = (t[name] or 0) + dtime
 
-		if areas.hud_timeout[name][area_name] and timer ~= "" then
-			local number = areas.hud_timeout[name][area_name]
-			if t[name] >= 1 and number and number > 0 then
-				areas.hud_timeout[name][area_name] = tonumber(number) - 1
+		local number = areas.hud_timeout[name][area_name]
+		if number and timer ~= "" then
+			if t[name] >= 1 and number > 0 then
+				areas.hud_timeout[name][area_name] = number - 1
 				t[name] = 0
 			end
 
