@@ -222,11 +222,12 @@ local function get_formspec_str(main, y, columns, width, buttons, name)
 	return string.format(
 		"size[%g,%g]", math.max(columns * width, 5),
 			       math.max(y + 0.5, (mode[name] == "default" and 4 or 2.5))) ..
-		"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
-		"label[" .. (mode[name] == "default" and 3.5 or 0.5) .. ",1;" ..
+		"item_image_button[" .. (columns * (width / 2) - 0.5) ..
+			",0.2;1,1;worldedit:hammer;worldedit_hammer;]" ..
+		--"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
+		"label[" .. (mode[name] == "default" and 3.8 or 2.2) .. ",1.2;" ..
 			minetest.wrap_text(
-			S("Use the hammer from your inventory to select an area, " ..
-			  "then choose one of these functionalities..."),
+			S("Click on the hammer button to get your WorldEdit tool"),
 			70, false) .. "]" ..
 		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") ..
 			";< " .. S("Back") .. "]" ..
@@ -275,6 +276,13 @@ worldedit.register_gui_function("worldedit_gui", {
 })
 
 worldedit.register_gui_handler("worldedit_gui", function(name, fields)
+	if fields.worldedit_hammer then
+		local player = minetest.get_player_by_name(name)
+		local inv = player:get_inventory()
+		inv:add_item("main", "worldedit:hammer 1")
+		worldedit.player_notify(name, "WorldEdit's tool added to your inventory!")
+	end
+
 	if fields.worldedit_gui_advanced then
 		mode[name] = mode[name] == "default" and "advanced" or "default"
 		worldedit.show_page(name, "worldedit_gui")
