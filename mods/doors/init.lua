@@ -461,8 +461,10 @@ function doors.register(name, def)
 				doors.get(pos):open()
 
 				for i = 1, #b_idx do
-					kidsbot.block_exercise(b_idx[i],
-						next(bot_exercise_blocks[i]), false)
+					if bot_exercise_blocks[i] then
+						kidsbot.block_exercise(b_idx[i],
+							next(bot_exercise_blocks[i]), false)
+					end
 				end
 			end
 
