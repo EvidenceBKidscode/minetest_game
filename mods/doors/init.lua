@@ -39,7 +39,7 @@ function doors.get(pos)
 			end,
 			state = function(self)
 				local state = minetest.get_meta(self.pos):get_int("state")
-				return state %2 == 1
+				return state % 2 == 1
 			end
 		}
 	elseif _doors.registered_trapdoors[node_name] then
@@ -429,19 +429,42 @@ function doors.register(name, def)
 	def.on_timer = function(pos)
 		if minetest.get_modpath("kidsbot") then
 			local meta = minetest.get_meta(pos)
-			local lever_id = meta:get_string("lever_id")
-			if lever_id == "" then
-				return true
-			end
+			local lever_idx = meta:get_string("lever_idx")
+			local block_idx = meta:get_string("block_idx")
+			local all_ok, l_idx, b_idx = true, {}, {}
 
-			for id in lever_id:gmatch("%d+") do
-				if bot_levers[tonumber(id)] and
-				   bot_levers[tonumber(id)].state == "off" then
-					return true
+			for id in lever_idx:gmatch("%d+") do
+				local id = tonumber(id)
+				l_idx[#l_idx + 1] = id
+
+				if bot_levers[id] and bot_levers[id].state == "off" then
+					all_ok = false
+				end
+			end	
+
+			for id in block_idx:gmatch("%d+") do
+				local id = tonumber(id)
+				b_idx[#b_idx + 1] = id
+
+				for action in pairs(bot_exercise_blocks[id] or {}) do
+					if bot_exercise_blocks[id][action] == false then
+						all_ok = false
+					end
 				end
 			end
 
-			doors.get(pos):open()
+			if all_ok and (lever_idx ~= "" or block_idx ~= "") then
+				for i = 1, #l_idx do
+					kidsbot.toggle_lever(l_idx[i], "off")
+				end
+
+				doors.get(pos):open()
+
+				for i = 1, #b_idx do
+					kidsbot.block_exercise(b_idx[i],
+						next(bot_exercise_blocks[i]), false)
+				end
+			end
 
 			return true
 		end
@@ -468,61 +491,61 @@ function doors.register(name, def)
 end
 
 doors.register("door_wood", {
-		tiles = {{ name = "doors_door_wood.png", backface_culling = true }},
-		description = "Wooden Door",
-		inventory_image = "doors_item_wood.png",
-		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
-		recipe = {
-			{"group:wood", "group:wood"},
-			{"group:wood", "group:wood"},
-			{"group:wood", "group:wood"},
-		}
+	tiles = {{ name = "doors_door_wood.png", backface_culling = true }},
+	description = "Wooden Door",
+	inventory_image = "doors_item_wood.png",
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+	recipe = {
+		{"group:wood", "group:wood"},
+		{"group:wood", "group:wood"},
+		{"group:wood", "group:wood"},
+	}
 })
 
 doors.register("door_steel", {
-		tiles = {{name = "doors_door_steel.png", backface_culling = true}},
-		description = "Steel Door",
-		inventory_image = "doors_item_steel.png",
-		protected = true,
-		groups = {cracky = 1, level = 2},
-		sounds = default.node_sound_metal_defaults(),
-		sound_open = "doors_steel_door_open",
-		sound_close = "doors_steel_door_close",
-		recipe = {
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-		}
+	tiles = {{name = "doors_door_steel.png", backface_culling = true}},
+	description = "Steel Door",
+	inventory_image = "doors_item_steel.png",
+	protected = true,
+	groups = {cracky = 1, level = 2},
+	sounds = default.node_sound_metal_defaults(),
+	sound_open = "doors_steel_door_open",
+	sound_close = "doors_steel_door_close",
+	recipe = {
+		{"default:steel_ingot", "default:steel_ingot"},
+		{"default:steel_ingot", "default:steel_ingot"},
+		{"default:steel_ingot", "default:steel_ingot"},
+	}
 })
 
 doors.register("door_glass", {
-		tiles = {"doors_door_glass.png"},
-		description = "Glass Door",
-		inventory_image = "doors_item_glass.png",
-		groups = {cracky=3, oddly_breakable_by_hand=3},
-		sounds = default.node_sound_glass_defaults(),
-		sound_open = "doors_glass_door_open",
-		sound_close = "doors_glass_door_close",
-		recipe = {
-			{"default:glass", "default:glass"},
-			{"default:glass", "default:glass"},
-			{"default:glass", "default:glass"},
-		}
+	tiles = {"doors_door_glass.png"},
+	description = "Glass Door",
+	inventory_image = "doors_item_glass.png",
+	groups = {cracky=3, oddly_breakable_by_hand=3},
+	sounds = default.node_sound_glass_defaults(),
+	sound_open = "doors_glass_door_open",
+	sound_close = "doors_glass_door_close",
+	recipe = {
+		{"default:glass", "default:glass"},
+		{"default:glass", "default:glass"},
+		{"default:glass", "default:glass"},
+	}
 })
 
 doors.register("door_obsidian_glass", {
-		tiles = {"doors_door_obsidian_glass.png"},
-		description = "Obsidian Glass Door",
-		inventory_image = "doors_item_obsidian_glass.png",
-		groups = {cracky=3},
-		sounds = default.node_sound_glass_defaults(),
-		sound_open = "doors_glass_door_open",
-		sound_close = "doors_glass_door_close",
-		recipe = {
-			{"default:obsidian_glass", "default:obsidian_glass"},
-			{"default:obsidian_glass", "default:obsidian_glass"},
-			{"default:obsidian_glass", "default:obsidian_glass"},
-		},
+	tiles = {"doors_door_obsidian_glass.png"},
+	description = "Obsidian Glass Door",
+	inventory_image = "doors_item_obsidian_glass.png",
+	groups = {cracky=3},
+	sounds = default.node_sound_glass_defaults(),
+	sound_open = "doors_glass_door_open",
+	sound_close = "doors_glass_door_close",
+	recipe = {
+		{"default:obsidian_glass", "default:obsidian_glass"},
+		{"default:obsidian_glass", "default:obsidian_glass"},
+		{"default:obsidian_glass", "default:obsidian_glass"},
+	},
 })
 
 -- Capture mods using the old API as best as possible.
