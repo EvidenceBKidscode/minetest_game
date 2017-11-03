@@ -2148,6 +2148,25 @@ minetest.register_node("default:meselamp", {
 	light_source = default.LIGHT_MAX,
 })
 
+
+minetest.register_node("default:neon", {
+	description = "Neon",
+	tiles = {"default_neon.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{0.5 - 10/16, -0.5, -0.5, -0.5 + 10/16, 0.5 - 14/16, 0.5},
+		}
+	},
+	groups = {snappy = 3},
+	light_source = default.LIGHT_MAX,
+	sounds = default.node_sound_glass_defaults(),
+	on_place = minetest.rotate_node
+})
+
 --
 -- Misc
 --
