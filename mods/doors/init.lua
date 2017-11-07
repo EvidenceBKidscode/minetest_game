@@ -431,16 +431,16 @@ function doors.register(name, def)
 			local meta = minetest.get_meta(pos)
 			local lever_idx = meta:get_string("lever_idx")
 			local block_idx = meta:get_string("block_idx")
+			local exercise_idx = tonumber(meta:get_string("exercise_idx"))
 			local all_ok, l_idx, b_idx = true, {}, {}
 
 			for id in lever_idx:gmatch("%d+") do
 				local id = tonumber(id)
 				l_idx[#l_idx + 1] = id
-
 				if bot_levers[id] and bot_levers[id].state == "off" then
 					all_ok = false
 				end
-			end	
+			end
 
 			for id in block_idx:gmatch("%d+") do
 				local id = tonumber(id)
@@ -453,18 +453,29 @@ function doors.register(name, def)
 				end
 			end
 
-			if all_ok and (lever_idx ~= "" or block_idx ~= "") then
+			if exercise_idx and
+				bot_exercises[exercise_idx] and
+				bot_exercises[exercise_idx].door_open == false then
+					all_ok = false
+			end
+
+			if all_ok and (lever_idx ~= "" or block_idx ~= "" or exercise_idx) then
+				doors.get(pos):open()
+
 				for i = 1, #l_idx do
 					kidsbot.toggle_lever(l_idx[i], "off")
 				end
-
-				doors.get(pos):open()
 
 				for i = 1, #b_idx do
 					if bot_exercise_blocks[i] then
 						kidsbot.block_exercise(b_idx[i],
 							next(bot_exercise_blocks[i]), false)
 					end
+				end
+
+				if bot_exercises[exercise_idx] and
+				   bot_exercises[exercise_idx].door_open then
+					bot_exercises[exercise_idx].door_open = false
 				end
 			end
 
