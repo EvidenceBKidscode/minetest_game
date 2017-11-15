@@ -190,23 +190,13 @@ function creative.register_tab(name, title, items)
 				  		return
 				  	end
 
-					local can_add = false
-					for i = 1, 8 do
-						if player_inv:get_stack("main", i):is_empty() then
-							can_add = true
-							break
-						end
+					if item:sub(-4) == "_inv" then
+						item = item:sub(1,-5)
 					end
 
-					if can_add or inv.expand then
-						if item:sub(-4) == "_inv" then
-							item = item:sub(1,-5)
-						end
-
-						local stack = ItemStack(item)
-						player_inv:add_item("main",
-							item .. " " .. stack:get_stack_max())
-					end
+					local stack = ItemStack(item)
+					player_inv:add_item("main",
+						item .. " " .. stack:get_stack_max())
 				  end
 			     end
 			end
