@@ -1553,7 +1553,7 @@ if minetest.get_modpath("areas") then
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
 					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
 				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
-					S("Player name") .. ";%s]", minetest.formspec_escape(player_name)) ..
+					S("Add owner") .. ";%s]", minetest.formspec_escape(player_name)) ..
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
 					names .. ";" .. area_idx .. "]" ..
@@ -1569,7 +1569,7 @@ if minetest.get_modpath("areas") then
 					table.concat(langs, ",") .. ";" .. lang_idx .. "]" ..
 				"button[5.5,7.32;2.5,1;worldedit_gui_protect_save_text;" .. S("Save") .. "]" ..
 				"button[0,8.4;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
-				"button[2.66,8.4;2.5,1;worldedit_gui_protect_add_owner;" .. S("Add owner") .. "]" ..
+				"button[2.66,8.4;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
 				"button[5.33,8.4;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
 		end,
 	})
