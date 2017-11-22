@@ -424,6 +424,9 @@ function doors.register(name, def)
 
 	def.on_punch = function(pos, node, puncher, pointed_thing)
 		local name = puncher:get_player_name()
+		local is_mapmaker = minetest.check_player_privs(name, "mapmaker")
+		if is_mapmaker then return end
+
 		local privs = minetest.get_player_privs(name)
 		privs.interact = nil
 
