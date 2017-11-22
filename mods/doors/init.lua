@@ -429,6 +429,7 @@ function doors.register(name, def)
 
 		minetest.after(1, function()
 			privs.interact = nil
+			minetest.set_player_privs(name, privs)
 		end)
 
 		minetest.set_player_privs(name, privs)
