@@ -422,13 +422,20 @@ function doors.register(name, def)
 		end
 	end
 
-	def.on_destruct = function(pos)
-		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+	def.on_punch = function(pos, node, puncher, pointed_thing)
+		local name = puncher:get_player_name()
+		local privs = minetest.get_player_privs(name)
+		privs.interact = nil
+
+		minetest.after(1, function()
+			privs.interact = nil
+		end)
+
+		minetest.set_player_privs(name, privs)
 	end
 
-	def.after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		minetest.set_node(pos, {name = oldnode.name, param2 = oldnode.param2})
-		minetest.get_meta(pos):from_table(oldmetadata)
+	def.on_destruct = function(pos)
+		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
 	end
 
 	def.on_timer = function(pos)
