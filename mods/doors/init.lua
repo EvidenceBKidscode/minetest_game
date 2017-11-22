@@ -427,7 +427,7 @@ function doors.register(name, def)
 	end
 
 	def.after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		minetest.set_node(pos, {name = oldnode.name, param = oldnode.param2})
+		minetest.set_node(pos, {name = oldnode.name, param2 = oldnode.param2})
 		minetest.get_meta(pos):from_table(oldmetadata)
 	end
 
