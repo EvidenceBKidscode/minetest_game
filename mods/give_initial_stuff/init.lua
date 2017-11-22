@@ -8,6 +8,8 @@ function give_initial_stuff.give(player)
 	minetest.log("action",
 			"Giving initial stuff to player " .. player:get_player_name())
 	local inv = player:get_inventory()
+	inv:set_stack("main", 1, "default:stick")
+
 	for _, stack in ipairs(give_initial_stuff.items) do
 		inv:add_item("main", stack)
 	end
@@ -38,5 +40,9 @@ end
 
 give_initial_stuff.add_from_csv(stuff_string)
 if minetest.settings:get_bool("give_initial_stuff") then
-	minetest.register_on_newplayer(give_initial_stuff.give)
+	minetest.register_on_newplayer(function(player)
+		give_initial_stuff.give(player)
+		local inv = player:get_inventory()
+		inv:set_stack("main", 1, "")
+	end)
 end

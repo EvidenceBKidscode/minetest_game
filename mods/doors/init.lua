@@ -426,6 +426,11 @@ function doors.register(name, def)
 		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
 	end
 
+	def.after_dig_node = function(pos, oldnode, oldmetadata, digger)
+		minetest.set_node(pos, {name = oldnode.name, param = oldnode.param2})
+		minetest.get_meta(pos):from_table(oldmetadata)
+	end
+
 	def.on_timer = function(pos)
 		if minetest.get_modpath("kidsbot") then
 			local meta = minetest.get_meta(pos)
@@ -507,7 +512,7 @@ doors.register("door_wood", {
 	tiles = {{ name = "doors_door_wood.png", backface_culling = true }},
 	description = "Wooden Door",
 	inventory_image = "doors_item_wood.png",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+	groups = {choppy = 1, level = 3, flammable = 2},
 	recipe = {
 		{"group:wood", "group:wood"},
 		{"group:wood", "group:wood"},
@@ -520,7 +525,7 @@ doors.register("door_steel", {
 	description = "Steel Door",
 	inventory_image = "doors_item_steel.png",
 	protected = true,
-	groups = {cracky = 1, level = 2},
+	groups = {cracky = 1, level = 3},
 	sounds = default.node_sound_metal_defaults(),
 	sound_open = "doors_steel_door_open",
 	sound_close = "doors_steel_door_close",
