@@ -493,6 +493,8 @@ function doors.register(name, def)
 				   bot_exercises[exercise_idx].door_open then
 					bot_exercises[exercise_idx].door_open = false
 				end
+			elseif not all_ok and doors.get(pos):state() then
+				doors.get(pos):close()
 			end
 
 			return true
