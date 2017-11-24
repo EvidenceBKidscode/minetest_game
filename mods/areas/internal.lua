@@ -83,10 +83,6 @@ function areas:add(datas)
 	local pos1 = datas.pos1
 	local pos2 = datas.pos2
 	local parent = datas.parent
-	local text = datas.text
-	local lang = datas.lang
-	local color = datas.color
-	local font_size = datas.font_size
 	local timer = datas.timer
 
 	local id = findFirstUnusedIndex(self.areas)
@@ -97,13 +93,8 @@ function areas:add(datas)
 		pos2   = pos2,
 		owner  = owner,
 		parent = parent,
-		text   = {},
-		color  = color,
 		timer  = timer,
-		font_size = font_size,
 	}
-
-	self.areas[id].text[lang] = text
 
 	-- Add to AreaStore
 	if self.store then

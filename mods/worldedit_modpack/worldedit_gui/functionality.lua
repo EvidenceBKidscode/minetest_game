@@ -1430,31 +1430,12 @@ end
 
 if minetest.get_modpath("areas") then
 	local area_datas = {}
-	local colors = {
-		"white",
-		"black",
-		"red",
-		"yellow",
-		"blue",
-		"green",
-		"purple",
-		"pink",
-	}
-
-	local LANG = minetest.settings:get("language")
-	LANG = LANG ~= "" and LANG or "en"
 
 	local function save_area(fields, datas)
 		local name = datas.name
 		local area_name = datas.area_name
 		local pos1 = datas.pos1
 		local pos2 = datas.pos2
-		local parent = datas.parent
-		local text = datas.text
-		local lang = datas.lang
-		local color = datas.color:gsub("^%s", "")
-		local font_size = datas.font_size
-		local timer = datas.timer
 
 		if not area_check_pos(pos1, pos2, name) then
 			return false
@@ -1480,8 +1461,7 @@ if minetest.get_modpath("areas") then
 	local function reload_page(fields)
 		if not fields.worldedit_gui_protect_submit    and
 		   not fields.worldedit_gui_protect_add_owner and
-		   not fields.worldedit_gui_protect_remove    and
-		   not fields.worldedit_gui_protect_save_text then
+		   not fields.worldedit_gui_protect_remove    then
 			return true
 		end
 	end
@@ -1495,11 +1475,6 @@ if minetest.get_modpath("areas") then
 			local area_name = area_datas[name].last_name or ""
 			local player_name = area_datas[name].last_player_name or ""
 			local dd_idx = area_datas[name] and area_datas[name].last_dd_idx or 1
-			local color = areas.areas[dd_idx] and areas.areas[dd_idx].color or "white"
-			local current_font_size = areas.areas[dd_idx] and areas.areas[dd_idx].font_size or 22
-			local lang = area_datas[name].last_lang or "en"
-			local text = (areas.areas[dd_idx] and areas.areas[dd_idx].text and
-				      areas.areas[dd_idx].text[lang]) or ""
 			local last_selected_area = area_datas[name].last_selected_area or ""
 			local timer = areas.areas[dd_idx] and areas.areas[dd_idx].timer or ""
 			local area_idx = 1
@@ -1517,39 +1492,7 @@ if minetest.get_modpath("areas") then
 			end
 			names = names:sub(1,-2)
 
-			local i = 1
-			local colors_str, color_idx = "", 1
-
-			for _, v in pairs(colors) do
-				colors_str = colors_str .. v:gsub("^%l", string.upper) .. ","
-				if color == v then
-					color_idx = i
-				end
-				i = i + 1
-			end
-			colors_str = colors_str:sub(1,-2)
-
-			local font_sizes = {}
-			local font_size_idx, j = 1, 0
-
-			for x = 10, 40 do
-				j = j + 1
-				font_sizes[#font_sizes + 1] = x
-				if current_font_size == x then
-					font_size_idx = j
-				end
-			end
-
-			local langs = {"EN", "FR"}
-			local lang_idx = 1
-
-			for k, v in pairs(langs) do
-				if v == lang:upper() then
-					lang_idx = k
-				end
-			end
-
-			return "size[8,9]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
+			return "size[8,4]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
 					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
 				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
@@ -1559,33 +1502,17 @@ if minetest.get_modpath("areas") then
 					names .. ";" .. area_idx .. "]" ..
 				"field[4.3,2.82;4,1;worldedit_gui_protect_chrono;"
 					.. S("Timer (seconds)") .. ";" .. timer .. "]" ..
-				"textarea[0.3,3.9;8,4;worldedit_gui_protect_text;" ..
-					S("Display Text:") .. ";" .. text .. "]" ..
-				"dropdown[0,7.4;2;worldedit_gui_protect_text_color; " ..
-					colors_str .. ";" .. color_idx .. "]" ..
-				"dropdown[2,7.4;1.5;worldedit_gui_protect_text_size;" ..
-					table.concat(font_sizes, ",") .. ";" .. font_size_idx .. "]" ..
-				"dropdown[3.5,7.4;1.5;worldedit_gui_protect_text_lang;" ..
-					table.concat(langs, ",") .. ";" .. lang_idx .. "]" ..
-				"button[5.5,7.32;2.5,1;worldedit_gui_protect_save_text;" .. S("Save") .. "]" ..
-				"button[0,8.4;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
-				"button[2.66,8.4;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
-				"button[5.33,8.4;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
+				"button[0,3.5;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
+				"button[2.66,3.5;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
+				"button[5.33,3.5;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
 		end,
 	})
 
 	worldedit.register_gui_handler("worldedit_gui_protect", function(name, fields)
 		local area_name = fields.worldedit_gui_protect_name
 		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
-		local text = fields.worldedit_gui_protect_text
 		local dd_idx = fields.worldedit_gui_protect_areas and
 			       tonumber(fields.worldedit_gui_protect_areas:match("%[(%d+)%]%s%("))
-		local color = fields.worldedit_gui_protect_text_color and
-			      fields.worldedit_gui_protect_text_color:lower()
-		local font_size = fields.worldedit_gui_protect_text_size and
-				  tonumber(fields.worldedit_gui_protect_text_size)
-		local lang = fields.worldedit_gui_protect_text_lang and
-			     fields.worldedit_gui_protect_text_lang:lower() or "en"
 		local timer = (fields.worldedit_gui_protect_chrono and
 			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
 			       tonumber(fields.worldedit_gui_protect_chrono) or ""
@@ -1599,48 +1526,14 @@ if minetest.get_modpath("areas") then
 			end
 		end
 
-		if fields.worldedit_gui_protect_text_lang then
-			area_datas[name].last_lang = lang
-			if reload_page(fields) then
-				worldedit.show_page(name, "worldedit_gui_protect")
-				return true
-			end
-		end
-
 		local datas = {
 			name = name,
 			area_name = area_name,
 			pos1 = pos1,
 			pos2 = pos2,
 			parent = nil,
-			text = text,
-			lang = lang,
-			color = color,
-			font_size = font_size,
 			timer = timer,
 		}
-
-		if fields.worldedit_gui_protect_save_text then
-			if areas.areas[dd_idx] then
-				areas.areas[dd_idx].text = areas.areas[dd_idx].text or {}
-				areas.areas[dd_idx].text[lang] = text
-				areas.areas[dd_idx].color = color
-				areas.areas[dd_idx].font_size = font_size
-				areas.areas[dd_idx].timer = timer
-
-				areas:save()
-
-				minetest.chat_send_player(name,
-					minetest.colorize("#FFFF00", S("Data saved")))
-
-				worldedit.show_page(name, "worldedit_gui_protect")
-				return true
-			else
-				save_area(fields, datas)
-				worldedit.show_page(name, "worldedit_gui_protect")
-				return true
-			end
-		end
 
 		if fields.worldedit_gui_protect_submit then
 			save_area(fields, datas)
