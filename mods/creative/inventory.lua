@@ -85,8 +85,8 @@ function creative.register_tab(name, title, items)
 				"field_close_on_enter[creative_filter;false]" ..
 				"field[0.3," .. offset .. ".5;2.2,1;creative_filter;;" ..
 					minetest.formspec_escape(inv.filter) .. ";#444444]" ..
-				default.get_hotbar_bg(0, (inv.expand and 4.5 or 7.5)) ..
-				default.gui_bg .. default.gui_bg_img .. default.gui_slots
+				default.get_hotbar_bg(0, (inv.expand and 4.5 or 7.5))
+			--	.. default.gui_bg .. default.gui_bg_img .. default.gui_slots
 
 			if inv.expand then
 				formspec = formspec ..
@@ -169,10 +169,15 @@ function creative.register_tab(name, title, items)
 
 			else for item in pairs(fields) do
 				  if item:find(":") then
-				  	if not is_mapmaker and not is_teacher and not sandbox then
-				  		if minetest.get_modpath("utils") and
-				  		   (utils.worldname == "coding_schools" or
-						    utils.worldname == "science_factory") then
+				  	local utils_installed = minetest.get_modpath("utils")
+				  	local sandbox = utils_installed and
+				  			utils.worldname:sub(1,6) == "build_"
+
+				  	if not is_mapmaker and not is_teacher and
+				  	  (utils_installed and not sandbox) then
+				  		if utils_installed and
+				  		  (utils.worldname == "coding_schools" or
+						   utils.worldname == "science_factory") then
 					  	       minetest.chat_send_player(player_name,
 								minetest.colorize("#FF0000",
 									"ERROR: You cannot use any other item " ..
