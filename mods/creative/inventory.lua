@@ -1,7 +1,3 @@
-local worldpath = minetest.get_worldpath()
-local worldname = worldpath:match("/([%w%s_]+)$") or worldpath:match("\\([%w%s_]+)$")
-local sandbox = worldname:sub(1,6) == "build_"
-
 local player_inventory = {}
 
 function creative.init_creative_inventory(player_name)
@@ -174,8 +170,9 @@ function creative.register_tab(name, title, items)
 			else for item in pairs(fields) do
 				  if item:find(":") then
 				  	if not is_mapmaker and not is_teacher and not sandbox then
-				  		if worldname == "coding_schools" or
-						   worldname == "science_factory" then
+				  		if minetest.get_modpath("utils") and
+				  		   (utils.worldname == "coding_schools" or
+						    utils.worldname == "science_factory") then
 					  	       minetest.chat_send_player(player_name,
 								minetest.colorize("#FF0000",
 									"ERROR: You cannot use any other item " ..
