@@ -67,7 +67,7 @@ minetest.register_node("fire:permanent_flame", {
 	buildable_to = true,
 	sunlight_propagates = true,
 	damage_per_second = 4,
-	groups = {igniter = 2, dig_immediate = 3},
+	groups = {igniter = 2, dig_immediate = 3, decoration = 1},
 	drop = "",
 })
 

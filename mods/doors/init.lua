@@ -367,6 +367,7 @@ function doors.register(name, def)
 
 	def.groups.not_in_creative_inventory = 1
 	def.groups.door = 1
+
 	def.drop = name
 	def.door = {
 		name = name,
@@ -523,7 +524,7 @@ doors.register("door_wood", {
 	tiles = {{ name = "doors_door_wood.png", backface_culling = true }},
 	description = "Wooden Door",
 	inventory_image = "doors_item_wood.png",
-	groups = {choppy = 1, level = 3, flammable = 2},
+	groups = {choppy = 1, level = 3, flammable = 2, decoration = 1},
 	recipe = {
 		{"group:wood", "group:wood"},
 		{"group:wood", "group:wood"},
@@ -536,7 +537,7 @@ doors.register("door_steel", {
 	description = "Steel Door",
 	inventory_image = "doors_item_steel.png",
 	protected = true,
-	groups = {cracky = 1, level = 3},
+	groups = {cracky = 1, level = 3, decoration = 1},
 	sounds = default.node_sound_metal_defaults(),
 	sound_open = "doors_steel_door_open",
 	sound_close = "doors_steel_door_close",
@@ -551,7 +552,7 @@ doors.register("door_glass", {
 	tiles = {"doors_door_glass.png"},
 	description = "Glass Door",
 	inventory_image = "doors_item_glass.png",
-	groups = {cracky=3, oddly_breakable_by_hand=3},
+	groups = {cracky=3, oddly_breakable_by_hand=3, decoration = 1},
 	sounds = default.node_sound_glass_defaults(),
 	sound_open = "doors_glass_door_open",
 	sound_close = "doors_glass_door_close",
@@ -566,7 +567,7 @@ doors.register("door_obsidian_glass", {
 	tiles = {"doors_door_obsidian_glass.png"},
 	description = "Obsidian Glass Door",
 	inventory_image = "doors_item_obsidian_glass.png",
-	groups = {cracky=3},
+	groups = {cracky=3, decoration = 1},
 	sounds = default.node_sound_glass_defaults(),
 	sound_open = "doors_glass_door_open",
 	sound_close = "doors_glass_door_close",
@@ -748,7 +749,7 @@ doors.register_trapdoor("doors:trapdoor", {
 	wield_image = "doors_trapdoor.png",
 	tile_front = "doors_trapdoor.png",
 	tile_side = "doors_trapdoor_side.png",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, door = 1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, door = 1, decoration = 1},
 })
 
 doors.register_trapdoor("doors:trapdoor_steel", {
@@ -761,7 +762,7 @@ doors.register_trapdoor("doors:trapdoor_steel", {
 	sounds = default.node_sound_metal_defaults(),
 	sound_open = "doors_steel_door_open",
 	sound_close = "doors_steel_door_close",
-	groups = {cracky = 1, level = 2, door = 1},
+	groups = {cracky = 1, level = 2, door = 1, decoration = 1},
 })
 
 minetest.register_craft({
@@ -862,35 +863,35 @@ doors.register_fencegate("doors:gate_wood", {
 	description = "Wooden Fence Gate",
 	texture = "default_wood.png",
 	material = "default:wood",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2}
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, decoration = 1}
 })
 
 doors.register_fencegate("doors:gate_acacia_wood", {
 	description = "Acacia Wood Fence Gate",
 	texture = "default_acacia_wood.png",
 	material = "default:acacia_wood",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2}
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, decoration = 1}
 })
 
 doors.register_fencegate("doors:gate_junglewood", {
 	description = "Jungle Wood Fence Gate",
 	texture = "default_junglewood.png",
 	material = "default:junglewood",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2}
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, decoration = 1}
 })
 
 doors.register_fencegate("doors:gate_pine_wood", {
 	description = "Pine Wood Fence Gate",
 	texture = "default_pine_wood.png",
 	material = "default:pine_wood",
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3}
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, decoration = 1}
 })
 
 doors.register_fencegate("doors:gate_aspen_wood", {
 	description = "Aspen Wood Fence Gate",
 	texture = "default_aspen_wood.png",
 	material = "default:aspen_wood",
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3}
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, decoration = 1}
 })
 
 

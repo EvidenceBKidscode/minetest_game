@@ -28,18 +28,16 @@ function sfinv.override_page(name, def)
 	end
 end
 
-function sfinv.get_nav_fs(player, context, nav, current_idx)
-	-- Only show tabs if there is more than one page
-	if #nav > 1 then
-		return "tabheader[0,0;tabs;" .. table.concat(nav, ",") .. ";" .. current_idx .. ";true;false]"
-	else
-		return ""
-	end
+local dirs = {"top", "left", "right", "bottom"}
+
+function sfinv.get_nav_fs(player, nav, current_idx)
+	return "image_tab[0,0;tabs;" .. table.concat(nav, ",") .. 
+			";" .. current_idx .. ";" ..
+			"80,160,20,4,4;16,24,4,4,4;tab_,16,16,11]"
 end
 
-local theme_main = "bgcolor[#080808BB;true]"
-		 .. default.gui_bg
-		 .. default.gui_bg_img
+local theme_main = "bgcolor[#080808BB;true]" .. default.gui_bg ..
+		default.gui_bg_img
 
 local theme_inv = default.gui_slots .. [[
 		list[current_player;main;0,4.5;8,1;]
@@ -49,13 +47,14 @@ local theme_inv = default.gui_slots .. [[
 function sfinv.make_formspec(player, context, content, show_inv, size)
 	local tmp = {
 		size or "size[8,8.6]",
-		theme_main,
-		sfinv.get_nav_fs(player, context, context.nav_titles, context.nav_idx),
+		sfinv.get_nav_fs(player, context.nav_titles, context.nav_idx),
 		content
 	}
+
 	if show_inv then
 		tmp[#tmp + 1] = theme_inv
 	end
+
 	return table.concat(tmp, "")
 end
 
@@ -70,7 +69,8 @@ function sfinv.get_formspec(player, context)
 	local current_idx = 1
 	for i, pdef in pairs(sfinv.pages_unordered) do
 		if not pdef.is_in_nav or pdef:is_in_nav(player, context) then
-			nav[#nav + 1] = pdef.title
+			local dir = pdef.dir or "top"
+			nav[#nav + 1] = (pdef.image or pdef.title) .. ":" .. dir
 			nav_ids[#nav_ids + 1] = pdef.name
 			if pdef.name == context.page then
 				current_idx = #nav_ids
@@ -166,11 +166,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				sfinv.set_page(player, id)
 			end
 		end
-	else
-		-- Pass event to page
-		local page = sfinv.pages[context.page]
-		if page and page.on_player_receive_fields then
-			return page:on_player_receive_fields(player, context, fields)
-		end
+	end
+
+	local page = sfinv.pages[context.page]
+	if page and page.on_player_receive_fields then
+		return page:on_player_receive_fields(player, context, fields)
 	end
 end)
