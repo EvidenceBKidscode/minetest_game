@@ -294,8 +294,8 @@ minetest.register_node("default:desert_sandstone_brick", {
 
 minetest.register_node("default:silver_sandstone", {
 	description = "Silver Sandstone",
-	tiles = {"default_silver_sandstone.png", building = 1},
-	groups = {crumbly = 1, cracky = 3},
+	tiles = {"default_silver_sandstone.png"},
+	groups = {crumbly = 1, cracky = 3, building = 1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
