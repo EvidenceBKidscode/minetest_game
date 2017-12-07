@@ -99,8 +99,6 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					list[current_player;craftpreview;5.75,1.5;1,1;]
 					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
 					list[current_player;main;0,4.5;8,3;8]
-					
-					
 				]]
 			else
 				local start_i = inv.start_i or 0
