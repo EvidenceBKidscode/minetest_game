@@ -84,9 +84,14 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				creative.init_creative_inventory(player_name)
 
 			local formspec =
-				"label[0,-0.1;" .. minetest.colorize("#333333", title) .. "]" ..
-				"listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]" ..
-				"list[current_player;main;0,7.8;8,1;]"
+				"label[0,-0.1;" .. minetest.colorize("#333333", title) .. "]" .. [[
+				listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
+				list[current_player;main;0,7.8;7,1;]
+				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
+				list[detached:creative_trash;main;7,7.8;1,1;]
+				listring[]
+				listring[current_player;main]
+			]]
 
 			if name == "storage" then
 				formspec = formspec .. [[
@@ -94,10 +99,6 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					list[current_player;craftpreview;5.75,1.5;1,1;]
 					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
 					list[current_player;main;0,4.5;8,3;8]
-					image[7.06,3.6;0.8,0.8;creative_trash_icon.png]
-					list[detached:creative_trash;main;7,3.5;1,1;]
-					listring[]
-					listring[current_player;main]
 				]]
 			else
 				local start_i = inv.start_i or 0
