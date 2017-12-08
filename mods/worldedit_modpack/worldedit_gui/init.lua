@@ -226,9 +226,7 @@ local function get_formspec_str(main, y, columns, width, buttons, name)
 			",0.2;1,1;worldedit:hammer;worldedit_hammer;]" ..
 		--"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
 		"label[" .. (mode[name] == "default" and 3.8 or 2.2) .. ",1.2;" ..
-			minetest.wrap_text(
-			S("Click on the hammer button to get your WorldEdit tool"),
-			70, false) .. "]" ..
+			S("Click on the hammer button to get your WorldEdit tool") .. "]" ..
 		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") ..
 			";< " .. S("Back") .. "]" ..
 		"label[2,0;WorldEdit GUI]" ..
