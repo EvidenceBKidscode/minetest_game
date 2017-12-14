@@ -99,6 +99,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					list[current_player;craftpreview;5.75,1.5;1,1;]
 					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
 					list[current_player;main;0,4.5;8,3;8]
+					button[6,3.5;2,1;trash_all;Trash All;#999999]
 				]]
 			else
 				local start_i = inv.start_i or 0
@@ -164,7 +165,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				inv.start_i = tonumber(fields.sb_v:match(":(%d+)"))
 				sfinv.set_player_inventory_formspec(player, context)
 
-			elseif fields.creative_clear_inv then
+			elseif fields.trash_all then
 				player_inv:set_list("main", {})
 
 			else for item in pairs(fields) do
