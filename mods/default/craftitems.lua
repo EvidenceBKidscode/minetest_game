@@ -50,7 +50,7 @@ local function book_on_use(itemstack, user)
 	end
 
 	local formspec
-	if owner ~= player_name then
+	if owner == player_name then
 		formspec = "size[8,8]" .. default.gui_bg ..
 			default.gui_bg_img ..
 			"field[0.5,1;7.5,0;title;Title:;" ..
