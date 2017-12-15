@@ -12,13 +12,14 @@ minetest.register_craftitem("default:paper", {
 	groups = {flammable = 3},
 })
 
-
 local lpp = 14 -- Lines per book's page
+local langs = {"FR", "EN"}
+
 local function book_on_use(itemstack, user)
 	local player_name = user:get_player_name()
 	local meta = itemstack:get_meta()
 	local title, text, owner = "", "", player_name
-	local page, page_max, lines, string = 1, 1, {}, ""
+	local page, page_max, lines, string, lang = 1, 1, {}, "", "en"
 
 	-- Backwards compatibility
 	local old_data = minetest.deserialize(itemstack:get_metadata())
@@ -27,14 +28,14 @@ local function book_on_use(itemstack, user)
 	end
 
 	local data = meta:to_table().fields
-
 	if data.owner then
 		title = data.title
-		text = data.text
+		lang = data.lang
+		text = data["text_" .. lang] and data["text_" .. lang] or ""
 		owner = data.owner
 
 		for str in (text .. "\n"):gmatch("([^\n]*)[\n]") do
-			lines[#lines+1] = str
+			lines[#lines + 1] = str
 		end
 
 		if data.page then
@@ -49,12 +50,12 @@ local function book_on_use(itemstack, user)
 	end
 
 	local formspec
-	if owner == player_name then
+	if owner ~= player_name then
 		formspec = "size[8,8]" .. default.gui_bg ..
 			default.gui_bg_img ..
 			"field[0.5,1;7.5,0;title;Title:;" ..
 				minetest.formspec_escape(title) .. "]" ..
-			"textarea[0.5,1.5;7.5,7;text;Contents:;" ..
+			"textarea[0.5,1.5;7.5,6.9;text;Contents:;" ..
 				minetest.formspec_escape(text) .. "]" ..
 			"button_exit[2.5,7.5;3,1;save;Save]"
 	else
@@ -70,6 +71,17 @@ local function book_on_use(itemstack, user)
 			"label[3.2,7.7;Page " .. page .. " of " .. page_max .. "]" ..
 			"button[4.9,7.6;0.8,0.8;book_next;>]"
 	end
+
+	local lang_idx = 1
+	for k, v in pairs(langs) do
+		if data.lang == v:lower() then
+			lang_idx = k
+		end
+	end
+
+	formspec = formspec ..
+		"dropdown[0.2,7.55;1;book_lang;" ..
+			(table.concat(langs, ",")) .. ";" .. lang_idx .. "]"
 
 	minetest.show_formspec(player_name, "default:book", formspec)
 	return itemstack
@@ -110,10 +122,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if #short_title > short_title_size + 3 then
 			short_title = short_title:sub(1, short_title_size) .. "..."
 		end
+
 		data.description = "\""..short_title.."\" by "..data.owner
-		data.text = fields.text:sub(1, max_text_size)
+
+		local lang = fields.book_lang:lower()
+		data.lang = lang
+		data["text_" .. lang] = fields.text:sub(1, max_text_size)
+		data["text_" .. lang] = data["text_" .. lang]:gsub("\r\n", "\n"):gsub("\r", "\n")
+
 		data.page = 1
-		data.page_max = math.ceil((#data.text:gsub("[^\n]", "") + 1) / lpp)
+		data.page_max = math.ceil((#data["text_" .. lang]:gsub("[^\n]", "") + 1) / lpp)
 
 		if new_stack then
 			new_stack:get_meta():from_table({ fields = data })
@@ -146,6 +164,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				data.page = data.page_max
 			end
 		end
+
+		stack:get_meta():from_table({fields = data})
+		stack = book_on_use(stack, player)
+
+	elseif fields.book_lang then
+		local data = stack:get_meta():to_table().fields
+		if not data then return end
+
+		local lang = fields.book_lang:lower()
+		data.lang = lang
 
 		stack:get_meta():from_table({fields = data})
 		stack = book_on_use(stack, player)
