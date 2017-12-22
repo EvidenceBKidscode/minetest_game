@@ -1,7 +1,7 @@
 worldedit
 worldedit_commands
+utils
 areas?
 sfinv?
 creative?
 teacher_menu?
-utils?

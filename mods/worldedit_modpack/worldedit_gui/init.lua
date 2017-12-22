@@ -71,7 +71,7 @@ worldedit.register_gui_handler = function(identifier, handler)
 
 		if not enabled then return false end
 		enabled = false
-		minetest.after(0.2, function() enabled = true end)
+		minetest.after(0.01, function() enabled = true end)
 
 		--ensure the player has permission to perform the action
 		local entry = worldedit.pages[identifier]

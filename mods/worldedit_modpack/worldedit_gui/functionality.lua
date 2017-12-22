@@ -77,40 +77,6 @@ local function combine_we_privs(list)
 	return combine_privs(unpack(args))
 end
 
-local function get_items_list(filter, pagenum, player_name, identifier)
-	local item_list = {}
-	for name, def in pairs(minetest.registered_nodes) do
-		if not (def.groups.not_in_creative_inventory == 1) and
-				def.description and def.description ~= "" and
-				(def.name:find(filter, 1, true) or
-					def.description:lower():find(filter, 1, true)) then
-			item_list[#item_list + 1] = name
-		end
-	end
-
-	worldedit.items[player_name].inv_size = #item_list
-	table.sort(item_list)
-
-	local width, height = 8, 3
-	local ipp, str = width * height, ""
-	local first_item = (pagenum - 1) * ipp
-	worldedit.items[player_name].pagemax = math.ceil(#item_list / ipp)
-
-	for i = first_item, first_item + ipp - 1 do
-		local name = item_list[i + 1]
-		if not name then break end
-		local X = i % width
-		local Y = (i % ipp - X) / width + 1
-
-		str = str .. "item_image_button[" ..
-			(X) .. "," ..
-			(Y - 0.2) .. ";1,1;" ..
-			name .. ";worldedit_gui_" .. identifier .. "_" .. name .. "_inv;]"
-	end
-
-	return str
-end
-
 worldedit.register_gui_function("worldedit_gui_about", {
 	type = "advanced",
 	name = S("About"),
@@ -223,68 +189,59 @@ worldedit.register_gui_function("worldedit_gui_set", {
 	name = S("Set Nodes"),
 	privs = we_privs("set"),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "set"
 		local node = gui_nodename1[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "set")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 		
 		return "size[8,6]" .. worldedit.get_formspec_header("worldedit_gui_set") ..
-			string.format("field[0.3,4.6;3,0.8;worldedit_gui_set_filter;" .. S("Filter") .. ";%s]",
-				minetest.formspec_escape(filter)) ..
-			string.format("field[0.3,5.82;3,0.8;worldedit_gui_set_node;" .. S("Name") .. ";%s]",
-				minetest.formspec_escape(node)) ..
-			"button[3,4.28;0.8,0.8;worldedit_gui_set_search;?]" ..
-			"button[3.7,4.28;0.8,0.8;worldedit_gui_set_search_clear;X]" ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_set_filter;" ..
+				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,5.82;3,0.8;worldedit_gui_set_node;" ..
+				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			items_list ..
-			"field_close_on_enter[worldedit_gui_set_filter;false]" ..
-			"button[5.5,4.18;0.8,1;worldedit_gui_set_items_prev;<]" ..
-			"label[6.2,4.38;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.18;0.8,1;worldedit_gui_set_items_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;set_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			"button_exit[3,5.5;3,0.8;worldedit_gui_set_submit;" .. S("Set Nodes") .. "]"
 	end,
 })
 
 worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_set_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_set_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_set")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_set_search or
-	   fields.key_enter_field == "worldedit_gui_set_node" then
-		worldedit.items[name].pagenum = 1
+	if fields.set_sb_h and fields.set_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.set_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_set")
 		return true
+	end
 
-	elseif fields.worldedit_gui_set_search or
-	       fields.worldedit_gui_set_submit or
-	       fields.worldedit_gui_set_node   or
-	       fields.worldedit_gui_set_search_clear then
-	   	local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
+	if fields.worldedit_gui_set_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_set_filter:lower() then
+	   	local filter = fields.worldedit_gui_set_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_set")
+		return true
+	end
 
-		if fields.worldedit_gui_set_items_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-		elseif fields.worldedit_gui_set_items_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
-
+	if fields.worldedit_gui_set_submit or fields.worldedit_gui_set_node then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_set_node)
-		worldedit.items[name].filter = fields.worldedit_gui_set_search_clear and "" or
-					       fields.worldedit_gui_set_filter
 		worldedit.show_page(name, "worldedit_gui_set")
 
 		if fields.worldedit_gui_set_submit then
@@ -305,29 +262,30 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 	name = S("Replace Nodes"),
 	privs = combine_we_privs({"replace", "replaceinverse"}),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "replace"
 		local search, replace = gui_nodename1[name], gui_nodename2[name]
 		local search_nodename, replace_nodename =
 			worldedit.normalize_nodename(search), worldedit.normalize_nodename(replace)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "replace")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,7]" .. worldedit.get_formspec_header("worldedit_gui_replace") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_replace_filter;" ..
-				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_replace_filter;" ..
+				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.8;4,0.8;worldedit_gui_replace_node;" ..
 				S("Replace") .. ";%s]", minetest.formspec_escape(search)) ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_replace_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_replace_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_replace_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_replace_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;replace_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[4.3,5.8;4,0.8;worldedit_gui_replace_replace;" ..
 				S("By") .. ";%s]", minetest.formspec_escape(replace)) ..
-			"field_close_on_enter[worldedit_gui_replace_filter;false]" ..
 			"button_exit[1,6.5;3,0.8;worldedit_gui_replace_submit;" ..
 				S("Replace Nodes") .. "]" ..
 			"button_exit[4,6.5;3,0.8;worldedit_gui_replace_submit_inverse;" ..
@@ -339,57 +297,32 @@ local replace_last = {}
 
 worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_replace_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_replace_([%w_]+:[%w_]+)_inv")
-
-			replace_last[name] = replace_last[name] or ""
-			if replace_last[name] == "" or replace_last[name] == 2 then
-				replace_last[name] = 1
-				gui_nodename1[name] = item
-			elseif replace_last[name] == 1 then
-				replace_last[name] = 2
-				gui_nodename2[name] = item
-			end
-
-			worldedit.show_page(name, "worldedit_gui_replace")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
+			gui_nodename1[name] = item
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_replace_search or
-	   fields.key_enter_field == "worldedit_gui_replace_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_replace_filter
+	if fields.replace_sb_h and fields.replace_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.replace_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_replace")
 		return true
+	end
 
-	elseif fields.worldedit_gui_replace_submit         or
-	       fields.worldedit_gui_replace_submit_inverse or
-	       fields.worldedit_gui_replace_search_clear   or
-	       fields.worldedit_gui_replace_next           or
-	       fields.worldedit_gui_replace_prev           then
-		local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
+	if fields.worldedit_gui_replace_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_replace_filter:lower() then
+	   	local filter = fields.worldedit_gui_replace_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_replace")
+		return true
+	end
 
-		if fields.worldedit_gui_replace_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_replace_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-		elseif fields.worldedit_gui_replace_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
-
+	if fields.worldedit_gui_replace_submit or fields.worldedit_gui_replace_submit_inverse then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_replace_node)
-		worldedit.items[name].filter = fields.worldedit_gui_replace_search_clear and "" or
-					       fields.worldedit_gui_replace_filter
 		gui_nodename2[name] = tostring(fields.worldedit_gui_replace_replace)
 		worldedit.show_page(name, "worldedit_gui_replace")
 
@@ -420,28 +353,29 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 	form = true,
 	privs = combine_we_privs({"hollowsphere", "sphere", "hollowdome", "dome"}),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "sphere_dome"
 		local node, radius = gui_nodename1[name], gui_distance2[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "sphere_dome")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_sphere_dome") ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_sphere_dome_filter;" ..
-				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_sphere_dome_filter;" ..
+				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
 			items_list ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_sphere_dome_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_sphere_dome_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_sphere_dome_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_sphere_dome_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;sphere_dome_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[0.3,5.7;3,0.8;worldedit_gui_sphere_dome_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			string.format("field[3.2,5.7;2,0.8;worldedit_gui_sphere_dome_radius;" ..
 				S("Radius") .. ";%s]", minetest.formspec_escape(radius)) ..
-			"field_close_on_enter[worldedit_gui_sphere_dome_filter;false]" ..
 			"button_exit[0.7,6.5;3,0.8;worldedit_gui_sphere_dome_submit_hollow;" ..
 				S("Hollow Sphere") .. "]" ..
 			"button_exit[4.2,6.5;3,0.8;worldedit_gui_sphere_dome_submit_solid;" ..
@@ -455,57 +389,38 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 
 worldedit.register_gui_handler("worldedit_gui_sphere_dome", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_sphere_dome_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_sphere_dome_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_sphere_dome")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_sphere_dome_search or
-	   fields.key_enter_field == "worldedit_gui_sphere_dome_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_sphere_dome_filter
+	if fields.sphere_dome_sb_h and fields.sphere_dome_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.sphere_dome_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_sphere_dome")
 		return true
 
-	elseif fields.worldedit_gui_sphere_dome_search             or
-	       fields.worldedit_gui_sphere_dome_submit_hollow      or
-	       fields.worldedit_gui_sphere_dome_submit_solid       or
-	       fields.worldedit_gui_sphere_dome_submit_hollow_dome or
-	       fields.worldedit_gui_sphere_dome_submit_solid_dome  or
-	       fields.worldedit_gui_sphere_dome_search_clear       or
-	       fields.worldedit_gui_sphere_dome_next               or
-	       fields.worldedit_gui_sphere_dome_prev               then
-	   	local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
+	elseif fields.worldedit_gui_sphere_dome_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_sphere_dome_filter:lower() then
+	   	local filter = fields.worldedit_gui_sphere_dome_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_sphere_dome")
+		return true
+	end
 
-		if fields.worldedit_gui_sphere_dome_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_sphere_dome_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-
-		elseif fields.worldedit_gui_sphere_dome_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
-
+	if fields.worldedit_gui_sphere_dome_submit_hollow      or
+	   fields.worldedit_gui_sphere_dome_submit_solid       or
+	   fields.worldedit_gui_sphere_dome_submit_hollow_dome or
+	   fields.worldedit_gui_sphere_dome_submit_solid_dome  then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_sphere_dome_node)
-		worldedit.items[name].filter = fields.worldedit_gui_sphere_dome_search_clear and "" or
-					       fields.worldedit_gui_sphere_dome_filter
-
 		gui_distance2[name] = tostring(fields.worldedit_gui_sphere_dome_radius)
 		worldedit.show_page(name, "worldedit_gui_sphere_dome")
-
 		local submit
+
 		if fields.worldedit_gui_sphere_dome_submit_hollow then
 			submit = "hollowsphere"
 		elseif fields.worldedit_gui_sphere_dome_submit_solid then
@@ -535,26 +450,28 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 	form = true,
 	privs = combine_we_privs({"hollowcylinder", "cylinder"}),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "cylinder"
 		local node, axis, length = gui_nodename1[name], gui_axis1[name], gui_distance1[name]
 		local radius1, radius2 = gui_distance2[name], gui_distance3[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "cylinder")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_cylinder") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cylinder_filter;" ..
-				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_cylinder_filter;" ..
+				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.6;4,0.8;worldedit_gui_cylinder_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_cylinder_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_cylinder_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_cylinder_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_cylinder_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;cylinder_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[0.3,6.9;2,0.8;worldedit_gui_cylinder_length;" ..
 				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
 			string.format("field[2.2,6.9;2,0.8;worldedit_gui_cylinder_radius1;"..
@@ -564,7 +481,6 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 			string.format("dropdown[5.7,6.55;2.4;worldedit_gui_cylinder_axis;" ..
 				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
 				S("Look direction") .. ";%d]", axis) ..
-			"field_close_on_enter[worldedit_gui_cylinder_filter;false]" ..
 			"button_exit[1,7.5;3,0.8;worldedit_gui_cylinder_submit_hollow;" ..
 				S("Hollow Cylinder") .. "]" ..
 			"button_exit[4,7.5;3,0.8;worldedit_gui_cylinder_submit_solid;" ..
@@ -574,54 +490,37 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 
 worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_cylinder_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_cylinder_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_cylinder")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_cylinder_search or
-	   fields.key_enter_field == "worldedit_gui_cylinder_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_cylinder_filter
+	if fields.cylinder_sb_h and fields.cylinder_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.cylinder_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_cylinder")
 		return true
+	end
 
-	elseif fields.worldedit_gui_cylinder_submit_hollow or
-	       fields.worldedit_gui_cylinder_submit_solid  or
-	       fields.worldedit_gui_cylinder_search_clear  or
-	       fields.worldedit_gui_cylinder_next          or
-	       fields.worldedit_gui_cylinder_prev          then
+	if fields.worldedit_gui_cylinder_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_cylinder_filter:lower() then
+	   	local filter = fields.worldedit_gui_cylinder_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_cylinder")
+		return true
+	end
+
+	if fields.worldedit_gui_cylinder_submit_hollow or
+	   fields.worldedit_gui_cylinder_submit_solid  then
 	   	gui_nodename1[name] = tostring(fields.worldedit_gui_cylinder_node)
-		worldedit.items[name].filter = fields.worldedit_gui_cylinder_search_clear and "" or
-					       fields.worldedit_gui_cylinder_filter
-
 		gui_axis1[name] = worldedit.axis_indices[fields.worldedit_gui_cylinder_axis]
 		gui_distance1[name] = tostring(fields.worldedit_gui_cylinder_length)
 		gui_distance2[name] = tostring(fields.worldedit_gui_cylinder_radius1)
 		gui_distance3[name] = tostring(fields.worldedit_gui_cylinder_radius2)
-
-		local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
-
-		if fields.worldedit_gui_cylinder_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_cylinder_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-
-		elseif fields.worldedit_gui_cylinder_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
 
 		worldedit.show_page(name, "worldedit_gui_cylinder")
 
@@ -664,31 +563,32 @@ worldedit.register_gui_function("worldedit_gui_pyramid", {
 	form = true,
 	privs = we_privs("pyramid"),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "pyramid"
 		local node, axis, length = gui_nodename1[name], gui_axis1[name], gui_distance1[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "pyramid")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,7]" .. worldedit.get_formspec_header("worldedit_gui_pyramid") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_pyramid_filter;" ..
-				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_pyramid_filter;" ..
+				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.8;3.5,0.8;worldedit_gui_pyramid_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_pyramid_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_pyramid_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_pyramid_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_pyramid_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;pyramid_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[3.8,5.8;2,0.8;worldedit_gui_pyramid_length;" ..
 				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
 			string.format("dropdown[5.5,5.45;2.5;worldedit_gui_pyramid_axis;" ..
 				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
 				S("Look direction") .. ";%d]", axis) ..
-			"field_close_on_enter[worldedit_gui_pyramid_filter;false]" ..
 			"button_exit[1,6.5;3,0.8;worldedit_gui_pyramid_submit_hollow;" ..
 				S("Hollow Pyramid") .. "]" ..
 			"button_exit[4,6.5;3,0.8;worldedit_gui_pyramid_submit_solid;" ..
@@ -698,54 +598,36 @@ worldedit.register_gui_function("worldedit_gui_pyramid", {
 
 worldedit.register_gui_handler("worldedit_gui_pyramid", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_pyramid_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_pyramid_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_pyramid")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_pyramid_search or
-	   fields.key_enter_field == "worldedit_gui_pyramid_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_pyramid_filter
+	if fields.pyramid_sb_h and fields.pyramid_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.pyramid_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_pyramid")
 		return true
+	end
 
-	elseif fields.worldedit_gui_pyramid_submit_solid  or
-	       fields.worldedit_gui_pyramid_submit_hollow or
-	       fields.worldedit_gui_pyramid_axis          or
-	       fields.worldedit_gui_pyramid_search_clear  or
-	       fields.worldedit_gui_pyramid_next          or
-	       fields.worldedit_gui_pyramid_prev          then
+	if fields.worldedit_gui_pyramid_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_pyramid_filter:lower() then
+	   	local filter = fields.worldedit_gui_pyramid_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_pyramid")
+		return true
+	end
+
+	if fields.worldedit_gui_pyramid_submit_solid  or
+	   fields.worldedit_gui_pyramid_submit_hollow or
+	   fields.worldedit_gui_pyramid_axis          then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_pyramid_node)
-		worldedit.items[name].filter = fields.worldedit_gui_pyramid_search_clear and "" or
-					       fields.worldedit_gui_pyramid_filter
-
 		gui_axis1[name] = axis_indices[fields.worldedit_gui_pyramid_axis]
 		gui_distance1[name] = tostring(fields.worldedit_gui_pyramid_length)
-
-		local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
-
-		if fields.worldedit_gui_pyramid_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_pyramid_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-
-		elseif fields.worldedit_gui_pyramid_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
-
 		worldedit.show_page(name, "worldedit_gui_pyramid")
 
 		local submit = nil
@@ -780,85 +662,69 @@ worldedit.register_gui_function("worldedit_gui_spiral", {
 	form = true,
 	privs = we_privs("spiral"),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "spiral"
 		local node, length, height, space =
 			gui_nodename1[name], gui_distance1[name], gui_distance2[name], gui_distance3[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "spiral")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_spiral") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_spiral_filter;" ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_spiral_filter;" ..
 				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.6;3.5,0.8;worldedit_gui_spiral_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_spiral_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_spiral_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_spiral_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_spiral_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;spiral_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[0.3,6.8;2,0.8;worldedit_gui_spiral_length;" ..
 				S("Side Length") .. ";%s]", minetest.formspec_escape(length)) ..
 			string.format("field[2.3,6.8;2,0.8;worldedit_gui_spiral_height;" ..
 				S("Height") .. ";%s]", minetest.formspec_escape(height)) ..
 			string.format("field[4.3,6.8;2,0.8;worldedit_gui_spiral_space;" ..
 				S("Wall Spacing") .. ";%s]", minetest.formspec_escape(space)) ..
-			"field_close_on_enter[worldedit_gui_spiral_filter;false]" ..
 			"button_exit[2.5,7.5;3,0.8;worldedit_gui_spiral_submit;" .. S("Spiral") .. "]"
 	end,
 })
 
 worldedit.register_gui_handler("worldedit_gui_spiral", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_spiral_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_spiral_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_spiral")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_spiral_search or
-	   fields.key_enter_field == "worldedit_gui_spiral_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_spiral_filter
+	if fields.spiral_sb_h and fields.spiral_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.spiral_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_spiral")
 		return true
+	end
 
-	elseif fields.worldedit_gui_spiral_submit        or
-	       fields.worldedit_gui_spiral_search_clear  or
-	       fields.worldedit_gui_spiral_next          or
-	       fields.worldedit_gui_spiral_prev          then
+	if fields.worldedit_gui_spiral_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_spiral_filter:lower() then
+	   	local filter = fields.worldedit_gui_spiral_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_spiral")
+		return true
+	end
+
+	if fields.worldedit_gui_spiral_submit then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_spiral_node)
-		worldedit.items[name].filter = fields.worldedit_gui_spiral_search_clear and "" or
-					       fields.worldedit_gui_spiral_filter
-
 		gui_distance1[name] = tostring(fields.worldedit_gui_spiral_length)
 		gui_distance2[name] = tostring(fields.worldedit_gui_spiral_height)
 		gui_distance3[name] = tostring(fields.worldedit_gui_spiral_space)
-
-		local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
-
-		if fields.worldedit_gui_spiral_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_spiral_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-
-		elseif fields.worldedit_gui_spiral_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
 
 		worldedit.show_page(name, "worldedit_gui_spiral")
 
@@ -1284,33 +1150,34 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 	form = true,
 	privs = combine_we_privs({"hollowcube", "cube"}),
 	get_formspec = function(name)
+		worldedit.items[name].current_page = "cube"
 		local width, height, length = gui_distance1[name], gui_distance2[name], gui_distance3[name]
 		local node = gui_nodename1[name]
 		local nodename = worldedit.normalize_nodename(node)
-		local pagenum = worldedit.items[name].pagenum or 1
+
+		local start_i = worldedit.items[name].start_i or 0
 		local filter = worldedit.items[name].filter or ""
-		local items_list = get_items_list(filter, pagenum, name, "cube")
-		local pagemax = worldedit.items[name].pagemax or 1
+		local width, height = 9, 3
+		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
+		local ipp = width * height
 
 		return "size[8,8]" .. worldedit.get_formspec_header("worldedit_gui_cube") ..
 			items_list ..
-			string.format("field[0.3,4.5;3,0.8;worldedit_gui_cube_filter;" ..
+			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_cube_filter;" ..
 				S("Filter") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.7;3.5,0.8;worldedit_gui_cube_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
-			"button[2.9,4.18;0.8,0.8;worldedit_gui_cube_search;?]" ..
-			"button[3.6,4.18;0.8,0.8;worldedit_gui_cube_search_clear;X]" ..
-			"button[5.5,4.08;0.8,1;worldedit_gui_cube_prev;<]" ..
-			"label[6.2,4.28;" ..
-				minetest.colorize("#FFFF00", pagenum) .. " / " .. pagemax .. "]" ..
-			"button[7.2,4.08;0.8,1;worldedit_gui_cube_next;>]" ..
+			"scrollbar[4,4.25;3.6,0.5;horizontal;cube_sb_h;" ..
+				start_i .. ",0," ..
+				(inv_size - (inv_size % ipp)) .. "," ..
+				ipp .. "," .. ipp .."," .. ipp ..
+				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[0.3,6.8;2,1;worldedit_gui_cube_width;" ..
 				S("Width") .. ";%s]", minetest.formspec_escape(width)) ..
 			string.format("field[2.3,6.8;2,1;worldedit_gui_cube_height;" ..
 				S("Height") .. ";%s]", minetest.formspec_escape(height)) ..
 			string.format("field[4.3,6.8;2,1;worldedit_gui_cube_length;" ..
 				S("Length") .. ";%s]", minetest.formspec_escape(length)) ..
-			"field_close_on_enter[worldedit_gui_cube_filter;false]" ..
 			"button_exit[1,7.5;3,1;worldedit_gui_cube_submit_hollow;" ..
 				S("Hollow Cuboid") .. "]" ..
 			"button_exit[4,7.5;3,1;worldedit_gui_cube_submit_solid;" ..
@@ -1320,53 +1187,36 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 
 worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
 	for field in pairs(fields) do
-		if field:find("worldedit_gui_cube_[%w_]+:[%w_]+_inv") then
-			local item = field:match("worldedit_gui_cube_([%w_]+:[%w_]+)_inv")
+		if field:find(":") then
+			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_cube")
+			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
 	end
 
-	if fields.worldedit_gui_cube_search or
-	   fields.key_enter_field == "worldedit_gui_cube_filter" then
-		worldedit.items[name].pagenum = 1
-		worldedit.items[name].filter = fields.worldedit_gui_cube_filter
+	if fields.cube_sb_h and fields.cube_sb_h:sub(1,3) == "CHG" then
+		worldedit.items[name].start_i = tonumber(fields.cube_sb_h:match(":(%d+)"))
 		worldedit.show_page(name, "worldedit_gui_cube")
 		return true
+	end
 
-	elseif fields.worldedit_gui_cube_submit_hollow or
-	       fields.worldedit_gui_cube_submit_solid  or
-	       fields.worldedit_gui_cube_search_clear  or
-	       fields.worldedit_gui_cube_next          or
-	       fields.worldedit_gui_cube_prev          then
+	if fields.worldedit_gui_cube_filter and
+	   worldedit.items[name].last_search ~= fields.worldedit_gui_cube_filter:lower() then
+	   	local filter = fields.worldedit_gui_cube_filter:lower()
+		worldedit.items[name].start_i = 0
+		worldedit.items[name].filter = filter
+		worldedit.items[name].last_search = filter
+		worldedit.show_page(name, "worldedit_gui_cube")
+		return true
+	end
+
+	if fields.worldedit_gui_cube_submit_hollow or
+	   fields.worldedit_gui_cube_submit_solid then
 		gui_nodename1[name] = tostring(fields.worldedit_gui_cube_node)
-		worldedit.items[name].filter = fields.worldedit_gui_cube_search_clear and "" or
-					       fields.worldedit_gui_cube_filter
-
 		gui_distance1[name] = tostring(fields.worldedit_gui_cube_width)
 		gui_distance2[name] = tostring(fields.worldedit_gui_cube_height)
 		gui_distance3[name] = tostring(fields.worldedit_gui_cube_length)
-
-		local pagenum = worldedit.items[name].pagenum or 1
-		local pagemax = worldedit.items[name].pagemax or 1
-
-		if fields.worldedit_gui_cube_search_clear then
-			worldedit.items[name].pagenum = 1
-		end
-
-		if fields.worldedit_gui_cube_next then
-			worldedit.items[name].pagenum = pagenum + 1
-			if worldedit.items[name].pagenum > pagemax then
-				worldedit.items[name].pagenum = 1
-			end
-
-		elseif fields.worldedit_gui_cube_prev then
-			worldedit.items[name].pagenum = pagenum - 1
-			if worldedit.items[name].pagenum <= 0 then
-				worldedit.items[name].pagenum = pagemax
-			end
-		end
 
 		worldedit.show_page(name, "worldedit_gui_cube")
 
