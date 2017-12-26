@@ -215,8 +215,15 @@ worldedit.register_gui_function("worldedit_gui_set", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -296,8 +303,15 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 local replace_last = {}
 
 worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -388,8 +402,15 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_sphere_dome", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -489,8 +510,15 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -597,8 +625,15 @@ worldedit.register_gui_function("worldedit_gui_pyramid", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_pyramid", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -695,8 +730,15 @@ worldedit.register_gui_function("worldedit_gui_spiral", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_spiral", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -1186,8 +1228,15 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
+	local continue = false
 	for field in pairs(fields) do
-		if field:find(":") then
+		if field:find("worldedit") then
+			continue = true
+		end
+	end
+
+	for field in pairs(fields) do
+		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
