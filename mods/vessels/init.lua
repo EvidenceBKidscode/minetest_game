@@ -171,38 +171,6 @@ minetest.register_craft( {
 	}
 })
 
-
--- Glass and steel recycling
-
-minetest.register_craftitem("vessels:glass_fragments", {
-	description = "Pile of Glass Fragments",
-	inventory_image = "vessels_glass_fragments.png",
-})
-
-minetest.register_craft( {
-	type = "shapeless",
-	output = "vessels:glass_fragments",
-	recipe = {
-		"vessels:glass_bottle",
-		"vessels:glass_bottle",
-	},
-})
-
-minetest.register_craft( {
-	type = "shapeless",
-	output = "vessels:glass_fragments",
-	recipe = {
-		"vessels:drinking_glass",
-		"vessels:drinking_glass",
-	},
-})
-
-minetest.register_craft({
-	type = "cooking",
-	output = "default:glass",
-	recipe = "vessels:glass_fragments",
-})
-
 minetest.register_craft( {
 	type = "cooking",
 	output = "default:steel_ingot",

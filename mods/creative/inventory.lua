@@ -84,8 +84,8 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				creative.init_creative_inventory(player_name)
 
 			local formspec =
-				"label[0,-0.1;" .. minetest.colorize("#333333", title) .. "]" .. [[
-				listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
+				"label[0,-0.1;" .. title .. "]" .. [[
+				listcolors[#00000069;#945744;#141318;#30434C;#FFF]
 				list[current_player;main;0,7.8;7,1;]
 				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
 				list[detached:creative_trash;main;7,7.8;1,1;]
@@ -99,7 +99,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					list[current_player;craftpreview;5.75,1.5;1,1;]
 					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
 					list[current_player;main;0,4.5;8,3;8]
-					button[6,3.5;2,1;trash_all;Trash All;#999999]
+					button[6,3.5;2,1;trash_all;Trash All;#88acc5]
 				]]
 			else
 				local start_i = inv.start_i or 0
@@ -109,7 +109,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					"scrollbar[7.15,0.5;0.7,6.97;vertical;sb_v;" ..
 						inv.start_i .. ",0," ..
 						(inv.size - (inv.size % ipp)) .. "," .. ipp .. "," .. ipp .."," .. ipp ..
-						";#999999;#777777;#FFFFFFFF;#808080FF]"
+						";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
 
 				local first_item = (pagenum - 1) * ipp
 				for i = first_item, first_item + ipp - 1 do
@@ -120,14 +120,14 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 					formspec = formspec ..
 						"item_image_button[" .. X .. "," .. (Y - 0.5) .. ";1.1,1.1;" ..
-						item_name .. ";" .. item_name .. "_inv;;#999999]"
+						item_name .. ";" .. item_name .. "_inv;;#c0d3e1]"
 				end
 			end
 
 			if name == "search" then
 				formspec = formspec ..
 					"field[2.5,0;4.92,1;!creative_filter;;" ..
-						minetest.formspec_escape(inv.filter) .. ";#999999]"
+						minetest.formspec_escape(inv.filter) .. ";#88acc5]"
 			end
 
 			return sfinv.make_formspec(player, context, formspec, false)
@@ -142,7 +142,6 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 		end,
 
 		on_player_receive_fields = function(self, player, context, fields)
-			--print(dump(fields))
 			if self.name ~= "creative:" .. name then return end
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
@@ -150,6 +149,12 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			local is_mapmaker = minetest.check_player_privs(player_name, "mapmaker")
 			local is_teacher = minetest.check_player_privs(player_name, "teacher")
 			assert(inv)
+
+			if self.name ~= "creative:search" then
+				inv.filter = ""
+				creative.update_creative_inventory(player_name, items, drawtype, group)
+				sfinv.set_player_inventory_formspec(player, context)
+			end
 
 			if fields.creative_filter and
 					player_inventory[player_name].last_search ~=
