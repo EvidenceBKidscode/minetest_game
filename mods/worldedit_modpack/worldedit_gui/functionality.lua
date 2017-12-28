@@ -77,6 +77,7 @@ local function combine_we_privs(list)
 	return combine_privs(unpack(args))
 end
 
+--[[
 worldedit.register_gui_function("worldedit_gui_about", {
 	type = "advanced",
 	name = S("About"),
@@ -85,6 +86,7 @@ worldedit.register_gui_function("worldedit_gui_about", {
 		minetest.chatcommands["/about"].func(name, "")
 	end,
 })
+]]
 
 worldedit.register_gui_function("worldedit_gui_inspect", {
 	type = "advanced",
@@ -95,6 +97,7 @@ worldedit.register_gui_function("worldedit_gui_inspect", {
 	end,
 })
 
+--[[
 worldedit.register_gui_function("worldedit_gui_region", {
 	type = "advanced",
 	name = S("Get / Set Region"),
@@ -183,6 +186,7 @@ worldedit.register_gui_handler("worldedit_gui_region", function(name, fields)
 	end
 	return false
 end)
+]]
 
 worldedit.register_gui_function("worldedit_gui_set", {
 	type = "advanced",

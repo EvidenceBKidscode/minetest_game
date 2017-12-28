@@ -85,7 +85,7 @@ end
 worldedit.get_formspec_header = function(identifier)
 	local entry = worldedit.pages[identifier] or {}
 	return "button[0,0;2,0.5;worldedit_gui;< " .. S("Back") .. "]" ..
-		string.format("label[2,0;WorldEdit GUI > %s]", entry.name or "")
+		string.format("label[2,0;%s]", entry.name or "")
 end
 
 local get_formspec = function(name, identifier)
@@ -229,7 +229,6 @@ local function get_formspec_str(main, y, columns, width, buttons, name)
 			S("Click on the hammer button to get your WorldEdit tool") .. "]" ..
 		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") ..
 			";< " .. S("Back") .. "]" ..
-		"label[2,0;WorldEdit GUI]" ..
 		table.concat(buttons) ..
 		"button[" .. (math.max(columns * width, 5) - 2) ..
 			",0;2,0.5;worldedit_gui_advanced;" ..
