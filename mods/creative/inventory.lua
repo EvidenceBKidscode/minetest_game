@@ -85,7 +85,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 			local formspec =
 				"label[0,-0.1;" .. title .. "]" .. [[
-				listcolors[#00000069;#945744;#141318;#30434C;#FFF]
+				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
 				list[current_player;main;0,7.8;7,1;]
 				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
 				list[detached:creative_trash;main;7,7.8;1,1;]
