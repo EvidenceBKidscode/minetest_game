@@ -112,25 +112,39 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 						"," .. ipp .. "," .. ipp .."," .. ipp ..
 						";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
 
+				if name == "search" then
+					ipp = 8*7
+				else
+					ipp = 8*8
+				end
+
 				local first_item = (pagenum - 1) * ipp
 				for i = first_item, first_item + ipp - 1 do
 					local item_name = inv_items[i + 1]
 					if not item_name then break end
 					local X = i % 8
-					local Y = (i % ipp - X) / 8 + 1
+					local Y
+
+					if name == "search" then
+						Y = (i % ipp - X) / 7 + 1
+					else
+						Y = (i % ipp - X) / 8 + 1
+					end
 
 					formspec = formspec ..
 						"item_image_button[" ..
 							(X - (X * 0.12)) .. "," ..
-							((Y - 0.5) - (Y * 0.1)) .. ";1,1;" ..
+							((Y - (name == "search" and 0.4 or 0.5)) -
+							 (Y * (name == "search" and 0.2 or 0.1))) ..
+							";1,1;" ..
 							item_name .. ";" .. item_name .. "_inv;;#c0d3e1]"
 				end
 			end
 
 			if name == "search" then
 				formspec = formspec ..
-					"field[2.5,0;4.92,1;!creative_filter;;" ..
-						minetest.formspec_escape(inv.filter) .. ";#88acc5]"
+					"field[0.3,7.15;7.17,1;!creative_filter;;" ..
+						minetest.formspec_escape(inv.filter) .. "]"
 			end
 
 			return sfinv.make_formspec(player, context, formspec, false)
