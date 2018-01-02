@@ -1,5 +1,5 @@
 local player_inventory = {}
-local ipp = 7*7
+local ipp = 8*8
 
 function creative.init_creative_inventory(player_name)
 	player_inventory[player_name] = {
@@ -106,21 +106,24 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				local pagenum = math.floor(start_i / ipp + 1)
 
 				formspec = formspec ..
-					"scrollbar[7.15,0.5;0.7,6.97;vertical;sb_v;" ..
+					"scrollbar[7.23,0.4;0.6,7.18;vertical;sb_v;" ..
 						inv.start_i .. ",0," ..
-						(inv.size - (inv.size % ipp)) .. "," .. ipp .. "," .. ipp .."," .. ipp ..
+						(inv.size - (inv.size % ipp)) ..
+						"," .. ipp .. "," .. ipp .."," .. ipp ..
 						";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
 
 				local first_item = (pagenum - 1) * ipp
 				for i = first_item, first_item + ipp - 1 do
 					local item_name = inv_items[i + 1]
 					if not item_name then break end
-					local X = i % 7
-					local Y = (i % ipp - X) / 7 + 1
+					local X = i % 8
+					local Y = (i % ipp - X) / 8 + 1
 
 					formspec = formspec ..
-						"item_image_button[" .. X .. "," .. (Y - 0.5) .. ";1.1,1.1;" ..
-						item_name .. ";" .. item_name .. "_inv;;#c0d3e1]"
+						"item_image_button[" ..
+							(X - (X * 0.12)) .. "," ..
+							((Y - 0.5) - (Y * 0.1)) .. ";1,1;" ..
+							item_name .. ";" .. item_name .. "_inv;;#c0d3e1]"
 				end
 			end
 
