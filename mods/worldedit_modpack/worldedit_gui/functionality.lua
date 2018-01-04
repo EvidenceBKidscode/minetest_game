@@ -219,6 +219,8 @@ worldedit.register_gui_function("worldedit_gui_set", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -307,6 +309,8 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 local replace_last = {}
 
 worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+	
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -406,6 +410,8 @@ worldedit.register_gui_function("worldedit_gui_sphere_dome", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_sphere_dome", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -514,6 +520,8 @@ worldedit.register_gui_function("worldedit_gui_cylinder", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_cylinder", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -629,6 +637,8 @@ worldedit.register_gui_function("worldedit_gui_pyramid", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_pyramid", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -734,6 +744,8 @@ worldedit.register_gui_function("worldedit_gui_spiral", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_spiral", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -1232,6 +1244,8 @@ worldedit.register_gui_function("worldedit_gui_cube", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
+	if utils.tablelen(fields) <= 3 then return end
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
