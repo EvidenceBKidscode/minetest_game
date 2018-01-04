@@ -1132,22 +1132,6 @@ worldedit.register_gui_function("worldedit_gui_restore", {
 
 local worldpath = minetest.get_worldpath()
 
-local function scandir()
-	local i, t, popen = 0, {}, io.popen
-	local pfile = popen("ls -a " .. worldpath .. "/schems")
-
-	for filename in pfile:lines() do
-		if filename:find(".we") then
-			local name = filename:match("(.*).we")
-			i = i + 1
-			t[i] = name
-		end
-	end
-
-	pfile:close()
-	return t
-end
-
 local function rm_schem(name)
 	local file = io.popen("rm " .. worldpath .. "/schems/" .. name .. ".we")
 	file:close()
@@ -1159,7 +1143,7 @@ worldedit.register_gui_function("worldedit_gui_save_load", {
 	privs = combine_we_privs({"save", "allocate", "load"}),
 	get_formspec = function(name)
 		local filename = gui_filename[name]
-		local schems = scandir()
+		local schems = utils.scandir(worldpath .. "/schems", true)
 
 		return "size[6,4]" .. worldedit.get_formspec_header("worldedit_gui_save_load") ..
 			string.format("field[0.3,1.5;3,0.8;worldedit_gui_save_filename;" ..
