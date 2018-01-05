@@ -248,7 +248,7 @@ creative.register_tab("nodes",
 )
 
 creative.register_tab("decoration",
-	"flowers_rose.png@0.8",
+	"allium.png@0.8",
 	"Decoration Blocks",
 	minetest.registered_nodes,
 	nil,
@@ -256,7 +256,7 @@ creative.register_tab("decoration",
 )
 
 creative.register_tab("items",
-	"default_tool_diamondpick.png@0.8",
+	"screwdriver.png@0.8",
 	"Items & Tools",
 	{minetest.registered_tools, minetest.registered_craftitems}
 )
@@ -270,7 +270,7 @@ creative.register_tab("mods",
 )
 
 creative.register_tab("search",
-	"tab_compass.png@0.8",
+	"tab_shelf.png@0.8",
 	"Search Items",
 	minetest.registered_items
 )
