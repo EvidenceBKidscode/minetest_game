@@ -71,13 +71,21 @@ end
 
 -- Checks if the area is unprotected or owned by you
 function areas:canInteract(pos, name)
+	local player = minetest.get_player_by_name(name)
+	local wield_item = player:get_wielded_item():get_name()
+
 	local meta = minetest.get_meta(pos)
 	local destructible = meta:get_string("destructible")
 
+	local node_name = minetest.get_node(pos).name
+
 	if minetest.check_player_privs(name, self.adminPrivs) or
-			destructible == "true" then
+	   destructible == "true" or
+	   wield_item:find("audioblocks:bloc_phrase") or
+	   node_name:find("audioblocks:bloc_phrase") then
 		return true
 	end
+
 	local owned = false
 	for _, area in pairs(self:getAreasAtPos(pos)) do
 		if area.owner == name or area.open then
