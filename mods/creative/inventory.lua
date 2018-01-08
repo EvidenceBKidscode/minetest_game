@@ -1,3 +1,4 @@
+local S = utils.gettext
 local player_inventory = {}
 local ipp = 8*8
 
@@ -99,8 +100,8 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					list[current_player;craftpreview;5.75,1.5;1,1;]
 					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
 					list[current_player;main;0,4.5;8,3;8]
-					button[6,3.5;2,1;trash_all;Trash All;#88acc5]
-				]]
+				]] ..
+				"button[5,3.5;3,1;trash_all;" .. S("Trash All") .. ";#88acc5]"
 			else
 				local start_i = inv.start_i or 0
 				local pagenum = math.floor(start_i / ipp + 1)
@@ -203,13 +204,13 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 						   utils.worldname == "science_factory") then
 					  	       minetest.chat_send_player(player_name,
 								minetest.colorize("#FF0000",
-									"ERROR: You cannot use any other item " ..
-									"on this map except the kidsbot"))
+									S("ERROR: You cannot use any other item " ..
+									"on this map except the kidsbot")))
 					  	else
 					  		minetest.chat_send_player(player_name,
 								minetest.colorize("#FF0000",
-									"ERROR: Privilege 'mapmaker' or 'teacher'" ..
-									" required to get this item"))
+									S("ERROR: Privilege 'mapmaker' or 'teacher'" ..
+									" required to get this item")))
 					  	end
 
 				  		return
@@ -236,12 +237,12 @@ end)
 
 creative.register_tab("storage",
 	"tab_storage.png@0.8",
-	"Storage"
+	S("Storage")
 )
 
 creative.register_tab("nodes",
 	"tab_building.png@0.8",
-	"Building Blocks",
+	S("Building Blocks"),
 	minetest.registered_nodes,
 	nil,
 	"building"
@@ -249,7 +250,7 @@ creative.register_tab("nodes",
 
 creative.register_tab("decoration",
 	"allium.png@0.8",
-	"Decoration Blocks",
+	S("Decoration Blocks"),
 	minetest.registered_nodes,
 	nil,
 	"decoration"
@@ -257,13 +258,13 @@ creative.register_tab("decoration",
 
 creative.register_tab("items",
 	"screwdriver.png@0.8",
-	"Items & Tools",
+	S("Items & Tools"),
 	{minetest.registered_tools, minetest.registered_craftitems}
 )
 
 creative.register_tab("mods",
 	"tab_mods.png@0.8",
-	"Mods",
+	S("Mods"),
 	minetest.registered_items,
 	nil,
 	"kidscode"
@@ -271,7 +272,7 @@ creative.register_tab("mods",
 
 creative.register_tab("search",
 	"tab_shelf.png@0.8",
-	"Search Items",
+	S("Search Items"),
 	minetest.registered_items
 )
 
