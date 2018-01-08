@@ -36,16 +36,15 @@ function creative.update_creative_inventory(player_name, tab_content, drawtype, 
 		tab_content = table_concat(unpack(tab_content))
 	end
 
-	for name, def in pairs(tab_content or {}) do
-		if not (def.groups.not_in_creative_inventory == 1) and
-		   def.description and def.description ~= ""	   and
+	local filter = inv.filter:lower()
 
+	for name, def in pairs(tab_content or {}) do
+		if not (def.groups.not_in_creative_inventory == 1)      and
+		   def.description and def.description ~= ""	        and
 		  ((not drawtype and true or def.drawtype == drawtype)) and
 		  ((not group    and true or def.groups[group]))        and
-
-		  (def.name:find(inv.filter, 1, true)		      or
-		   def.description:lower():find(inv.filter, 1, true)) then
-
+		  (def.name:find(filter, 1, true)                       or
+		   def.description:lower():find(filter, 1, true))       then
 			creative_list[#creative_list + 1] = name
 		end
 	end
@@ -87,7 +86,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			local formspec =
 				"label[0,-0.1;" .. title .. "]" .. [[
 				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
-				list[current_player;main;0,7.8;7,1;]
+				list[current_player;main;0,7.8;8,1;1;0.2,0.0;1.0]
 				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
 				list[detached:creative_trash;main;7,7.8;1,1;]
 				listring[]
@@ -161,6 +160,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 		on_player_receive_fields = function(self, player, context, fields)
 			if self.name ~= "creative:" .. name then return end
+			--print(dump(fields))
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()
@@ -176,9 +176,9 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 			if fields.creative_filter and
 					player_inventory[player_name].last_search ~=
-			   		fields.creative_filter:lower() then
+			   		fields.creative_filter then
 				inv.start_i = 0
-				inv.filter = fields.creative_filter:lower()
+				inv.filter = fields.creative_filter
 				player_inventory[player_name].last_search = inv.filter
 
 				creative.update_creative_inventory(player_name, items, drawtype, group)
