@@ -26,6 +26,7 @@ areas:load()
 minetest.register_privilege("areas", {
 	description = "Can administer areas."
 })
+
 minetest.register_privilege("areas_high_limit", {
 	description = "Can can more, bigger areas."
 })
@@ -40,4 +41,17 @@ if minetest.settings:get_bool("log_mod") then
 	local diffTime = os.clock() - areas.startTime
 	minetest.log("action", "areas loaded in "..diffTime.."s.")
 end
+
+minetest.register_on_joinplayer(function(player)
+	local player_name = player:get_player_name()
+	local privs = minetest.get_player_privs(player_name)
+	local is_mapmaker = minetest.check_player_privs(player, "mapmaker")
+	local is_teacher  = minetest.check_player_privs(player, "teacher")
+
+	if is_mapmaker or is_teacher then
+		privs.areas = true
+		privs.areas_high_limit = true
+		minetest.set_player_privs(player_name, privs)
+	end
+end)
 

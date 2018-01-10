@@ -1,5 +1,7 @@
+local S = utils.gettext
+
 minetest.register_tool(":worldedit:hammer", {
-	description = "WorldEdit Hammer. Left-click to set 1st position, right-click to set 2nd",
+	description = S("WorldEdit Hammer. Left-click to set 1st position, right-click to set 2nd"),
 	inventory_image = "worldedit_hammer.png",
 	stack_max = 1, -- there is no need to have more than one
 	liquids_pointable = true, -- ground with only water on can be selected as well
