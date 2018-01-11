@@ -282,7 +282,7 @@ msgstr "Terre"
 #: init.lua
 #, fuzzy
 msgid "Dirt with Dry Grass"
-msgstr "Terre avec de l'herbe humide"
+msgstr "Terre avec de l'herbe sèche"
 
 #: init.lua
 msgid "Dirt with Grass and Footsteps"
@@ -294,7 +294,7 @@ msgstr "Terre avec de l'herbe"
 
 #: init.lua
 msgid "Dirt with Rainforest Litter"
-msgstr "Terre avec humus forestier"
+msgstr "Terre avec de l'humus forestier"
 
 #: init.lua
 msgid "Dirt with Snow"
@@ -546,20 +546,20 @@ msgstr "Panneau en acier"
 
 #: init.lua
 msgid "Wooden Sign"
-msgstr "Panneau"
+msgstr "Panneau en bois"
 
 #: init.lua
 #, fuzzy
 msgid "Silver Sand"
-msgstr "Sable du désert"
+msgstr "Sable argenté"
 
 #: init.lua
 msgid "Silver Sandstone Block"
-msgstr ""
+msgstr "Bloc de grès argenté"
 
 #: init.lua
 msgid "Silver Sandstone Brick"
-msgstr ""
+msgstr "Bloc de briques de grès argenté"
 
 #: init.lua
 #, fuzzy
@@ -598,7 +598,7 @@ msgstr "Bloc d'acier"
 #: init.lua
 #, fuzzy
 msgid "Stone Brick"
-msgstr "Pioche en pierre"
+msgstr "Briques en pierre"
 
 #: init.lua
 msgid "Stone"
@@ -641,7 +641,7 @@ msgstr "Épée en diamant"
 #: init.lua
 #, fuzzy
 msgid "Tin Block"
-msgstr "Bloc de neige"
+msgstr "Bloc d'étain"
 
 #: init.lua
 #, fuzzy
@@ -907,6 +907,14 @@ msgid "Bronze Block Slab"
 msgstr "Dalle en bronze"
 
 #: init.lua
+msgid "Inner"
+msgstr "Interne"
+
+#: init.lua
+msgid "Outer"
+msgstr "Externe"
+
+#: init.lua
 #, fuzzy
 msgid "Cobblestone Slab"
 msgstr "Dalle en pierres"
@@ -1059,7 +1067,7 @@ msgstr "Escalier en bois de bouleau"
 
 #: init.lua
 msgid "Brick Stair"
-msgstr "Escalier en briques"
+msgstr "Escaliers en briques"
 
 #: init.lua
 msgid "Bronze Block Stair"
@@ -1225,17 +1233,10 @@ msgid "Heavy Steel Bottle (empty)"
 msgstr "Bouteille en acier"
 
 #: init.lua
-#, fuzzy
 msgid "Cobblestone Wall"
 msgstr "Muret en pierres"
 
 #: init.lua
-#, fuzzy
-msgid "Desert Cobblestone Wall"
-msgstr "Muret de pierres du désert"
-
-#: init.lua
-#, fuzzy
 msgid "Mossy Cobblestone Wall"
 msgstr "Muret de pierres moussues"
 
