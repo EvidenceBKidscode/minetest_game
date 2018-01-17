@@ -46,10 +46,11 @@ end
 
 -- Unlimited node placement
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
-	return creative.is_enabled_for(placer:get_player_name())
+	--return creative.is_enabled_for(placer:get_player_name())
 end)
 
 -- Don't pick up if the item is already in the inventory
+--[[
 local old_handle_node_drops = minetest.handle_node_drops
 function minetest.handle_node_drops(pos, drops, digger)
 	if not digger or not digger:is_player() then
@@ -67,6 +68,7 @@ function minetest.handle_node_drops(pos, drops, digger)
 		end
 	end
 end
+]]
 
 minetest.register_privilege("teacher", {
 	description = "Teacher privilege",
