@@ -8,8 +8,10 @@ minetest.register_privilege("creative", {
 local creative_mode_cache = minetest.settings:get_bool("creative_mode")
 
 function creative.is_enabled_for(name)
-	return creative_mode_cache or
-		minetest.check_player_privs(name, {creative = true})
+	local is_mapmaker = minetest.check_player_privs(name, "mapmaker")
+	local is_teacher = minetest.check_player_privs(name, "teacher")
+
+	return creative_mode_cache or is_mapmaker or is_teacher
 end
 
 dofile(minetest.get_modpath("creative") .. "/inventory.lua")
@@ -46,7 +48,8 @@ end
 
 -- Unlimited node placement
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
-	--return creative.is_enabled_for(placer:get_player_name())
+	local player_name = player:get_player_name()
+	return creative.is_enabled_for(player_name)
 end)
 
 -- Don't pick up if the item is already in the inventory
