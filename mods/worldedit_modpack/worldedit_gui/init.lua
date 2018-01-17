@@ -249,7 +249,8 @@ worldedit.register_gui_function("worldedit_gui", {
 			local identifier = identifiers[i]
 			if identifier ~= "worldedit_gui" then
 				local entry = worldedit.pages[identifier]
-				if entry.type ~= mode[name] and not entry.form then
+				if (mode[name] == "advanced"  and entry.type == "default") or
+				   (mode[name] == "default") and not entry.form then
 					buttons[#buttons + 1] =
 						string.format((entry.get_formspec and "button" or "button_exit") ..
 						"[%g,%g;%g,%g;%s;%s]",
