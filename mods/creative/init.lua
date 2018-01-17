@@ -48,7 +48,7 @@ end
 
 -- Unlimited node placement
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
-	local player_name = player:get_player_name()
+	local player_name = placer:get_player_name()
 	return creative.is_enabled_for(player_name)
 end)
 
