@@ -122,7 +122,7 @@ function areas:canInteractInArea(pos1, pos2, name, allow_open)
 	print("hello")
 
 	if name and (minetest.check_player_privs(name, self.adminPrivs) or
-	   wield_item:find("audioblocks:bloc_phrase") then
+	   wield_item:find("audioblocks:bloc_phrase")) then
 		return true
 	end
 	self:sortPos(pos1, pos2)
