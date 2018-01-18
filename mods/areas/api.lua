@@ -117,6 +117,7 @@ end
 function areas:canInteractInArea(pos1, pos2, name, allow_open)
 	local player = minetest.get_player_by_name(name)
 	local wield_item = player:get_wielded_item():get_name()
+	print("hello")
 
 	if name and (minetest.check_player_privs(name, self.adminPrivs) or
 	   wield_item:find("audioblocks:bloc_phrase") then
