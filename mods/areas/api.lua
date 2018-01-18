@@ -79,6 +79,8 @@ function areas:canInteract(pos, name)
 
 	local node_name = minetest.get_node(pos).name
 
+	print(dump(wield_item))
+
 	if minetest.check_player_privs(name, self.adminPrivs) or
 	   destructible == "true" or
 	   wield_item:find("audioblocks:bloc_phrase") or
