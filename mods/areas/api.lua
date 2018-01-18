@@ -117,7 +117,7 @@ end
 -- @return Boolean indicating whether the player can interact in that area.
 -- @return Un-owned intersecting area ID, if found.
 function areas:canInteractInArea(pos1, pos2, name, allow_open)
-	if name and (minetest.check_player_privs(name, self.adminPrivs) then
+	if name and minetest.check_player_privs(name, self.adminPrivs) then
 		return true
 	end
 	self:sortPos(pos1, pos2)
