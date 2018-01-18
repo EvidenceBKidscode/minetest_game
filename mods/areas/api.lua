@@ -82,7 +82,9 @@ function areas:canInteract(pos, name)
 	if minetest.check_player_privs(name, self.adminPrivs) or
 	   destructible or
 	   wield_item:find("audioblocks:bloc_phrase") or
-	   node_name:find("audioblocks:bloc_phrase") then
+	   wield_item:find("audioblocks:bush")        or
+	   node_name:find("audioblocks:bloc_phrase")  or
+	   node_name:find("audioblocks:bush")         then
 		return true
 	end
 
