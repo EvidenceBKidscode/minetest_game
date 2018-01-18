@@ -79,8 +79,6 @@ function areas:canInteract(pos, name)
 
 	local node_name = minetest.get_node(pos).name
 
-	print(dump(wield_item))
-
 	if minetest.check_player_privs(name, self.adminPrivs) or
 	   destructible == "true" or
 	   wield_item:find("audioblocks:bloc_phrase") or
@@ -117,7 +115,11 @@ end
 -- @return Boolean indicating whether the player can interact in that area.
 -- @return Un-owned intersecting area ID, if found.
 function areas:canInteractInArea(pos1, pos2, name, allow_open)
-	if name and minetest.check_player_privs(name, self.adminPrivs) then
+	local player = minetest.get_player_by_name(name)
+	local wield_item = player:get_wielded_item():get_name()
+
+	if name and (minetest.check_player_privs(name, self.adminPrivs) or
+	   wield_item:find("audioblocks:bloc_phrase") then
 		return true
 	end
 	self:sortPos(pos1, pos2)
