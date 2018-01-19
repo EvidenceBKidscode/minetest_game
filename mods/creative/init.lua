@@ -11,7 +11,7 @@ function creative.is_enabled_for(name)
 	local is_mapmaker = minetest.check_player_privs(name, "mapmaker")
 	local is_teacher = minetest.check_player_privs(name, "teacher")
 
-	return creative_mode_cache or is_mapmaker or is_teacher
+	return is_mapmaker or is_teacher
 end
 
 dofile(minetest.get_modpath("creative") .. "/inventory.lua")
