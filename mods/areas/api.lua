@@ -1,3 +1,5 @@
+-- UP-TO-DATE!
+
 local hudHandlers = {}
 
 --- Adds a function as a HUD handler, it will be able to add items to the Areas HUD element.
