@@ -73,8 +73,12 @@ end
 
 -- Checks if the area is unprotected or owned by you
 function areas:canInteract(pos, name)
+	local wield_item
 	local player = minetest.get_player_by_name(name)
-	local wield_item = player:get_wielded_item():get_name()
+
+	if player then
+		wield_item = player:get_wielded_item():get_name()
+	end
 
 	local meta = minetest.get_meta(pos)
 	local destructible = meta:get_string("destructible") == "true"
@@ -83,10 +87,10 @@ function areas:canInteract(pos, name)
 
 	if minetest.check_player_privs(name, self.adminPrivs) or
 	   destructible or
-	   wield_item:find("audioblocks:bloc_phrase") or
-	   wield_item:find("audioblocks:bush")        or
-	   node_name:find("audioblocks:bloc_phrase")  or
-	   node_name:find("audioblocks:bush")         or
+	   (wield_item and wield_item:find("audioblocks:bloc_phrase")) or
+	   (wield_item and wield_item:find("audioblocks:bush"))        or
+	   node_name:find("audioblocks:bloc_phrase")		       or
+	   node_name:find("audioblocks:bush")			       or
 	   (rawget(_G, "audioblocks") and audioblocks.bushes[name].obj) then
 		return true
 	end
