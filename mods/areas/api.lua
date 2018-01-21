@@ -91,7 +91,9 @@ function areas:canInteract(pos, name)
 	   (wield_item and wield_item:find("audioblocks:bush"))        or
 	   node_name:find("audioblocks:bloc_phrase")		       or
 	   node_name:find("audioblocks:bush")			       or
-	   (rawget(_G, "audioblocks") and audioblocks.bushes[name].obj) then
+	   (rawget(_G, "audioblocks") and
+	   		audioblocks.bushes[name] and
+	   		audioblocks.bushes[name].obj) then
 		return true
 	end
 
