@@ -219,8 +219,6 @@ worldedit.register_gui_function("worldedit_gui_set", {
 })
 
 worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
-	if utils.tablelen(fields) <= 3 then return end
-
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -230,6 +228,7 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 
 	for field in pairs(fields) do
 		if continue and field:find(":") then
+			print("hey")
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
