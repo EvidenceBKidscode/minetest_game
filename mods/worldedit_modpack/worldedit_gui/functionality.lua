@@ -228,7 +228,6 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 
 	for field in pairs(fields) do
 		if continue and field:find(":") then
-			print("hey")
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
@@ -1239,7 +1238,14 @@ worldedit.register_gui_handler("worldedit_gui_cube", function(name, fields)
 	for field in pairs(fields) do
 		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
-			gui_nodename1[name] = item
+			if gui_nodename1[name] == "" or
+					(gui_nodename1[name] ~= "" and gui_nodename2[name] ~= "") then
+				gui_nodename1[name] = item
+				gui_nodename2[name] = ""
+			else
+				gui_nodename2[name] = item
+			end
+
 			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
 			return true
 		end
@@ -1326,175 +1332,4 @@ local function area_check_pos(pos1, pos2, name)
 	end
 
 	return true
-end
-
-if minetest.get_modpath("areas") then
-	local area_datas = {}
-
-	local function save_area(fields, datas)
-		local name = datas.name
-		local area_name = datas.area_name
-		local pos1 = datas.pos1
-		local pos2 = datas.pos2
-
-		if not area_check_pos(pos1, pos2, name) then
-			return false
-		end
-
-		if area_name == "" then
-			minetest.chat_send_player(name,
-				minetest.colorize("#FF0000", S("ERROR: Area name required")))
-			return false
-		end
-
-		area_name = fields.worldedit_gui_protect_name
-		area_datas[name].last_name = fields.worldedit_gui_protect_name
-
-		local id = areas:add(datas)
-		areas:save()
-
-		minetest.chat_send_player(name,
-			minetest.colorize("#FFFF00",
-				S("The area '" .. area_name .. "' has been protected")))
-	end
-
-	local function reload_page(fields)
-		if not fields.worldedit_gui_protect_submit    and
-		   not fields.worldedit_gui_protect_add_owner and
-		   not fields.worldedit_gui_protect_remove    then
-			return true
-		end
-	end
-
-	worldedit.register_gui_function("worldedit_gui_protect", {
-		type = "default",
-		name = S("Area Protection"),
-		privs = {areas=true},
-		get_formspec = function(name)
-			area_datas[name] = area_datas[name] or {}
-			local area_name = area_datas[name].last_name or ""
-			local player_name = area_datas[name].last_player_name or ""
-			local dd_idx = area_datas[name] and area_datas[name].last_dd_idx or 1
-			local last_selected_area = area_datas[name].last_selected_area or ""
-			local timer = areas.areas[dd_idx] and areas.areas[dd_idx].timer or ""
-			local area_idx = 1
-			local x = 1
-			
-			local names = ""
-			for k, v in pairs(areas.areas) do
-				local s = v.name .. " \\[" .. k .. "\\] (" .. v.owner .. ")"
-				names = names .. s .. ","
-
-				if last_selected_area == s:gsub("\\", "") then
-					area_idx = x
-				end
-				x = x + 1
-			end
-			names = names:sub(1,-2)
-
-			return "size[8,4]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
-				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
-					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
-				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
-					S("Add owner") .. ";%s]", minetest.formspec_escape(player_name)) ..
-				"label[0,2.1;" .. S("Areas:") .. "]" ..
-				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
-					names .. ";" .. area_idx .. "]" ..
-				"field[4.3,2.82;4,1;worldedit_gui_protect_chrono;"
-					.. S("Timer (seconds)") .. ";" .. timer .. "]" ..
-				"button[0,3.5;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
-				"button[2.66,3.5;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
-				"button[5.33,3.5;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
-		end,
-	})
-
-	worldedit.register_gui_handler("worldedit_gui_protect", function(name, fields)
-		local area_name = fields.worldedit_gui_protect_name
-		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
-		local dd_idx = fields.worldedit_gui_protect_areas and
-			       tonumber(fields.worldedit_gui_protect_areas:match("%[(%d+)%]%s%("))
-		local timer = (fields.worldedit_gui_protect_chrono and
-			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
-			       tonumber(fields.worldedit_gui_protect_chrono) or ""
-
-		if fields.worldedit_gui_protect_areas then
-			area_datas[name].last_selected_area = fields.worldedit_gui_protect_areas
-			area_datas[name].last_dd_idx = dd_idx or 1
-			if reload_page(fields) then
-				worldedit.show_page(name, "worldedit_gui_protect")
-				return true
-			end
-		end
-
-		local datas = {
-			name = name,
-			area_name = area_name,
-			pos1 = pos1,
-			pos2 = pos2,
-			parent = nil,
-			timer = timer,
-		}
-
-		if fields.worldedit_gui_protect_submit then
-			save_area(fields, datas)
-			worldedit.show_page(name, "worldedit_gui_protect")
-			return true
-
-		elseif fields.worldedit_gui_protect_add_owner then
-			if not area_check_pos(pos1, pos2, name) then
-				return false
-			end
-
-			local player_name = fields.worldedit_gui_protect_player_name
-			if player_name == "" then
-				minetest.chat_send_player(name,
-					minetest.colorize("#FF0000", S("ERROR: Player name required")))
-				return false
-			end
-
-			area_name = fields.worldedit_gui_protect_areas
-			datas.name = player_name
-			datas.text = nil
-
-			local id = areas:add(datas)
-			areas:save()
-
-			minetest.chat_send_player(name,
-				minetest.colorize("#FFFF00",
-					S("Player '" .. player_name ..
-					  "' added to ownership of area '" .. area_name .. "'")))
-
-			worldedit.show_page(name, "worldedit_gui_protect")
-			return true
-
-		elseif fields.worldedit_gui_protect_remove then
-			area_name = fields.worldedit_gui_protect_areas:match("^(.*)%s%(")
-			local id
-
-			for k, v in pairs(areas.areas) do
-				if area_name == v.name .. " [" .. k .. "]" then
-					id = k
-				end
-			end
-
-			if id then
-				areas:remove(id)
-				areas:save()
-
-				minetest.chat_send_player(name,
-					minetest.colorize("#FFFF00",
-						S("The area '" .. area_name .. "' has been removed")))
-
-				worldedit.show_page(name, "worldedit_gui_protect")
-
-				return true
-			else
-				minetest.chat_send_player(name,
-					minetest.colorize("#FF0000", S("ERROR: Select an area first")))
-				return false
-			end
-		end
-
-		return false
-	end)
 end
