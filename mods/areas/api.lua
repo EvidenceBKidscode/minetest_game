@@ -81,14 +81,13 @@ function areas:canInteract(pos, name)
 
 	local node_name = minetest.get_node(pos).name
 
-	print(node_name)
-
 	if minetest.check_player_privs(name, self.adminPrivs) or
 	   destructible or
 	   wield_item:find("audioblocks:bloc_phrase") or
 	   wield_item:find("audioblocks:bush")        or
 	   node_name:find("audioblocks:bloc_phrase")  or
-	   node_name:find("audioblocks:bush")         then
+	   node_name:find("audioblocks:bush")         or
+	   (rawget(_G, "audioblocks") and audioblocks.bushes[name].obj) then
 		return true
 	end
 
