@@ -230,8 +230,11 @@ worldedit.register_gui_handler("worldedit_gui_set", function(name, fields)
 		if continue and field:find(":") then
 			local item = field:match("([%w_]+:[%w_]+)_inv")
 			gui_nodename1[name] = item
-			worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
-			return true
+
+			if worldedit.items[name].current_page then
+				worldedit.show_page(name, "worldedit_gui_" .. worldedit.items[name].current_page)
+				return true
+			end
 		end
 	end
 
