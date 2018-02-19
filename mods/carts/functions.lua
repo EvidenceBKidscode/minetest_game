@@ -221,6 +221,7 @@ function carts:get_rail_groups(additional_groups)
 		dig_immediate = 2,
 		attached_node = 1,
 		rail = 1,
+		interactive = 1,
 		connect_to_raillike = minetest.raillike_group("rail")
 	}
 	if type(additional_groups) == "table" then
