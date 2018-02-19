@@ -1848,7 +1848,7 @@ default.register_chest("chest", {
 	sounds = default.node_sound_wood_defaults(),
 	sound_open = "default_chest_open",
 	sound_close = "default_chest_close",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, building = 1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, building = 1, interactive = 1},
 })
 
 default.register_chest("chest_locked", {
@@ -1864,7 +1864,7 @@ default.register_chest("chest_locked", {
 	sounds = default.node_sound_wood_defaults(),
 	sound_open = "default_chest_open",
 	sound_close = "default_chest_close",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, building = 1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, building = 1, interactive = 1},
 	protected = true,
 })
 
@@ -1892,7 +1892,7 @@ minetest.register_node("default:bookshelf", {
 		"default_wood.png", "default_bookshelf.png", "default_bookshelf.png"},
 	paramtype2 = "facedir",
 	is_ground_content = false,
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, building = 1},
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, building = 1, interactive = 1},
 	sounds = default.node_sound_wood_defaults(),
 
 	on_construct = function(pos)
@@ -1984,12 +1984,12 @@ end
 
 register_sign("wood", "Wooden", {
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy = 2, attached_node = 1, flammable = 2, oddly_breakable_by_hand = 3, decoration = 1}
+	groups = {choppy = 2, attached_node = 1, flammable = 2, oddly_breakable_by_hand = 3, decoration = 1, interactive = 1}
 })
 
 register_sign("steel", "Steel", {
 	sounds = default.node_sound_metal_defaults(),
-	groups = {cracky = 2, attached_node = 1, decoration = 1}
+	groups = {cracky = 2, attached_node = 1, decoration = 1, interactive = 1}
 })
 
 minetest.register_node("default:ladder_wood", {

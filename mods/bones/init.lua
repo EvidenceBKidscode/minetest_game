@@ -35,7 +35,7 @@ minetest.register_node("bones:bones", {
 		"bones_front.png"
 	},
 	paramtype2 = "facedir",
-	groups = {dig_immediate = 2},
+	groups = {dig_immediate = 2, interactive = 1},
 	sounds = default.node_sound_gravel_defaults(),
 
 	can_dig = function(pos, player)

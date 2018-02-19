@@ -114,6 +114,7 @@ minetest.register_craftitem("bucket:bucket_empty", {
 	inventory_image = "bucket.png",
 	stack_max = 99,
 	liquids_pointable = true,
+	groups = {interactive = 1},
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "object" then
 			pointed_thing.ref:punch(user, 1.0, { full_punch_interval=1.0 }, nil)
@@ -185,7 +186,7 @@ bucket.register_liquid(
 	"bucket:bucket_water",
 	"bucket_water.png",
 	"Water Bucket",
-	{water_bucket = 1}
+	{water_bucket = 1, interactive = 1}
 )
 
 bucket.register_liquid(
@@ -193,7 +194,8 @@ bucket.register_liquid(
 	"default:lava_flowing",
 	"bucket:bucket_lava",
 	"bucket_lava.png",
-	"Lava Bucket"
+	"Lava Bucket",
+	{interactive = 1}
 )
 
 minetest.register_craft({

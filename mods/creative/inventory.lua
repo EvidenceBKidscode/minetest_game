@@ -262,12 +262,12 @@ creative.register_tab("items",
 	{minetest.registered_tools, minetest.registered_craftitems}
 )
 
-creative.register_tab("mods",
+creative.register_tab("interactive",
 	"tab_mods.png@0.8",
-	S("Mods"),
+	S("Interactive"),
 	minetest.registered_items,
 	nil,
-	"kidscode"
+	"interactive"
 )
 
 creative.register_tab("search",
