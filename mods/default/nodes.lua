@@ -1,3 +1,5 @@
+local S = utils.gettext
+
 -- mods/default/nodes.lua
 
 
@@ -1573,11 +1575,11 @@ function default.get_chest_formspec(pos)
 		default.gui_bg ..
 		default.gui_bg_img ..
 		default.gui_slots ..
-		"label[0,0;" .. "Blocks / items inside the chest" .. "]" ..
+		"label[0,0;" .. S("Blocks / items inside the chest") .. "]" ..
 		"list[nodemeta:" .. spos .. ";main;0,0.6;8,4;]" ..
-		"label[0,4.7;" .. "Blocks / items inside your quick inventory" .. "]" ..
+		"label[0,4.7;" .. S("Blocks / items inside your quick inventory") .. "]" ..
 		"list[current_player;main;0,5.3;8,1;]" ..
-		"label[0,6.4;" .. "Blocks / items inside your inventory" .. "]" ..
+		"label[0,6.4;" .. S("Blocks / items inside your inventory") .. "]" ..
 		"list[current_player;main;0,7;8,3;8]" ..
 		"listring[nodemeta:" .. spos .. ";main]" ..
 		"listring[current_player;main]" ..
