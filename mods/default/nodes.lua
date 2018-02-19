@@ -1568,16 +1568,20 @@ minetest.register_node("default:lava_flowing", {
 function default.get_chest_formspec(pos)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
 	local formspec =
-		"size[8,9]" ..
+		"size[8,10]" ..
+		"button_exit[7.45,-0.25;0.8,0.8;exit;X]" ..
 		default.gui_bg ..
 		default.gui_bg_img ..
 		default.gui_slots ..
-		"list[nodemeta:" .. spos .. ";main;0,0.3;8,4;]" ..
-		"list[current_player;main;0,4.85;8,1;]" ..
-		"list[current_player;main;0,6.08;8,3;8]" ..
+		"label[0,0;" .. "Blocks / items inside the chest" .. "]" ..
+		"list[nodemeta:" .. spos .. ";main;0,0.6;8,4;]" ..
+		"label[0,4.7;" .. "Blocks / items inside your quick inventory" .. "]" ..
+		"list[current_player;main;0,5.3;8,1;]" ..
+		"label[0,6.4;" .. "Blocks / items inside your inventory" .. "]" ..
+		"list[current_player;main;0,7;8,3;8]" ..
 		"listring[nodemeta:" .. spos .. ";main]" ..
 		"listring[current_player;main]" ..
-		default.get_hotbar_bg(0,4.85)
+		default.get_hotbar_bg(0,5.3)
 	return formspec
 end
 
