@@ -184,7 +184,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 minetest.register_craftitem("default:book", {
-	description = "Book",
+	description = "Book" .. "\n" ..
+		"Select the book and left click to start writing.",
 	inventory_image = "default_book.png",
 	groups = {book = 1, flammable = 3},
 	on_use = book_on_use,
