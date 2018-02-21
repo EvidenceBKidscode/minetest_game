@@ -95,9 +95,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 			if name == "storage" then
 				formspec = formspec .. [[
-					list[current_player;craft;1.75,0.5;3,3;]
-					list[current_player;craftpreview;5.75,1.5;1,1;]
-					image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
+					image[0.3,0.8;9,3;kidscode_logo.png]
 					list[current_player;main;0,4.5;8,3;8]
 				]] ..
 				"button[5,3.5;3,1;trash_all;" .. S("Trash All") .. ";#88acc5]"
