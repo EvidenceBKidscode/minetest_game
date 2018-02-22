@@ -1,3 +1,5 @@
+local S = utils.gettext
+
 screwdriver = {}
 
 screwdriver.ROTATE_FACE = 1
@@ -143,7 +145,7 @@ end
 
 -- Screwdriver
 minetest.register_tool("screwdriver:screwdriver", {
-	description = "Screwdriver (left-click rotates face, right-click rotates axis)",
+	description = S("Screwdriver (left-click rotates face, right-click rotates axis)"),
 	inventory_image = "screwdriver.png",
 	groups = {interactive = 1},
 	on_use = function(itemstack, user, pointed_thing)
