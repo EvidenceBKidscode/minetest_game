@@ -2160,6 +2160,62 @@ minetest.register_node("default:neon", {
 	on_place = minetest.rotate_node
 })
 
+local additional_nodes = {
+	{S("cobble"), "cracky", "normal"},
+	{S("glowstone"), "cracky", "normal"},
+	{S("gravel"), "crumbly", "normal"},
+	{S("leaves_acacia"), "crumbly", "normal"},
+	{S("leaves_acacia_opaque"), "crumbly", "normal"},
+	{S("leaves_big_oak"), "crumbly", "normal"},
+	{S("leaves_big_oak_opaque"), "crumbly", "normal"},
+	{S("leaves_birch"), "crumbly", "normal"},
+	{S("leaves_birch_opaque"), "crumbly", "normal"},
+	{S("leaves_jungle"), "crumbly", "normal"},
+	{S("leaves_jungle_opaque"), "crumbly", "normal"},
+	{S("leaves_oak"), "crumbly", "normal"},
+	{S("leaves_oak_opaque"), "crumbly", "normal"},
+	{S("leaves_spruce"), "crumbly", "normal"},
+	{S("leaves_spruce_opaque"), "crumbly", "normal"},
+	{S("nether_brick"), "cracky", "normal"},
+	{S("prismarine_bricks"), "cracky", "normal"},
+	{S("prismarine_dark"), "cracky", "normal"},
+	{S("purpur_block"), "cracky", "normal"},
+	{S("quartz_ore"), "cracky", "normal"},
+	{S("red_sandstone_bottom"), "cracky", "normal"},
+	{S("red_sandstone_carved"), "cracky", "normal"},
+	{S("red_sandstone_normal"), "cracky", "normal"},
+	{S("red_sandstone_smooth"), "cracky", "normal"},
+	{S("sandstone_top"), "cracky", "normal"},
+	{S("sandstone_bottom"), "cracky", "normal"},
+	{S("sandstone_carved"), "cracky", "normal"},
+	{S("sandstone_normal"), "cracky", "normal"},
+	{S("sandstone_smooth"), "cracky", "normal"},
+	{S("sandstone_top"), "cracky", "normal"},
+	{S("stone"), "cracky", "normal"},
+	{S("stone_andesite_smooth"), "cracky", "normal"},
+	{S("stone_diorite"), "cracky", "normal"},
+	{S("stone_diorite_smooth"), "cracky", "normal"},
+	{S("stone_granite"), "cracky", "normal"},
+	{S("stone_granite_smooth"), "cracky", "normal"},
+	{S("stonebrick"), "cracky", "normal"},
+	{S("stonebrick_cracked"), "cracky", "normal"},
+}
+
+for i = 1, #additional_nodes do
+	local name = additional_nodes[i][1]
+	local group_name = additional_nodes[i][2]
+	local groups = {}
+	groups[group_name] = 1
+
+	minetest.register_node("default:" .. name .. "_2", {
+		description = name:gsub("%f[%w]%l", string.upper):gsub("_", " "),
+		paramtype = "light",
+		paramtype2 = "facedir",
+		tiles = {"default_" .. name .. "_2.png"},
+		groups = groups,
+	})
+end
+
 --
 -- Misc
 --
