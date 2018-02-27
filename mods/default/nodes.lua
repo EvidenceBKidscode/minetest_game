@@ -2216,6 +2216,8 @@ for i = 1, #additional_nodes do
 	})
 end
 
+minetest.register_alias("kidsblocks_native:end_stone_brick", "default:nether_brick_2")
+
 --
 -- Misc
 --
