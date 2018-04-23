@@ -99,7 +99,48 @@ function areas:canInteract(pos, name)
 
 	local owned = false
 	for _, area in pairs(self:getAreasAtPos(pos)) do
-		if area.owner == name or area.open then
+		if area.owner == name or area.open or area.can_dig or area.can_place
+		then
+			return true
+		else
+			owned = true
+		end
+	end
+	return not owned
+end
+
+-- Checks if the area is diggeable or owned by you
+function areas:canDig(pos, name)
+	local player = minetest.get_player_by_name(name)
+	local meta = minetest.get_meta(pos)
+
+	if minetest.check_player_privs(name, self.adminPrivs) then
+		return true
+	end
+
+	local owned = false
+	for _, area in pairs(self:getAreasAtPos(pos)) do
+		if area.owner == name or area.open or area.can_dig == 'true' then
+			return true
+		else
+			owned = true
+		end
+	end
+	return not owned
+end
+
+-- Checks if the area is "placeable" or owned by you
+function areas:canPlace(pos, name)
+	local player = minetest.get_player_by_name(name)
+	local meta = minetest.get_meta(pos)
+
+	if minetest.check_player_privs(name, self.adminPrivs) then
+		return true
+	end
+
+	local owned = false
+	for _, area in pairs(self:getAreasAtPos(pos)) do
+		if area.owner == name or area.open or area.can_place == 'true' then
 			return true
 		else
 			owned = true

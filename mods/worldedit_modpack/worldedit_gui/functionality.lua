@@ -1386,6 +1386,10 @@ if minetest.get_modpath("areas") then
 			local dd_idx = area_datas[name] and area_datas[name].last_dd_idx or 1
 			local last_selected_area = area_datas[name].last_selected_area or ""
 			local timer = areas.areas[dd_idx] and areas.areas[dd_idx].timer or ""
+			local can_dig = area_datas[name].can_dig == "true" and 2 or 1
+			local can_place = area_datas[name].can_place == "true" and 2 or 1
+			local kidsbot_mode = area_datas[name].kidsbot_mode == "free" and 2 or 1
+
 			local area_idx = 1
 			local x = 1
 			
@@ -1401,7 +1405,7 @@ if minetest.get_modpath("areas") then
 			end
 			names = names:sub(1,-2)
 
-			return "size[8,4]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
+			return "size[8,6.5]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
 					S("Area name") .. ";%s]", minetest.formspec_escape(area_name)) ..
 				string.format("field[4.3,1.4;4,1;worldedit_gui_protect_player_name;" ..
@@ -1409,11 +1413,22 @@ if minetest.get_modpath("areas") then
 				"label[0,2.1;" .. S("Areas:") .. "]" ..
 				"dropdown[0,2.6;4.1;worldedit_gui_protect_areas;" ..
 					names .. ";" .. area_idx .. "]" ..
-				"field[4.3,2.82;4,1;worldedit_gui_protect_chrono;"
-					.. S("Timer (seconds)") .. ";" .. timer .. "]" ..
-				"button[0,3.5;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
-				"button[2.66,3.5;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
-				"button[5.33,3.5;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
+				"field[4.3,2.82;4,1;worldedit_gui_protect_chrono;" ..
+					S("Timer (seconds)") .. ";" .. timer .. "]" ..
+				"label[0,3.5;" .. S("User actions:") .. "]" ..
+				"dropdown[0,4;4.1;worldedit_gui_protect_can_dig;" ..
+					S("User can not dig") .. "," .. S("User can dig") .. 
+					";" .. can_dig .. "]" ..
+				"dropdown[0,4.8;4.1;worldedit_gui_protect_can_place;" ..
+					S("User can not place") .. "," .. S("User can place") .. 
+					";" .. can_place .. "]" ..
+				"label[4,3.5;" .. S("Kidsbot mode:") .. "]" ..
+				"dropdown[4,4;4.1;worldedit_gui_protect_kidsbot_mode;" ..
+					S("Free") .. "," .. S("Exercice") .. 
+					";" .. kidsbot_mode .. "]" ..
+				"button[0,6;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
+				"button[2.66,6;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
+				"button[5.33,6;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
 		end,
 	})
 
@@ -1425,6 +1440,15 @@ if minetest.get_modpath("areas") then
 		local timer = (fields.worldedit_gui_protect_chrono and
 			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
 			       tonumber(fields.worldedit_gui_protect_chrono) or ""
+		local can_dig = 
+			(fields.worldedit_gui_protect_can_dig == S("User can dig")
+			 and 'true' or nil)
+		local can_place = 
+			(fields.worldedit_gui_protect_can_place == S("User can place")
+			 and 'true' or nil)
+		local kidsbot_mode = 
+			(fields.worldedit_gui_protect_kidsbot_mode == S("Free") 
+			 and 'free' or 'exercice')
 
 		if fields.worldedit_gui_protect_areas then
 			area_datas[name].last_selected_area = fields.worldedit_gui_protect_areas
@@ -1435,6 +1459,7 @@ if minetest.get_modpath("areas") then
 			end
 		end
 
+
 		local datas = {
 			name = name,
 			area_name = area_name,
@@ -1442,6 +1467,9 @@ if minetest.get_modpath("areas") then
 			pos2 = pos2,
 			parent = nil,
 			timer = timer,
+			can_dig = can_dig,
+			can_place = can_place,
+			kidsbot_mode = kidsbot_mode,
 		}
 
 		if fields.worldedit_gui_protect_submit then

@@ -8,7 +8,7 @@ minetest.log("action", "[" .. modname .. "] version " .. version .. " loaded.")
 
 areas = {}
 
-areas.adminPrivs = {areas=true}
+areas.adminPrivs = {areas=true, teacher=true, mapmaker=true}
 areas.startTime = os.clock()
 
 areas.modpath = minetest.get_modpath("areas")
