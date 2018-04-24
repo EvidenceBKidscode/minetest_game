@@ -77,24 +77,23 @@ end
 
 --- Add a area.
 -- @return The new area's ID.
-function areas:add(datas)
-	local owner = datas.name
-	local name = datas.area_name
-	local pos1 = datas.pos1
-	local pos2 = datas.pos2
-	local parent = datas.parent
-	local timer = datas.timer
+function areas:add(data)
+	local pos1 = data.pos1
+	local pos2 = data.pos2
+
+	-- Strange fields renaming inherited from previous code
+	-- TODO: Tide that up
+	data.owner = data.name
+	data.name = data.area_name
+	data.area_name = nil
 
 	local id = findFirstUnusedIndex(self.areas)
 
-	self.areas[id] = {
-		name   = name,
-		pos1   = pos1,
-		pos2   = pos2,
-		owner  = owner,
-		parent = parent,
-		timer  = timer,
-	}
+	self.areas[id] = { }
+	-- TODO: deep copy ?
+	for name, value in pairs(data) do
+		self.areas[id][name] = value
+	end
 
 	-- Add to AreaStore
 	if self.store then
@@ -193,10 +192,12 @@ end
 -- Also checks the size of the area and if the user already
 -- has more than max_areas.
 function areas:canPlayerAddArea(pos1, pos2, name)
-	local privs = minetest.get_player_privs(name)
-	if privs.areas then
+
+	if minetest.check_player_privs(name, self.adminPrivs) then
 		return true
 	end
+
+	local privs = minetest.get_player_privs(name)
 
 	-- Check self protection privilege, if it is enabled,
 	-- and if the area is too big.
