@@ -579,24 +579,75 @@ function default.can_interact_with_node(player, pos)
 	return false
 end
 
+--
+-- Spawn point management
+--
 
-local spawn_pos = vector.new(0,3,0)
-local static_spawnpoint = minetest.setting_get_pos("static_spawnpoint")
+local spawn_pos = nil
+local spawn_dir = nil
 
-if static_spawnpoint then
-	spawn_pos = static_spawnpoint
+if minetest.setting_get_pos("static_spawnpoint") then
+	spawn_pos = minetest.setting_get_pos("static_spawnpoint")
+
+	local spawn_dirs = { 
+		N=0, 
+		W=math.pi/2, 
+		S=math.pi, 
+		E=math.pi*3/2 
+	}
+	spawn_dir = spawn_dirs[minetest.setting_get("static_spawndirection")]
+
+	if spawn_dir then
+		minetest.log("action", "["..minetest.get_current_modname()..
+		             "] Spawn point set to "..
+		             minetest.pos_to_string(spawn_pos)..
+		             " with look direction "..
+		             minetest.setting_get("static_spawndirection"))
+	else
+		minetest.log("action", "["..minetest.get_current_modname()..
+		             "] Spawn point set to "..
+		             minetest.pos_to_string(spawn_pos))
+	end
 end
+
+local function teleport_to_spawn(player)
+	if player then
+		if spawn_pos then
+			player:set_pos(spawn_pos)
+			if spawn_dir then
+				player:set_look_horizontal(spawn_dir)
+				player:set_look_vertical(0)
+			end
+			return true
+		end
+	end
+	return false
+end
+
+default.teleport_to_spawn = teleport_to_spawn
+
+minetest.register_on_joinplayer(function(player)
+	local distance = vector.distance(player:getpos(), spawn_pos)
+	if vector.distance(player:getpos(), spawn_pos) < 1 then
+		teleport_to_spawn(player)
+	end
+end)
+
+minetest.register_on_respawnplayer(function(player)
+	teleport_to_spawn(player)
+end)
 
 minetest.register_chatcommand("spawn", {
 	description = "Teleport you to spawn point.",
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
-		if player == nil then
-			return false
+		if player then
+			if teleport_to_spawn(player) then
+				minetest.chat_send_player(name, S("Teleported to spawn!"))
+			else
+				minetest.chat_send_player(name, S("No spawnpoint set."))
+			end
 		end
-
-		player:set_pos(spawn_pos)
-		minetest.chat_send_player(name, "Teleported to spawn!")
 	end,
 })
 
