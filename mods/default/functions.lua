@@ -643,9 +643,9 @@ minetest.register_chatcommand("spawn", {
 		local player = minetest.get_player_by_name(name)
 		if player then
 			if teleport_to_spawn(player) then
-				minetest.chat_send_player(name, S("Teleported to spawn!"))
+				minetest.chat_send_player(name, "Teleported to spawn!")
 			else
-				minetest.chat_send_player(name, S("No spawnpoint set."))
+				minetest.chat_send_player(name, "No spawnpoint set.")
 			end
 		end
 	end,
