@@ -627,9 +627,11 @@ end
 default.teleport_to_spawn = teleport_to_spawn
 
 minetest.register_on_joinplayer(function(player)
-	local distance = vector.distance(player:getpos(), spawn_pos)
-	if vector.distance(player:getpos(), spawn_pos) < 1 then
-		teleport_to_spawn(player)
+	if spawn_pos ~= nil then
+		local distance = vector.distance(player:getpos(), spawn_pos)
+		if vector.distance(player:getpos(), spawn_pos) < 1 then
+			teleport_to_spawn(player)
+		end
 	end
 end)
 
