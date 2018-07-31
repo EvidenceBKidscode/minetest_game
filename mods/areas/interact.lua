@@ -17,12 +17,22 @@ minetest.register_on_protection_violation(function(pos, name)
 end)
 
 -- Place node restriction
-minetest.register_on_placenode(function(pos, _, placer, oldnode)
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode)
 	if not placer or not placer:is_player() then return end
 	local player_name = placer:get_player_name()
 	if not areas:canPlace(pos, player_name) then
-		minetest.swap_node(pos, oldnode)
-		return true
+		-- Hack to allow place bush with glove
+		local wielded = placer:get_wielded_item()
+		if wielded == nil or 
+		   wielded:get_name() ~= "audioblocks:glove" then
+			minetest.swap_node(pos, oldnode)
+			local def = minetest.registered_nodes[newnode.name]
+			if def.on_destruct then
+				def.on_destruct(pos)
+			end
+			minetest.record_protection_violation(pos, player_name)
+			return true
+		end
 	end
 end)
 
@@ -34,6 +44,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 		minetest.swap_node(pos, oldnode)
 		digger:get_inventory():remove_item("main",
 			minetest.registered_nodes[oldnode.name].drop or oldnode.name)
+		minetest.record_protection_violation(pos, player_name)
 	end
 end)
 
