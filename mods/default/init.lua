@@ -11,7 +11,7 @@ default.LIGHT_MAX = 14
 -- GUI related stuff
 default.gui_bg = "bgcolor[#080808BB;true]"
 default.gui_bg_img = "background[5,5;1,1;gui_formbg.png;true]"
-default.gui_slots = "listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]]"
+default.gui_slots = "listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]"
 
 function default.get_hotbar_bg(x,y)
 	local out = ""
