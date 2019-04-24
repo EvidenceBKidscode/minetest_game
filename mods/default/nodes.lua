@@ -311,7 +311,7 @@ minetest.register_node("default:sandstone_block", {
 	description = "Sandstone Block",
 	tiles = {"default_sandstone_block.png"},
 	is_ground_content = false,
-	groups = {cracky = 2, building = 1},},
+	groups = {cracky = 2, building = 1},
 	sounds = default.node_sound_stone_defaults(),
  })
 
@@ -1844,6 +1844,7 @@ minetest.register_on_leaveplayer(function(player)
 	if open_chests[pn] then
 		chest_lid_close(pn)
 	end
+end)
 
 function default.register_chest(name, d)
 	local def = table.copy(d)
