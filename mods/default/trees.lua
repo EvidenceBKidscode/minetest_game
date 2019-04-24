@@ -77,6 +77,14 @@ function default.grow_sapling(pos)
 		minetest.log("action", "An aspen sapling grows into a tree at "..
 			minetest.pos_to_string(pos))
 		default.grow_new_aspen_tree(pos)
+	elseif node.name == "default:bush_sapling" then
+		minetest.log("action", "A bush sapling grows into a bush at "..
+			minetest.pos_to_string(pos))
+		default.grow_bush(pos)
+	elseif node.name == "default:acacia_bush_sapling" then
+		minetest.log("action", "An acacia bush sapling grows into a bush at "..
+			minetest.pos_to_string(pos))
+		default.grow_acacia_bush(pos)
 	end
 end
 
@@ -426,6 +434,29 @@ function default.grow_new_aspen_tree(pos)
 end
 
 
+-- Bushes do not need 'from sapling' schematic variants because
+-- only the stem node is force-placed in the schematic.
+
+-- Bush
+
+function default.grow_bush(pos)
+	local path = minetest.get_modpath("default") ..
+		"/schematics/bush.mts"
+	minetest.place_schematic({x = pos.x - 1, y = pos.y - 1, z = pos.z - 1},
+		path, "0", nil, false)
+end
+
+
+-- Acacia bush
+
+function default.grow_acacia_bush(pos)
+	local path = minetest.get_modpath("default") ..
+		"/schematics/acacia_bush.mts"
+	minetest.place_schematic({x = pos.x - 1, y = pos.y - 1, z = pos.z - 1},
+		path, "0", nil, false)
+end
+
+
 --
 -- Sapling 'on place' function to check protection of node and resulting tree volume
 --
@@ -437,7 +468,9 @@ function default.sapling_on_place(itemstack, placer, pointed_thing,
 	local node = minetest.get_node_or_nil(pos)
 	local pdef = node and minetest.registered_nodes[node.name]
 
-	if pdef and pdef.on_rightclick and not placer:get_player_control().sneak then
+	if pdef and pdef.on_rightclick and
+			not (placer and placer:is_player() and
+			placer:get_player_control().sneak) then
 		return pdef.on_rightclick(pos, node, placer, itemstack, pointed_thing)
 	end
 
@@ -450,7 +483,7 @@ function default.sapling_on_place(itemstack, placer, pointed_thing,
 		end
 	end
 
-	local player_name = placer:get_player_name()
+	local player_name = placer and placer:get_player_name() or ""
 	-- Check sapling position for protection
 	if minetest.is_protected(pos, player_name) then
 		minetest.record_protection_violation(pos, player_name)

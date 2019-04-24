@@ -297,7 +297,7 @@ function default.register_fence(name, def)
 		groups = {},
 	}
 	for k, v in pairs(default_fields) do
-		if not def[k] then
+		if def[k] == nil then
 			def[k] = v
 		end
 	end
@@ -319,7 +319,7 @@ end
 -- Prevent decay of placed leaves
 
 default.after_place_leaves = function(pos, placer, itemstack, pointed_thing)
-	if placer and not placer:get_player_control().sneak then
+	if placer and placer:is_player() and not placer:get_player_control().sneak then
 		local node = minetest.get_node(pos)
 		node.param2 = 1
 		minetest.set_node(pos, node)
@@ -589,11 +589,11 @@ local spawn_dir = nil
 if minetest.setting_get_pos("static_spawnpoint") then
 	spawn_pos = minetest.setting_get_pos("static_spawnpoint")
 
-	local spawn_dirs = { 
-		N=0, 
-		W=math.pi/2, 
-		S=math.pi, 
-		E=math.pi*3/2 
+	local spawn_dirs = {
+		N=0,
+		W=math.pi/2,
+		S=math.pi,
+		E=math.pi*3/2
 	}
 	spawn_dir = spawn_dirs[minetest.setting_get("static_spawndirection")]
 
@@ -652,4 +652,3 @@ minetest.register_chatcommand("spawn", {
 		end
 	end,
 })
-
