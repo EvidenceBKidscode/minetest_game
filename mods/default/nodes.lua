@@ -1343,6 +1343,8 @@ minetest.register_node("default:bush_leaves", {
 	after_place_node = default.after_place_leaves,
 })
 
+minetest.register_alias_force("kidsblocks_native:oak_leaves", "default:bush_leaves")
+
 minetest.register_node("default:bush_sapling", {
 	description = "Bush Sapling",
 	drawtype = "plantlike",
