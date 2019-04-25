@@ -1851,6 +1851,7 @@ minetest.register_on_leaveplayer(function(player)
 	if open_chests[pn] then
 		chest_lid_close(pn)
 	end
+end)
 
 function default.register_chest(name, d)
 	local def = table.copy(d)
