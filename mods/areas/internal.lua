@@ -4,13 +4,19 @@ function areas:player_exists(name)
 end
 
 -- Save the areas table to a file
-function areas:save()
+function areas:save(suffix)
 	local datastr = minetest.serialize(self.areas)
 	if not datastr then
 		minetest.log("error", "[areas] Failed to serialize area data!")
 		return
 	end
-	local file, err = io.open(self.config.filename, "w")
+
+	local filename = self.config.filename
+	if suffix then
+		filename = string.format("%s/areas_%s.dat", minetest.get_worldpath(), suffix)
+	end
+print("Saving into "..filename)
+	local file, err = io.open(filename, "w")
 	if err then
 		return err
 	end
@@ -19,8 +25,13 @@ function areas:save()
 end
 
 -- Load the areas table from the save file
-function areas:load()
-	local file, err = io.open(self.config.filename, "r")
+function areas:load(suffix)
+	local filename = self.config.filename
+	if suffix then
+		filename = string.format("%s/areas_%s.dat", minetest.get_worldpath(), suffix)
+	end
+print("Loading from "..filename)
+	local file, err = io.open(filename, "r")
 	if err then
 		self.areas = self.areas or {}
 		return err
@@ -294,4 +305,3 @@ function areas:isAreaOwner(id, name)
 	end
 	return false
 end
-
