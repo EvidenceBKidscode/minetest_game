@@ -1848,13 +1848,6 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
-	local pn = player:get_player_name()
-	if open_chests[pn] then
-		chest_lid_close(pn)
-	end
-end)
-
 function default.register_chest(name, d)
 	local def = table.copy(d)
 	def.drawtype = "mesh"
