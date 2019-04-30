@@ -22,7 +22,7 @@ minetest.register_chatcommand("protect", {
 			return false, "You can't protect that area: "..errMsg
 		end
 
-		local id = areas:add(name, param, pos1, pos2, nil)
+		local id = areas:add({ pos1 = pos1, pos2 = pos2, name = name, area_name = param })
 		areas:save()
 
 		return true, "Area protected. ID: "..id
@@ -60,7 +60,7 @@ minetest.register_chatcommand("set_owner", {
 
 		local id = areas:add(ownerName, areaName, pos1, pos2, nil)
 		areas:save()
-	
+
 		minetest.chat_send_player(ownerName,
 				"You have been granted control over area #"..
 				id..". Type /list_areas to show your areas.")
@@ -402,4 +402,3 @@ minetest.register_chatcommand("area_info", {
 		return true, table.concat(lines, "\n")
 	end,
 })
-
