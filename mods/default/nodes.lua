@@ -2440,6 +2440,25 @@ minetest.register_node("default:neon", {
 	on_place = minetest.rotate_node
 })
 
+for i = 1, 8 do
+	minetest.register_node(":farming:wheat_" .. i, {
+		description = "Wheat Seed",
+		drawtype = "plantlike",
+		waving = 1,
+		tiles = {"farming_wheat_" .. i .. ".png"},
+		paramtype = "light",
+		paramtype2 = "meshoptions",
+		walkable = false,
+		buildable_to = true,
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
+		},
+		groups = {flammable = 4, not_in_creative_inventory = 1},
+		sounds = default.node_sound_leaves_defaults(),
+	})
+end
+
 local additional_nodes = {
 	{S("cobble"), "cracky", "normal"},
 	{S("glowstone"), "cracky", "normal"},
