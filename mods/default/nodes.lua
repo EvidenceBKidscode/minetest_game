@@ -206,6 +206,13 @@ default:cloud
 
 --]]
 
+minetest.register_node("default:concrete", {
+	description = "Béton Armé",
+	tiles = {"default_concrete.png"},
+	groups = {cracky = 2, building = 1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 --
 -- Stone
 --
