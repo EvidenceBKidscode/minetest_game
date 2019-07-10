@@ -216,6 +216,8 @@ for i = -0.5, 0.5 - d, d do
 	fixed[#fixed + 1] = {-0.5, i, i, 0.5, i + d, 0.5}
 end
 
+print(dump(#fixed))
+
 local box_slope = {
 	type = "fixed",
 	fixed = fixed
@@ -227,7 +229,7 @@ local function register_slope(name, texture, desc, sound, groups)
 		mesh = "slope.obj",
 		paramtype = "light",
 		paramtype2 = "facedir",
-		description = desc,
+		description = "Butte en " .. desc,
 		tiles = {texture},
 		groups = groups,
 		sounds = sound,
@@ -240,7 +242,7 @@ end
 register_slope(
 	"concrete",
 	"default_concrete.png",
-	"Pente en béton armé",
+	"béton armé",
 	default.node_sound_stone_defaults(),
 	{cracky = 3, building = 1}
 )
@@ -248,17 +250,25 @@ register_slope(
 register_slope(
 	"stone",
 	"default_stone.png",
-	"Pente en roche",
+	"roche",
 	default.node_sound_stone_defaults(),
-	{cracky = 3, building = 1}
+	{cracky = 3, stone = 1, building = 1}
 )
 
 register_slope(
 	"dirt",
 	"default_dirt.png",
-	"Pente en terre",
+	"terre",
 	default.node_sound_dirt_defaults(),
 	{crumbly = 3, building = 1}
+)
+
+register_slope(
+	"wood",
+	"default_wood.png",
+	"bois",
+	default.node_sound_wood_defaults(),
+	{choppy = 3, wood = 1, building = 1}
 )
 
 minetest.register_node("default:concrete", {
