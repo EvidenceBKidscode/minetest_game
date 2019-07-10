@@ -206,6 +206,61 @@ default:cloud
 
 --]]
 
+
+
+
+local fixed = {}
+local d = 0.05
+
+for i = -0.5, 0.5 - d, d do
+	fixed[#fixed + 1] = {-0.5, i, i, 0.5, i + d, 0.5}
+end
+
+local box_slope = {
+	type = "fixed",
+	fixed = fixed
+}
+
+local function register_slope(name, texture, desc, sound, groups)
+	minetest.register_node("default:slope_" .. name, {
+		drawtype = "mesh",
+		mesh = "slope.obj",
+		paramtype = "light",
+		paramtype2 = "facedir",
+		description = desc,
+		tiles = {texture},
+		groups = groups,
+		sounds = sound,
+		collision_box = box_slope,
+		--selection_box = box_slope,
+		on_place = minetest.rotate_node,
+	})
+end
+
+register_slope(
+	"concrete",
+	"default_concrete.png",
+	"Pente en béton armé",
+	default.node_sound_stone_defaults(),
+	{cracky = 3, building = 1}
+)
+
+register_slope(
+	"stone",
+	"default_stone.png",
+	"Pente en roche",
+	default.node_sound_stone_defaults(),
+	{cracky = 3, building = 1}
+)
+
+register_slope(
+	"dirt",
+	"default_dirt.png",
+	"Pente en terre",
+	default.node_sound_dirt_defaults(),
+	{crumbly = 3, building = 1}
+)
+
 minetest.register_node("default:concrete", {
 	description = "Béton Armé",
 	tiles = {"default_concrete.png"},
