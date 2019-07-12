@@ -392,7 +392,7 @@ function tnt.boom(pos, def, intact)
 	minetest.set_node(pos, {name = "tnt:boom"})
 	local radius, drops = 4
 
-	if def and not intact then 
+	if def and not intact then
 		drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
 				def.ignore_on_blast, owner)
 		-- append entity drops
@@ -403,7 +403,7 @@ function tnt.boom(pos, def, intact)
 		end
 
 		minetest.log("action", "A TNT explosion occurred at " .. minetest.pos_to_string(pos) ..
-		" with radius " .. rad)
+		" with radius " .. radius)
 	end
 
 	add_effects(pos, radius, drops, def.texture)
