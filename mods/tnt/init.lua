@@ -1,4 +1,5 @@
 tnt = {}
+tnt.placed = utils.read_table("tnt_placed") or {}
 
 -- Default to enabled when in singleplayer
 local enable_tnt = minetest.settings:get_bool("enable_tnt")
@@ -198,7 +199,7 @@ local function entity_physics(pos, radius, drops)
 	end
 end
 
-local function add_effects(pos, radius, drops)
+local function add_effects(pos, radius, drops, texture)
 	minetest.add_particle({
 		pos = pos,
 		velocity = vector.new(),
@@ -227,15 +228,18 @@ local function add_effects(pos, radius, drops)
 
 	-- we just dropped some items. Look at the items entities and pick
 	-- one of them to use as texture
-	local texture = "tnt_blast.png" --fallback texture
-	local most = 0
-	for name, stack in pairs(drops) do
-		local count = stack:get_count()
-		if count > most then
-			most = count
-			local def = minetest.registered_nodes[name]
-			if def and def.tiles and def.tiles[1] then
-				texture = def.tiles[1]
+	texture = texture or "tnt_blast.png" --fallback texture
+
+	if drops then
+		local most = 0
+		for name, stack in pairs(drops) do
+			local count = stack:get_count()
+			if count > most then
+				most = count
+				local def = minetest.registered_nodes[name]
+				if def and def.tiles and def.tiles[1] then
+					texture = def.tiles[1]
+				end
 			end
 		end
 	end
@@ -381,22 +385,28 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	return drops, radius
 end
 
-function tnt.boom(pos, def)
+function tnt.boom(pos, def, intact)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.5, max_hear_distance = 2*64})
 	minetest.set_node(pos, {name = "tnt:boom"})
-	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			def.ignore_on_blast, owner)
-	-- append entity drops
-	local damage_radius = (radius / def.radius) * def.damage_radius
-	entity_physics(pos, damage_radius, drops)
-	if not def.disable_drops then
-		eject_drops(drops, pos, radius)
+	local radius, drops = 4
+
+	if def and not intact then 
+		drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
+				def.ignore_on_blast, owner)
+		-- append entity drops
+		local damage_radius = (radius / def.radius) * def.damage_radius
+		entity_physics(pos, damage_radius, drops)
+		if not def.disable_drops then
+			eject_drops(drops, pos, radius)
+		end
+
+		minetest.log("action", "A TNT explosion occurred at " .. minetest.pos_to_string(pos) ..
+		" with radius " .. rad)
 	end
-	add_effects(pos, radius, drops)
-	minetest.log("action", "A TNT explosion occurred at " .. minetest.pos_to_string(pos) ..
-		" with radius " .. radius)
+
+	add_effects(pos, radius, drops, def.texture)
 end
 
 minetest.register_node("tnt:boom", {
@@ -576,13 +586,28 @@ function tnt.register_tnt(def)
 			description = def.description,
 			tiles = {tnt_top, tnt_bottom, tnt_side},
 			is_ground_content = false,
-			groups = {dig_immediate = 2, mesecon = 2, tnt = 1, flammable = 5, interactive = 1},
+			groups = {cracky = 3, tnt = 1, flammable = 5, interactive = 1},
 			sounds = default.node_sound_wood_defaults(),
 			after_place_node = function(pos, placer)
 				if placer:is_player() then
+					local snows = utils.nodes_in_range(pos, 8, {"default:snowblock"})
+					if #tnt.placed < 3 and snows > 100 then
+						tnt.placed[#tnt.placed + 1] = pos
+					end
+
 					local meta = minetest.get_meta(pos)
 					meta:set_string("owner", placer:get_player_name())
 				end
+			end,
+			on_destruct = function(pos)
+				minetest.after(0.1, function()
+					for i, p in ipairs(tnt.placed) do
+						if vector.equals(pos, p) then
+							table.remove(tnt.placed, i)
+							break
+						end
+					end
+				end)
 			end,
 			on_punch = function(pos, node, puncher)
 				if puncher:get_wielded_item():get_name() == "default:torch" then
@@ -598,13 +623,6 @@ function tnt.register_tnt(def)
 					tnt.boom(pos, def)
 				end)
 			end,
-			mesecons = {effector =
-				{action_on =
-					function(pos)
-						tnt.boom(pos, def)
-					end
-				}
-			},
 			on_burn = function(pos)
 				minetest.swap_node(pos, {name = name .. "_burning"})
 				minetest.registered_nodes[name .. "_burning"].on_construct(pos)
@@ -651,3 +669,7 @@ tnt.register_tnt({
 	description = "TNT",
 	radius = tnt_radius,
 })
+
+minetest.register_on_shutdown(function()
+	utils.write_table("tnt_placed", tnt.placed)
+end)
