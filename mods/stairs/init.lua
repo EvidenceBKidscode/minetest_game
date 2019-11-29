@@ -797,3 +797,18 @@ stairs.register_stair_and_slab(
 		dig = {name = "default_snow_footstep", gain = 0.2}
 	})
 )
+
+for name, def in pairs(minetest.registered_nodes) do
+	if (name:find("stone") or name:find("clay")) and
+			not def.groups.not_in_creative_inventory and
+			def.drawtype == "normal" and not def.drop then
+		stairs.register_slab(
+			name:match(":(.*)"),
+			name,
+			{cracky = 3},
+			{def.tiles[1]},
+			def.description .. " Slab",
+			default.node_sound_stone_defaults()
+		)
+	end
+end
