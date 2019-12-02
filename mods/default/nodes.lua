@@ -206,9 +206,6 @@ default:cloud
 
 --]]
 
-
-
-
 local fixed = {}
 local d = 0.05
 
@@ -216,15 +213,13 @@ for i = -0.5, 0.5 - d, d do
 	fixed[#fixed + 1] = {-0.5, i, i, 0.5, i + d, 0.5}
 end
 
-print(dump(#fixed))
-
 local box_slope = {
 	type = "fixed",
 	fixed = fixed
 }
 
-local function register_slope(name, texture, desc, sound, groups)
-	minetest.register_node("default:slope_" .. name, {
+function default.register_slope(name, texture, desc, sound, groups)
+	minetest.register_node(":default:slope_" .. name, {
 		drawtype = "mesh",
 		mesh = "slope.obj",
 		paramtype = "light",
@@ -239,7 +234,7 @@ local function register_slope(name, texture, desc, sound, groups)
 	})
 end
 
-register_slope(
+default.register_slope(
 	"concrete",
 	"default_concrete.png",
 	"béton armé",
@@ -247,7 +242,7 @@ register_slope(
 	{cracky = 3, building = 1}
 )
 
-register_slope(
+default.register_slope(
 	"stone",
 	"default_stone.png",
 	"roche",
@@ -255,7 +250,7 @@ register_slope(
 	{cracky = 3, stone = 1, building = 1}
 )
 
-register_slope(
+default.register_slope(
 	"dirt",
 	"default_dirt.png",
 	"terre",
@@ -263,7 +258,7 @@ register_slope(
 	{crumbly = 3, building = 1}
 )
 
-register_slope(
+default.register_slope(
 	"wood",
 	"default_wood.png",
 	"bois",

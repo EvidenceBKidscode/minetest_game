@@ -810,5 +810,13 @@ for name, def in pairs(minetest.registered_nodes) do
 			def.description .. " Slab",
 			default.node_sound_stone_defaults()
 		)
+
+		default.register_slope(
+			name:match(":(.*)"),
+			def.tiles[1],
+			name:match(":(.*)"):gsub("%f[%w]%l", string.upper):gsub("_", " "),
+			default.node_sound_stone_defaults(),
+			{cracky = 3, building = 1}
+		)
 	end
 end
