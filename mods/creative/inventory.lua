@@ -104,9 +104,9 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				local pagenum = math.floor(start_i / ipp + 1)
 
 				formspec = formspec ..
-					"scrollbaroptions[min=0,max=" ..
-					(inv.size - (inv.size % ipp)) ..
-					",smallstep=" .. ipp .. ",largestep=" .. ipp .."]" ..
+					"scrollbaroptions[min=0;max=" ..
+						(inv.size - (inv.size % ipp)) ..
+						";smallstep=" .. ipp .. ";largestep=" .. ipp .."]" ..
 					"scrollbar[7.23,0.4;0.6,7.18;vertical;sb_v;" ..
 					inv.start_i .. ";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
 
