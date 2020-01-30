@@ -273,12 +273,3 @@ creative.register_tab("search",
 	S("Search Items"),
 	minetest.registered_items
 )
-
-local old_homepage_name = sfinv.get_homepage_name
-function sfinv.get_homepage_name(player)
-	if creative.is_enabled_for(player:get_player_name()) then
-		return "creative:nodes"
-	else
-		return old_homepage_name(player)
-	end
-end
