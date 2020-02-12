@@ -73,7 +73,10 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 		title = title,
 		dir = "top",
 		is_in_nav = function(self, player, context)
-			return creative.is_enabled_for(player:get_player_name())
+			local pname = player:get_player_name()
+
+			return minetest.setting_getbool("allow_building") or
+				minetest.check_player_privs(pname, "teacher")
 		end,
 
 		get = function(self, player, context)
