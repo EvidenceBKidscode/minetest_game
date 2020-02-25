@@ -177,7 +177,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 			if fields.creative_filter and
 					player_inventory[player_name].last_search ~=
-			   		fields.creative_filter then
+					fields.creative_filter then
 				inv.start_i = 0
 				inv.filter = fields.creative_filter
 				player_inventory[player_name].last_search = inv.filter
@@ -186,8 +186,12 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				sfinv.set_player_inventory_formspec(player, context)
 
 			elseif fields.sb_v and fields.sb_v:sub(1,3) == "CHG" then
-				inv.start_i = tonumber(fields.sb_v:match(":(%d+)"))
-				sfinv.set_player_inventory_formspec(player, context)
+				local start_i = tonumber(fields.sb_v:match(":(%d+)"))
+				if math.floor(start_i / ipp + 1) ~= math.floor(inv.start_i / ipp + 1)
+				then
+					inv.start_i = start_i
+					sfinv.set_player_inventory_formspec(player, context)
+				end
 
 			elseif fields.trash_all then
 				player_inv:set_list("main", {})
