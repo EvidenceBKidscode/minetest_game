@@ -263,8 +263,10 @@ local function add_effects(pos, radius, drops, texture)
 end
 
 function tnt.burn(pos, nodename)
+	if not pos then return end
 	local name = nodename or minetest.get_node(pos).name
 	local def = minetest.registered_nodes[name]
+
 	if not def then
 		return
 	elseif def.on_ignite then
