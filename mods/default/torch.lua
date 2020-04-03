@@ -1,39 +1,7 @@
+-- default/torch.lua
 
---[[
-
-Torch mod - formerly mod "Torches"
-======================
-
-(c) Copyright BlockMen (2013-2015)
-(C) Copyright sofar <sofar@foo-projects.org> (2016)
-
-This mod changes the default torch drawtype from "torchlike" to "mesh",
-giving the torch a three dimensional appearance. The mesh contains the
-proper pixel mapping to make the animation appear as a particle above
-the torch, while in fact the animation is just the texture of the mesh.
-
-
-License:
-~~~~~~~~
-(c) Copyright BlockMen (2013-2015)
-
-Textures and Meshes/Models:
-CC-BY 3.0 BlockMen
-Note that the models were entirely done from scratch by sofar.
-
-Code:
-Licensed under the GNU LGPL version 2.1 or higher.
-You can redistribute it and/or modify it under
-the terms of the GNU Lesser General Public License
-as published by the Free Software Foundation;
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-See LICENSE.txt and http://www.gnu.org/licenses/lgpl-2.1.txt
-
---]]
+-- support for MT game translation.
+local S = default.get_translator
 
 local function on_flood(pos, oldnode, newnode)
 	minetest.add_item(pos, ItemStack("default:torch 1"))
@@ -43,7 +11,8 @@ local function on_flood(pos, oldnode, newnode)
 			nodedef.groups.igniter and nodedef.groups.igniter > 0) then
 		minetest.sound_play(
 			"default_cool_lava",
-			{pos = pos, max_hear_distance = 16, gain = 0.1}
+			{pos = pos, max_hear_distance = 16, gain = 0.1},
+			true
 		)
 	end
 	-- Remove the torch node
@@ -51,7 +20,7 @@ local function on_flood(pos, oldnode, newnode)
 end
 
 minetest.register_node("default:torch", {
-	description = "Torch",
+	description = S("Torch"),
 	drawtype = "mesh",
 	mesh = "torch_floor.obj",
 	inventory_image = "default_torch_on_floor.png",
@@ -102,6 +71,7 @@ minetest.register_node("default:torch", {
 	end,
 	floodable = true,
 	on_flood = on_flood,
+	on_rotate = false
 })
 
 minetest.register_node("default:torch_wall", {
@@ -125,6 +95,7 @@ minetest.register_node("default:torch_wall", {
 	sounds = default.node_sound_wood_defaults(),
 	floodable = true,
 	on_flood = on_flood,
+	on_rotate = false
 })
 
 minetest.register_node("default:torch_ceiling", {
@@ -148,6 +119,7 @@ minetest.register_node("default:torch_ceiling", {
 	sounds = default.node_sound_wood_defaults(),
 	floodable = true,
 	on_flood = on_flood,
+	on_rotate = false
 })
 
 minetest.register_lbm({
@@ -165,4 +137,18 @@ minetest.register_lbm({
 				param2 = node.param2})
 		end
 	end
+})
+
+minetest.register_craft({
+	output = "default:torch 4",
+	recipe = {
+		{"default:coal_lump"},
+		{"group:stick"},
+	}
+})
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "default:torch",
+	burntime = 4,
 })

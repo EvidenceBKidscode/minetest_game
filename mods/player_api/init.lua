@@ -1,3 +1,5 @@
+-- player/init.lua
+
 dofile(minetest.get_modpath("player_api") .. "/api.lua")
 
 -- Default player appearance
@@ -13,9 +15,12 @@ player_api.register_model("player.b3d", {
 		walk_mine = {x = 200, y = 219},
 		sit       = {x = 81,  y = 160},
 	},
-	collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.77, 0.3},
+	collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 	stepheight = 0.6,
+-->> KIDSCODE - Eye Height
 	eye_height = 1.625,
+--	eye_height = 1.47,
+--<< KIDSCODE - Eye Height
 })
 
 -- Update appearance when the player joins
@@ -29,6 +34,5 @@ minetest.register_on_joinplayer(function(player)
 		{x = 200, y = 219},
 		30
 	)
-	--player:hud_set_hotbar_image("gui_hotbar.png")
-	player:hud_set_hotbar_selected_image("gui_hotbar_selected.png")
+	player:hud_set_hotbar_selected_image("gui_hotbar_selected.png") -- KIDSCODE
 end)

@@ -1,11 +1,44 @@
+-- fire/init.lua
+
 -- Global namespace for functions
 
 fire = {}
 
+-- Load support for MT game translation.
+local S = minetest.get_translator("fire")
+
+
+-- 'Enable fire' setting
+
+local fire_enabled = minetest.settings:get_bool("enable_fire")
+if fire_enabled == nil then
+	-- enable_fire setting not specified, check for disable_fire
+	local fire_disabled = minetest.settings:get_bool("disable_fire")
+	if fire_disabled == nil then
+		-- Neither setting specified, check whether singleplayer
+		fire_enabled = minetest.is_singleplayer()
+	else
+		fire_enabled = not fire_disabled
+	end
+end
 
 --
 -- Items
 --
+
+-- Flood flame function
+
+local function flood_flame(pos, oldnode, newnode)
+	-- Play flame extinguish sound if liquid is not an 'igniter'
+	local nodedef = minetest.registered_items[newnode.name]
+	if not (nodedef and nodedef.groups and
+			nodedef.groups.igniter and nodedef.groups.igniter > 0) then
+		minetest.sound_play("fire_extinguish_flame",
+			{pos = pos, max_hear_distance = 16, gain = 0.15}, true)
+	end
+	-- Remove the flame
+	return false
+end
 
 -- Flame nodes
 
@@ -28,26 +61,34 @@ minetest.register_node("fire:basic_flame", {
 	walkable = false,
 	buildable_to = true,
 	sunlight_propagates = true,
+	floodable = true,
 	damage_per_second = 4,
 	groups = {igniter = 2, dig_immediate = 3, not_in_creative_inventory = 1},
+	drop = "",
+
 	on_timer = function(pos)
 		local f = minetest.find_node_near(pos, 1, {"group:flammable"})
-		if not f then
+		if not fire_enabled or not f then
 			minetest.remove_node(pos)
 			return
 		end
 		-- Restart timer
 		return true
 	end,
-	drop = "",
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(30, 60))
+		if not fire_enabled then
+			minetest.remove_node(pos)
+		else
+			minetest.get_node_timer(pos):start(math.random(30, 60))
+		end
 	end,
+
+	on_flood = flood_flame,
 })
 
 minetest.register_node("fire:permanent_flame", {
-	description = "Permanent Flame",
+	description = S("Permanent Flame"),
 	drawtype = "firelike",
 	tiles = {
 		{
@@ -66,11 +107,70 @@ minetest.register_node("fire:permanent_flame", {
 	walkable = false,
 	buildable_to = true,
 	sunlight_propagates = true,
+	floodable = true,
 	damage_per_second = 4,
 	groups = {igniter = 2, dig_immediate = 3, decoration = 1},
 	drop = "",
+
+	on_flood = flood_flame,
 })
 
+
+-- Flint and steel
+
+--[[ KIDSCODE - Remove flint and steel
+minetest.register_tool("fire:flint_and_steel", {
+	description = S("Flint and Steel"),
+	inventory_image = "fire_flint_steel.png",
+	sound = {breaks = "default_tool_breaks"},
+
+	on_use = function(itemstack, user, pointed_thing)
+		local sound_pos = pointed_thing.above or user:get_pos()
+		minetest.sound_play(
+			"fire_flint_and_steel",
+			{pos = sound_pos, gain = 0.5, max_hear_distance = 8},
+			true
+		)
+		local player_name = user:get_player_name()
+		if pointed_thing.type == "node" then
+			local node_under = minetest.get_node(pointed_thing.under).name
+			local nodedef = minetest.registered_nodes[node_under]
+			if not nodedef then
+				return
+			end
+			if minetest.is_protected(pointed_thing.under, player_name) then
+				minetest.chat_send_player(player_name, "This area is protected")
+				return
+			end
+			if nodedef.on_ignite then
+				nodedef.on_ignite(pointed_thing.under, user)
+			elseif minetest.get_item_group(node_under, "flammable") >= 1
+					and minetest.get_node(pointed_thing.above).name == "air" then
+				minetest.set_node(pointed_thing.above, {name = "fire:basic_flame"})
+			end
+		end
+		if not (creative and creative.is_enabled_for
+				and creative.is_enabled_for(player_name)) then
+			-- Wear tool
+			local wdef = itemstack:get_definition()
+			itemstack:add_wear(1000)
+			-- Tool break sound
+			if itemstack:get_count() == 0 and wdef.sound and wdef.sound.breaks then
+				minetest.sound_play(wdef.sound.breaks, {pos = sound_pos,
+					gain = 0.5}, true)
+			end
+			return itemstack
+		end
+	end
+})
+
+minetest.register_craft({
+	output = "fire:flint_and_steel",
+	recipe = {
+		{"default:flint", "default:steel_ingot"}
+	}
+})
+]]-- KIDSCODE - Remove flint and steel
 
 -- Override coalblock to enable permanent flame above
 -- Coalblock is non-flammable to avoid unwanted basic_flame nodes
@@ -116,7 +216,7 @@ if flame_sound then
 	function fire.update_player_sound(player)
 		local player_name = player:get_player_name()
 		-- Search for flame nodes in radius around player
-		local ppos = player:getpos()
+		local ppos = player:get_pos()
 		local areamin = vector.subtract(ppos, radius)
 		local areamax = vector.add(ppos, radius)
 		local fpos, num = minetest.find_nodes_in_area(
@@ -218,51 +318,7 @@ end
 -- ABMs
 --
 
--- Extinguish all flames quickly with water, snow, ice
-
-minetest.register_abm({
-	label = "Extinguish flame",
-	nodenames = {"fire:basic_flame", "fire:permanent_flame"},
-	neighbors = {"group:puts_out_fire"},
-	interval = 3,
-	chance = 1,
-	catch_up = false,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		minetest.remove_node(pos)
-		minetest.sound_play("fire_extinguish_flame",
-			{pos = pos, max_hear_distance = 16, gain = 0.15})
-	end,
-})
-
-
--- Enable the following ABMs according to 'enable fire' setting
-
-local fire_enabled = minetest.settings:get_bool("enable_fire")
-if fire_enabled == nil then
-	-- enable_fire setting not specified, check for disable_fire
-	local fire_disabled = minetest.settings:get_bool("disable_fire")
-	if fire_disabled == nil then
-		-- Neither setting specified, check whether singleplayer
-		fire_enabled = minetest.is_singleplayer()
-	else
-		fire_enabled = not fire_disabled
-	end
-end
-
-if not fire_enabled then
-
-	-- Remove basic flames only if fire disabled
-
-	minetest.register_abm({
-		label = "Remove disabled fire",
-		nodenames = {"fire:basic_flame"},
-		interval = 7,
-		chance = 1,
-		catch_up = false,
-		action = minetest.remove_node,
-	})
-
-else -- Fire enabled
+if fire_enabled then
 
 	-- Ignite neighboring nodes, add basic flames
 
@@ -273,11 +329,7 @@ else -- Fire enabled
 		interval = 7,
 		chance = 12,
 		catch_up = false,
-		action = function(pos, node, active_object_count, active_object_count_wider)
-			-- If there is water or stuff like that around node, don't ignite
-			if minetest.find_node_near(pos, 1, {"group:puts_out_fire"}) then
-				return
-			end
+		action = function(pos)
 			local p = minetest.find_node_near(pos, 1, {"air"})
 			if p then
 				minetest.set_node(p, {name = "fire:basic_flame"})
@@ -294,17 +346,18 @@ else -- Fire enabled
 		interval = 5,
 		chance = 18,
 		catch_up = false,
-		action = function(pos, node, active_object_count, active_object_count_wider)
+		action = function(pos)
 			local p = minetest.find_node_near(pos, 1, {"group:flammable"})
-			if p then
-				local flammable_node = minetest.get_node(p)
-				local def = minetest.registered_nodes[flammable_node.name]
-				if def.on_burn then
-					def.on_burn(p)
-				else
-					minetest.remove_node(p)
-					minetest.check_for_falling(p)
-				end
+			if not p then
+				return
+			end
+			local flammable_node = minetest.get_node(p)
+			local def = minetest.registered_nodes[flammable_node.name]
+			if def.on_burn then
+				def.on_burn(p)
+			else
+				minetest.remove_node(p)
+				minetest.check_for_falling(p)
 			end
 		end,
 	})

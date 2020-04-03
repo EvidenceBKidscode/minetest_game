@@ -1,4 +1,9 @@
-local stuff_string = minetest.settings:get("initial_stuff") or ""
+local stuff_string = minetest.settings:get("initial_stuff") or
+-->> KIDSCODE - No initial stuff
+		""
+--		"default:pick_steel,default:axe_steel,default:shovel_steel," ..
+--		"default:torch 99,default:cobble 99"
+--<< KIDSCODE - No initial stuff
 
 give_initial_stuff = {
 	items = {}

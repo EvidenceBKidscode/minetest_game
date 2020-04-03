@@ -1,18 +1,78 @@
-local S = utils.gettext
-local player_inventory = {}
 local ipp = 8*8
+-- creative/inventory.lua
 
-function creative.init_creative_inventory(player_name)
+-- support for MT game translation.
+local S = creative.get_translator
+
+local player_inventory = {}
+local inventory_cache = {}
+
+local function init_creative_cache(items)
+	inventory_cache[items] = {}
+	local i_cache = inventory_cache[items]
+
+	for name, def in pairs(items) do
+		if def.groups.not_in_creative_inventory ~= 1 and
+				def.description and def.description ~= "" then
+			i_cache[name] = def
+		end
+	end
+	table.sort(i_cache)
+	return i_cache
+end
+
+function creative.init_creative_inventory(player)
+	local player_name = player:get_player_name()
 	player_inventory[player_name] = {
 		size = 0,
 		filter = "",
 		start_i = 0,
-		last_search = "",
+		old_filter = nil, -- use only for caching in update_creative_inventory
+		old_content = nil
 	}
+
+	minetest.create_detached_inventory("creative_" .. player_name, {
+		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player2)
+			local name = player2 and player2:get_player_name() or ""
+			if not creative.is_enabled_for(name) or
+					to_list == "main" then
+				return 0
+			end
+			return count
+		end,
+		allow_put = function(inv, listname, index, stack, player2)
+			return 0
+		end,
+		allow_take = function(inv, listname, index, stack, player2)
+			local name = player2 and player2:get_player_name() or ""
+			if not creative.is_enabled_for(name) then
+				return 0
+			end
+			return -1
+		end,
+		on_move = function(inv, from_list, from_index, to_list, to_index, count, player2)
+		end,
+		on_take = function(inv, listname, index, stack, player2)
+			if stack and stack:get_count() > 0 then
+				minetest.log("action", player_name .. " takes " .. stack:get_name().. " from creative inventory")
+			end
+		end,
+	}, player_name)
 
 	return player_inventory[player_name]
 end
 
+local function match(s, filter)
+	if filter == "" then
+		return 0
+	end
+	if s:lower():find(filter, 1, true) then
+		return #s - #filter
+	end
+	return nil
+end
+
+-->> KIDSCODE - Allow to merge lists of content
 local function table_concat(...)
 	local args = {...}
 	local t1 = args[1]
@@ -26,32 +86,52 @@ local function table_concat(...)
 
 	return t1
 end
+--<< KIDSCODE - Allow to merge lists of content
 
-function creative.update_creative_inventory(player_name, tab_content, drawtype, group)
-	local creative_list = {}
+function creative.update_creative_inventory(player_name, tab_content,
+		drawtype, group) -- KIDSCODE filter on drawtype and/or groups
+
 	local inv = player_inventory[player_name] or
-		creative.init_creative_inventory(player_name)
+			creative.init_creative_inventory(minetest.get_player_by_name(player_name))
+	local player_inv = minetest.get_inventory({type = "detached", name = "creative_" .. player_name})
 
+	-- >> KIDSCODE - Allow to merge lists of content
 	if tab_content and #tab_content > 1 then
 		tab_content = table_concat(unpack(tab_content))
 	end
+	-- << KIDSCODE - Allow to merge lists of content
 
-	local filter = inv.filter:lower()
+	if inv.filter == inv.old_filter and tab_content == inv.old_content
+		and inv.old_drawtype == drawtype and inv.old_group == group then -- KIDSCODE filter on drawtype and/or groups
+		return
+	end
+	inv.old_filter = inv.filter
+	inv.old_content = tab_content
+	inv.old_drawtype = drawtype -- KIDSCODE filter on drawtype and/or groups
+	inv.old_group = group -- KIDSCODE filter on drawtype and/or groups
 
-	for name, def in pairs(tab_content or {}) do
-		if not (def.groups.not_in_creative_inventory == 1)      and
-		   def.description and def.description ~= ""	        and
-		  ((not drawtype and true or def.drawtype == drawtype)) and
-		  ((not group    and true or def.groups[group]))        and
-		  (def.name:find(filter, 1, true)                       or
-		   def.description:lower():find(filter, 1, true))       then
-			creative_list[#creative_list + 1] = name
+	local items = inventory_cache[tab_content] or init_creative_cache(tab_content)
+
+	local creative_list = {}
+	local order = {}
+	for name, def in pairs(items) do
+		local m = match(def.description, inv.filter) or match(def.name, inv.filter)
+		-->> KIDSCODE filter on drawtype and/or groups
+		if m and (not drawtype or def.drawtype == drawtype)
+				and (not group or def.groups[group]) then
+		-- if m then
+		--<< KIDSCODE filter on drawtype and/or groups
+			creative_list[#creative_list+1] = name
+			-- Sort by description length first so closer matches appear earlier
+			order[name] = string.format("%02d", m) .. name
 		end
 	end
 
+	table.sort(creative_list, function(a, b) return order[a] < order[b] end)
+
+	player_inv:set_size("main", #creative_list)
+	player_inv:set_list("main", creative_list)
 	inv.size = #creative_list
-	table.sort(creative_list)
-	return creative_list
 end
 
 -- Create the trash field
@@ -67,6 +147,8 @@ local trash = minetest.create_detached_inventory("creative_trash", {
 })
 trash:set_size("main", 1)
 
+creative.formspec_add = ""
+
 function creative.register_tab(name, image, title, items, drawtype, group)
 	sfinv.register_page("creative:" .. name, {
 		image = image,
@@ -75,21 +157,23 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 		is_in_nav = function(self, player, context)
 			local pname = player:get_player_name()
 
-			return minetest.setting_getbool("allow_building") or
+			return minetest.settings:get_bool("allow_building") or
 				minetest.check_player_privs(pname, "teacher")
 		end,
 
 		get = function(self, player, context)
 			local player_name = player:get_player_name()
+			creative.update_creative_inventory(player_name, items, drawtype, group)
+			local inv = player_inventory[player_name]
+
+			-->> KIDSCODE - Specific inventory
 			local inv_items =
-				creative.update_creative_inventory(player_name, items, drawtype, group)
-			local inv = player_inventory[player_name] or
-				creative.init_creative_inventory(player_name)
+				minetest.get_inventory({type = "detached", name = "creative_" .. player_name}):get_list("main")
 
 			local formspec =
 				"label[0,-0.1;" .. title .. "]" .. [[
 				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
-				list[current_player;main;0,7.8;8,1;0;0.2,0.0;1.0]
+				list[current_player;main;0,7.8;7,1;0;0.2,0.0;1.0]
 				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
 				list[detached:creative_trash;main;7,7.8;1,1;]
 				listring[]
@@ -105,7 +189,6 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			else
 				local start_i = inv.start_i or 0
 				local pagenum = math.floor(start_i / ipp + 1)
-
 				formspec = formspec ..
 					"scrollbaroptions[min=0;max=" ..
 						(inv.size - (inv.size % ipp)) ..
@@ -121,8 +204,9 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 				local first_item = (pagenum - 1) * ipp
 				for i = first_item, first_item + ipp - 1 do
-					local item_name = inv_items[i + 1]
-					if not item_name then break end
+					local item = inv_items[i + 1]
+					if not item then break end
+					local item_name = item:get_name()
 					local X = i % 8
 					local Y
 
@@ -149,6 +233,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			end
 
 			return sfinv.make_formspec(player, context, formspec, false)
+			--<< KIDSCODE - Specific inventory
 		end,
 
 		on_enter = function(self, player, context)
@@ -162,6 +247,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 		on_player_receive_fields = function(self, player, context, fields)
 			if self.name ~= "creative:" .. name then return end
 			--print(dump(fields))
+
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()
@@ -175,16 +261,18 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				sfinv.set_player_inventory_formspec(player, context)
 			end
 
+			-->> KIDSCODE - Search on every key press
 			if fields.creative_filter and
-					player_inventory[player_name].last_search ~=
-					fields.creative_filter then
+					fields.creative_filter ~= (inv.last_search or "")
+			then
 				inv.start_i = 0
-				inv.filter = fields.creative_filter
-				player_inventory[player_name].last_search = inv.filter
-
+				inv.filter = fields.creative_filter:lower()
+				inv.last_search = inv.filter
 				creative.update_creative_inventory(player_name, items, drawtype, group)
 				sfinv.set_player_inventory_formspec(player, context)
+			--<< KIDSCODE - Search on every key press
 
+			-->> KIDSCODE - Manage scrollbar instead of buttons
 			elseif fields.sb_v and fields.sb_v:sub(1,3) == "CHG" then
 				local start_i = tonumber(fields.sb_v:match(":(%d+)"))
 				if math.floor(start_i / ipp + 1) ~= math.floor(inv.start_i / ipp + 1)
@@ -192,57 +280,72 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 					inv.start_i = start_i
 					sfinv.set_player_inventory_formspec(player, context)
 				end
+			--[[
+			if fields.creative_prev then
+				start_i = start_i - 4*8
+				if start_i < 0 then
+					start_i = inv.size - (inv.size % (4*8))
+					if inv.size == start_i then
+						start_i = math.max(0, inv.size - (4*8))
+					end
+				end
+			elseif fields.creative_next then
+				start_i = start_i + 4*8
+				if start_i >= inv.size then
+					start_i = 0
+				end
+			]]
+			--<< KIDSCODE - Manage scrollbar instead of buttons
 
 			elseif fields.trash_all then
 				player_inv:set_list("main", {})
 
-			else for item in pairs(fields) do
-				  if item:find(":") then
-				  	local utils_installed = minetest.get_modpath("utils")
-				  	local sandbox = utils_installed and
-				  			utils.worldname:sub(1,6) == "build_"
+			else
+				for item in pairs(fields) do
+					if item:find(":") then
+						local utils_installed = minetest.get_modpath("utils")
+						local sandbox = utils_installed and
+								utils.worldname:sub(1,6) == "build_"
 
-				  	if not is_mapmaker and not is_teacher and
-				  	  (utils_installed and not sandbox) then
-				  		if utils_installed and
-				  		  (utils.worldname == "coding_schools" or
-						   utils.worldname == "science_factory") then
-					  	       minetest.chat_send_player(player_name,
-								minetest.colorize("#FF0000",
-									S("ERROR: You cannot use any other item " ..
-									"on this map except the kidsbot")))
-					  	else
-					  		minetest.chat_send_player(player_name,
-								minetest.colorize("#FF0000",
-									S("ERROR: Privilege 'mapmaker' or 'teacher'" ..
-									" required to get this item")))
-					  	end
+						if not is_mapmaker and not is_teacher and
+						  (utils_installed and not sandbox) then
+							if utils_installed and
+							  (utils.worldname == "coding_schools" or
+							   utils.worldname == "science_factory") then
+							       minetest.chat_send_player(player_name,
+									minetest.colorize("#FF0000",
+										S("ERROR: You cannot use any other item " ..
+										"on this map except the kidsbot")))
+							else
+								minetest.chat_send_player(player_name,
+									minetest.colorize("#FF0000",
+										S("ERROR: Privilege 'mapmaker' or 'teacher'" ..
+										" required to get this item")))
+							end
 
-				  		return
-				  	end
+							return
+						end
 
-					if item:sub(-4) == "_inv" then
-						item = item:sub(1,-5)
+						if item:sub(-4) == "_inv" then
+							item = item:sub(1,-5)
+						end
+
+						local stack = ItemStack(item)
+						player_inv:add_item("main",
+							item .. " " .. stack:get_stack_max())
 					end
-
-					local stack = ItemStack(item)
-					player_inv:add_item("main",
-						item .. " " .. stack:get_stack_max())
-				  end
-			     end
+				end
 			end
 		end
 	})
 end
 
-minetest.register_on_joinplayer(function(player)
-	creative.update_creative_inventory(
-		player:get_player_name(), minetest.registered_items)
-end)
+-->> KIDSCODE - Specific inventory
 
 creative.register_tab("storage",
 	"tab_storage.png@0.8",
-	S("Storage")
+	S("Storage"),
+	{}
 )
 
 creative.register_tab("nodes",
@@ -264,7 +367,7 @@ creative.register_tab("decoration",
 creative.register_tab("items",
 	"screwdriver.png@0.8",
 	S("Items & Tools"),
-	{minetest.registered_tools, minetest.registered_craftitems}
+	{ minetest.registered_tools, minetest.registered_craftitems }
 )
 
 creative.register_tab("interactive",
@@ -280,3 +383,22 @@ creative.register_tab("search",
 	S("Search Items"),
 	minetest.registered_items
 )
+--[[
+creative.register_tab("all", S("All"), minetest.registered_items)
+creative.register_tab("nodes", S("Nodes"), minetest.registered_nodes)
+creative.register_tab("tools", S("Tools"), minetest.registered_tools)
+creative.register_tab("craftitems", S("Items"), minetest.registered_craftitems)
+--]]
+--<< KIDSCODE - Specific inventory
+
+--[[ TODO:CHECK
+local old_homepage_name = sfinv.get_homepage_name
+function sfinv.get_homepage_name(player)
+	if creative.is_enabled_for(player:get_player_name()) then
+		return "creative:storage" -- KIDSCODE - Specific inventory
+		-- return "creative:all"
+	else
+		return old_homepage_name(player)
+	end
+end
+]]
