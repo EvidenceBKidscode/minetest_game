@@ -1,4 +1,4 @@
-local S = utils.gettext
+local S = minetest.get_translator("worldedit_commands")
 
 minetest.register_tool(":worldedit:hammer", {
 	description = S("WorldEdit Hammer. Left-click to set 1st position, right-click to set 2nd"),

@@ -1,4 +1,4 @@
-local S = utils.gettext
+local S = minetest.get_translator("worldedit_gui")
 
 --saved state for each player
 local gui_nodename1 = {} --mapping of player names to node names
@@ -202,7 +202,7 @@ worldedit.register_gui_function("worldedit_gui_set", {
 		local width, height = 9, 3
 		local items_list, inv_size = utils.get_items_list(start_i, filter, width, height, 0, 0.2)
 		local ipp = width * height
-		
+
 		return "size[8,6]" .. worldedit.get_formspec_header("worldedit_gui_set") ..
 			string.format("field[0.3,4.5;4,0.8;!worldedit_gui_set_filter;" ..
 				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
@@ -311,7 +311,7 @@ local replace_last = {}
 
 worldedit.register_gui_handler("worldedit_gui_replace", function(name, fields)
 	if utils.tablelen(fields) <= 3 then return end
-	
+
 	local continue = false
 	for field in pairs(fields) do
 		if field:find("worldedit") then
@@ -1392,7 +1392,7 @@ if minetest.get_modpath("areas") then
 
 			local area_idx = 1
 			local x = 1
-			
+
 			local names = ""
 			for k, v in pairs(areas.areas) do
 				local s = v.name .. " \\[" .. k .. "\\] (" .. v.owner .. ")"
@@ -1417,14 +1417,14 @@ if minetest.get_modpath("areas") then
 					S("Timer (seconds)") .. ";" .. timer .. "]" ..
 				"label[0,3.5;" .. S("User actions:") .. "]" ..
 				"dropdown[0,4;4.1;worldedit_gui_protect_can_dig;" ..
-					S("User can not dig") .. "," .. S("User can dig") .. 
+					S("User can not dig") .. "," .. S("User can dig") ..
 					";" .. can_dig .. "]" ..
 				"dropdown[0,4.8;4.1;worldedit_gui_protect_can_place;" ..
-					S("User can not place") .. "," .. S("User can place") .. 
+					S("User can not place") .. "," .. S("User can place") ..
 					";" .. can_place .. "]" ..
 				"label[4,3.5;" .. S("Kidsbot mode:") .. "]" ..
 				"dropdown[4,4;4.1;worldedit_gui_protect_kidsbot_mode;" ..
-					S("Free") .. "," .. S("Exercice") .. 
+					S("Free") .. "," .. S("Exercice") ..
 					";" .. kidsbot_mode .. "]" ..
 				"button[0,6;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
 				"button[2.66,6;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
@@ -1440,14 +1440,14 @@ if minetest.get_modpath("areas") then
 		local timer = (fields.worldedit_gui_protect_chrono and
 			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
 			       tonumber(fields.worldedit_gui_protect_chrono) or ""
-		local can_dig = 
+		local can_dig =
 			(fields.worldedit_gui_protect_can_dig == S("User can dig")
 			 and 'true' or nil)
-		local can_place = 
+		local can_place =
 			(fields.worldedit_gui_protect_can_place == S("User can place")
 			 and 'true' or nil)
-		local kidsbot_mode = 
-			(fields.worldedit_gui_protect_kidsbot_mode == S("Free") 
+		local kidsbot_mode =
+			(fields.worldedit_gui_protect_kidsbot_mode == S("Free")
 			 and 'free' or 'exercice')
 
 		if fields.worldedit_gui_protect_areas then

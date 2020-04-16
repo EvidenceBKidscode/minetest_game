@@ -1,4 +1,4 @@
-local S = utils.gettext
+local S = minetest.get_translator("worldedit_commands")
 
 minetest.register_privilege("worldedit", "Can use WorldEdit commands")
 
@@ -834,7 +834,7 @@ local check_pyramid = function(name, param)
 	height = tonumber(height)
 	return math.ceil(((height * 2 + 1) ^ 2) * height / 3)
 end
-     
+
 minetest.register_chatcommand("/hollowpyramid", {
 	params = "x/y/z/? <height> <node>",
 	description = "Add hollow pyramid centered at WorldEdit position 1 along the x/y/z/? axis with height <height>, composed of <node>",

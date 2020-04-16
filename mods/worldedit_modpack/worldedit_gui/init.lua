@@ -1,5 +1,5 @@
 worldedit = worldedit or {}
-local S = utils.gettext
+local S = minetest.get_translator("worldedit_gui")
 
 --[[
 Example:
@@ -97,7 +97,7 @@ end
 
 --implement worldedit.show_page(name, page) in different ways depending on the available APIs
 if rawget(_G, "sfinv") then
-	assert(sfinv.enabled)	
+	assert(sfinv.enabled)
 
 	for n in pairs(sfinv.pages) do
 		local orig_get = sfinv.pages[n].get
