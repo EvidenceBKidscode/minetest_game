@@ -249,7 +249,7 @@ function default.register_slope(name, texture, desc, sound, groups)
 		mesh = "slope.obj",
 		paramtype = "light",
 		paramtype2 = "facedir",
-		description = "Butte en " .. desc,
+		description = desc,
 		tiles = {texture},
 		groups = groups,
 		sounds = sound,
@@ -262,7 +262,7 @@ end
 default.register_slope(
 	"concrete",
 	"default_concrete.png",
-	"béton armé",
+	"Butte en Béton Armé",
 	default.node_sound_stone_defaults(),
 	{cracky = 3, building = 1}
 )
@@ -270,7 +270,7 @@ default.register_slope(
 default.register_slope(
 	"stone",
 	"default_stone.png",
-	"roche",
+	"Butte en roche",
 	default.node_sound_stone_defaults(),
 	{cracky = 3, stone = 1, building = 1}
 )
@@ -278,7 +278,7 @@ default.register_slope(
 default.register_slope(
 	"dirt",
 	"default_dirt.png",
-	"terre",
+	"Butte en Terre",
 	default.node_sound_dirt_defaults(),
 	{crumbly = 3, building = 1}
 )
@@ -286,7 +286,7 @@ default.register_slope(
 default.register_slope(
 	"wood",
 	"default_wood.png",
-	"bois",
+	"Butte en Bois",
 	default.node_sound_wood_defaults(),
 	{choppy = 3, wood = 1, building = 1}
 )
@@ -3027,54 +3027,54 @@ end
 -- TODO: Move into a new mod
 
 local additional_nodes = {
-	{"cobble", "cracky", "normal"},
-	{"glowstone", "cracky", "normal"},
-	{"gravel", "crumbly", "normal"},
-	{"leaves_acacia", "crumbly", "normal"},
-	{"leaves_acacia_opaque", "crumbly", "normal"},
-	{"leaves_big_oak", "crumbly", "normal"},
-	{"leaves_big_oak_opaque", "crumbly", "normal"},
-	{"leaves_birch", "crumbly", "normal"},
-	{"leaves_birch_opaque", "crumbly", "normal"},
-	{"leaves_jungle", "crumbly", "normal"},
-	{"leaves_jungle_opaque", "crumbly", "normal"},
-	{"leaves_oak", "crumbly", "normal"},
-	{"leaves_oak_opaque", "crumbly", "normal"},
-	{"leaves_spruce", "crumbly", "normal"},
-	{"leaves_spruce_opaque", "crumbly", "normal"},
-	{"nether_brick", "cracky", "normal"},
-	{"prismarine_bricks", "cracky", "normal"},
-	{"prismarine_dark", "cracky", "normal"},
-	{"purpur_block", "cracky", "normal"},
-	{"quartz_ore", "cracky", "normal"},
-	{"red_sandstone_bottom", "cracky", "normal"},
-	{"red_sandstone_carved", "cracky", "normal"},
-	{"red_sandstone_normal", "cracky", "normal"},
-	{"red_sandstone_smooth", "cracky", "normal"},
-	{"sandstone_top", "cracky", "normal"},
-	{"sandstone_bottom", "cracky", "normal"},
-	{"sandstone_carved", "cracky", "normal"},
-	{"sandstone_normal", "cracky", "normal"},
-	{"sandstone_smooth", "cracky", "normal"},
-	{"sandstone_top", "cracky", "normal"},
-	{"stone", "cracky", "normal"},
-	{"stone_andesite_smooth", "cracky", "normal"},
-	{"stone_diorite", "cracky", "normal"},
-	{"stone_diorite_smooth", "cracky", "normal"},
-	{"stone_granite", "cracky", "normal"},
-	{"stone_granite_smooth", "cracky", "normal"},
-	{"stonebrick", "cracky", "normal"},
-	{"stonebrick_cracked", "cracky", "normal"},
+	{S("Cobblestone"), "cobble", "cracky", "normal"},
+	{S("Glowstone"), "glowstone", "cracky", "normal"},
+	{S("Gravel"), "gravel", "crumbly", "normal"},
+	{S("Acacia Tree Leaves"), "leaves_acacia", "crumbly", "normal"},
+	{S("Opaque Acacia Tree Leaves"), "leaves_acacia_opaque", "crumbly", "normal"},
+	{S("Big Oak Leaves"), "leaves_big_oak", "crumbly", "normal"},
+	{S("Opaque Big Oak Leaves"), "leaves_big_oak_opaque", "crumbly", "normal"},
+	{S("Birch Leaves"), "leaves_birch", "crumbly", "normal"},
+	{S("Opaque Birch Leaves"), "leaves_birch_opaque", "crumbly", "normal"},
+	{S("Jungle Tree Leaves"), "leaves_jungle", "crumbly", "normal"},
+	{S("Opaque Jungle Tree Leaves"), "leaves_jungle_opaque", "crumbly", "normal"},
+	{S("Oak Leaves"), "leaves_oak", "crumbly", "normal"},
+	{S("Opaque Oak Leaves"), "leaves_oak_opaque", "crumbly", "normal"},
+	{S("Spurce Leaves"), "leaves_spruce", "crumbly", "normal"},
+	{S("Opaque Spurce Leaves"), "leaves_spruce_opaque", "crumbly", "normal"},
+	{S("Nether Brick"), "nether_brick", "cracky", "normal"},
+	{S("Prismarine Bricks"), "prismarine_bricks", "cracky", "normal"},
+	{S("Prismaring Dark Bricks"), "prismarine_dark", "cracky", "normal"},
+	{S("Purpur Block"), "purpur_block", "cracky", "normal"},
+	{S("Quartz Ore"), "quartz_ore", "cracky", "normal"},
+	{S("Red Sandstone Bottom"), "red_sandstone_bottom", "cracky", "normal"},
+	{S("Carved Red Sandstone"), "red_sandstone_carved", "cracky", "normal"},
+	{S("Red Sandstone"), "red_sandstone_normal", "cracky", "normal"},
+	{S("Smooth Red Sandstone"), "red_sandstone_smooth", "cracky", "normal"},
+	{S("Sandstone Top"), "sandstone_top", "cracky", "normal"},
+	{S("Sandstone Bottom"), "sandstone_bottom", "cracky", "normal"},
+	{S("Carved Sandstone"), "sandstone_carved", "cracky", "normal"},
+	{S("Sandstone"), "sandstone_normal", "cracky", "normal"},
+	{S("Smooth Sandstone"), "sandstone_smooth", "cracky", "normal"},
+	{S("Stone"), "stone", "cracky", "normal"},
+	{S("Smooth Andesite"), "stone_andesite_smooth", "cracky", "normal"},
+	{S("Diorite"), "stone_diorite", "cracky", "normal"},
+	{S("Smooth Diorite"), "stone_diorite_smooth", "cracky", "normal"},
+	{S("Granite"), "stone_granite", "cracky", "normal"},
+	{S("Smooth Granite"), "stone_granite_smooth", "cracky", "normal"},
+	{S("Stone Brick"), "stonebrick", "cracky", "normal"},
+	{S("Cracked Stone Brick"), "stonebrick_cracked", "cracky", "normal"},
 }
 
 for i = 1, #additional_nodes do
-	local name = additional_nodes[i][1]
-	local group_name = additional_nodes[i][2]
+	local desc = additional_nodes[i][1]
+	local name = additional_nodes[i][2]
+	local group_name = additional_nodes[i][3]
 	local groups = {}
 	groups[group_name] = 1
 
 	minetest.register_node("default:" .. name .. "_2", {
-		description = name:gsub("%f[%w]%l", string.upper):gsub("_", " "),
+		description = desc,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		tiles = {"default_" .. name .. "_2.png"},
