@@ -157,6 +157,8 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 	end
 end
 
+-- Slab facedir to placement 6d matching table
+local slab_trans_dir = {[0] = 8, 0, 2, 1, 3, 4}
 
 -- Register slab
 -- Node will be called stairs:slab_<subname>
