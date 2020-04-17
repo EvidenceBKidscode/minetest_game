@@ -6,10 +6,13 @@
 180 degrees=180 degrés
 270 degrees=270 degrés
 90 degrees=90 degrés
+<new area>=<nouvelle aire>
 About=A propos
 Add owner=Ajout proprio
 Allocate=Allouer
 Amount=Quantité
+Area '@1' has been protected.=L'aire '@1' a été protégée.
+Area '@1' has been updated.=L'aire '@1' a été modifiée.
 Area Protection=Protection d'une aire
 Area name=Nom de l'aire
 Areas:=Aires:
@@ -27,6 +30,7 @@ Count=Quantité
 Cuboid=Cube
 Cylinder=Cylindre
 Delete=Supprimer
+ERROR: Another player name is required=ERREUR : Le nom d'un autre joueur est requis
 ERROR: Area name required=ERREUR : Nom de l'aire requis
 ERROR: Missing position 1=ERREUR : Position 1 manquante
 ERROR: Missing position 2=ERREUR : Position 2 manquante
@@ -36,7 +40,7 @@ Exercice=Exercice
 Filter=Filtre
 Fix Lighting=Corriger la lumière
 Flip=Retourner
-Free=Libérer
+Free=Libre
 Get / Set Region=Définir Région
 Get Positions=Prendre les positions
 Height=Hauteur
@@ -56,7 +60,7 @@ Move Region=Déplacer une région
 Name=Nom
 New building=Nouvelle structure
 Orient=Orienter
-Player '=Joueur '
+Player '@1' added to ownership of area '@2'=Joueur '@1' ajouté comme propirétaire de l'aire '@2'
 Position 1=Position 1
 Position 1 Here=Position 1 ici
 Position 2=Position 2
@@ -90,12 +94,13 @@ Stretch X=Étirer sur X
 Stretch Y=Étirer sur Y
 Stretch Z=Étirer sur Z
 Suppress Nodes=Supprimer région
-The area '=L'aire '
+The area '@1' has been removed=L'aire '@1' a été supprimée
 Timer (seconds)=Chronomètre (secondes)
 Toggle Inspect=Inspection
 Top Radius=Rayon du sommet
 Transpose=Transposer
 Unmark Region=Déselectionner une région
+Update Area=Modifier l'aire
 User actions:=Actions utilisateur :
 User can dig=L'utilisateur peut casser
 User can not dig=L'utilisateur ne peut pas casser
@@ -117,3 +122,10 @@ Forms=Formes
 World Editor=Editeur de Monde
 
 you are not allowed to use this function (missing privileges: @1)=vous n'êtes pas autorisé à utiliser cette fonction (privilèges manquants : @1)
+
+
+
+##### not used anymore #####
+
+Player '=Joueur '
+The area '=L'aire '

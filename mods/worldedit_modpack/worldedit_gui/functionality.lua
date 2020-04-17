@@ -1338,40 +1338,24 @@ local function area_check_pos(pos1, pos2, name)
 end
 
 if minetest.get_modpath("areas") then
-	local area_datas = {}
+	local area_data = {}
 
-	local function save_area(fields, datas)
-		local name = datas.name
-		local area_name = datas.area_name
-		local pos1 = datas.pos1
-		local pos2 = datas.pos2
-
-		if not area_check_pos(pos1, pos2, name) then
-			return false
-		end
-
-		if area_name == "" then
-			minetest.chat_send_player(name,
-				minetest.colorize("#FF0000", S("ERROR: Area name required")))
-			return false
-		end
-
-		area_name = fields.worldedit_gui_protect_name
-		area_datas[name].last_name = fields.worldedit_gui_protect_name
-
-		local id = areas:add(datas)
-		areas:save()
-
-		minetest.chat_send_player(name,
-			minetest.colorize("#FFFF00",
-				S("The area '" .. area_name .. "' has been protected")))
-	end
-
-	local function reload_page(fields)
-		if not fields.worldedit_gui_protect_submit    and
-		   not fields.worldedit_gui_protect_add_owner and
-		   not fields.worldedit_gui_protect_remove    then
-			return true
+	local function select_area(name, id)
+		local data = area_data[name]
+		if areas.areas[id] then
+			data.area_id = id
+			data.area_name = areas.areas[id].name
+			data.name = areas.areas[id].owner
+			data.timer = areas.areas[id].timer
+			data.can_dig = areas.areas[id].can_dig
+			data.can_place =  areas.areas[id].can_place
+			data.kidsbot_mode =  areas.areas[id].kidsbot_mode
+			data.pos1 = areas.areas[id].pos1
+			data.pos2 = areas.areas[id].pos2
+		else
+			data.area_id = nil
+			data.pos1 = nil
+			data.pos2 = nil
 		end
 	end
 
@@ -1380,30 +1364,35 @@ if minetest.get_modpath("areas") then
 		name = S("Area Protection"),
 		privs = {areas=true},
 		get_formspec = function(name)
-			area_datas[name] = area_datas[name] or {}
-			local area_name = area_datas[name].last_name or ""
-			local player_name = area_datas[name].last_player_name or ""
-			local dd_idx = area_datas[name] and area_datas[name].last_dd_idx or 1
-			local last_selected_area = area_datas[name].last_selected_area or ""
-			local timer = areas.areas[dd_idx] and areas.areas[dd_idx].timer or ""
-			local can_dig = area_datas[name].can_dig == "true" and 2 or 1
-			local can_place = area_datas[name].can_place == "true" and 2 or 1
-			local kidsbot_mode = area_datas[name].kidsbot_mode == "free" and 2 or 1
+			area_data[name] = area_data[name] or {}
+			local data = area_data[name]
+			select_area(name, data.area_id)
 
-			local area_idx = 1
+			local area_idx
 			local x = 1
-
-			local names = ""
+			local names = S("<new area>")
 			for k, v in pairs(areas.areas) do
-				local s = v.name .. " \\[" .. k .. "\\] (" .. v.owner .. ")"
-				names = names .. s .. ","
+				x = x + 1
+				names = names .. "," .. v.name .. " \\[" .. k .. "\\] (" .. v.owner .. ")"
 
-				if last_selected_area == s:gsub("\\", "") then
+				if data.area_id == k then
 					area_idx = x
 				end
-				x = x + 1
 			end
-			names = names:sub(1,-2)
+
+			if not area_idx then
+				area_idx = 1
+				data.area_id = nil
+				-- Default owner = me
+				data.name = data.name or name
+			end
+
+			local area_name = data.area_name or ""
+			local player_name = data.name or ""
+			local timer = data.timer or ""
+			local can_dig = data.can_dig == "true" and 2 or 1
+			local can_place = data.can_place == "true" and 2 or 1
+			local kidsbot_mode = data.kidsbot_mode == "free" and 2 or 1
 
 			return "size[8,6.5]" .. worldedit.get_formspec_header("worldedit_gui_protect") ..
 				string.format("field[0.3,1.4;4,1;worldedit_gui_protect_name;" ..
@@ -1426,110 +1415,137 @@ if minetest.get_modpath("areas") then
 				"dropdown[4,4;4.1;worldedit_gui_protect_kidsbot_mode;" ..
 					S("Free") .. "," .. S("Exercice") ..
 					";" .. kidsbot_mode .. "]" ..
-				"button[0,6;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
-				"button[2.66,6;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
-				"button[5.33,6;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
+				(data.area_id and
+					"button_exit[0,6;2.5,1;worldedit_gui_protect_remove;" .. S("Remove area") .. "]" ..
+					"button_exit[2.66,6;2.5,1;worldedit_gui_protect_add_owner;" .. S("Confirm owner") .. "]" ..
+					"button_exit[5.33,6;2.5,1;worldedit_gui_protect_submit;" .. S("Update Area") .. "]"
+				or
+					"button_exit[5.33,6;2.5,1;worldedit_gui_protect_submit;" .. S("Protect Area") .. "]"
+				)
 		end,
 	})
 
 	worldedit.register_gui_handler("worldedit_gui_protect", function(name, fields)
-		local area_name = fields.worldedit_gui_protect_name
-		local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
-		local dd_idx = fields.worldedit_gui_protect_areas and
-			       tonumber(fields.worldedit_gui_protect_areas:match("%[(%d+)%]%s%("))
-		local timer = (fields.worldedit_gui_protect_chrono and
-			       fields.worldedit_gui_protect_chrono:find("^%d+$")) and
-			       tonumber(fields.worldedit_gui_protect_chrono) or ""
-		local can_dig =
-			(fields.worldedit_gui_protect_can_dig == S("User can dig")
-			 and 'true' or nil)
-		local can_place =
-			(fields.worldedit_gui_protect_can_place == S("User can place")
-			 and 'true' or nil)
-		local kidsbot_mode =
-			(fields.worldedit_gui_protect_kidsbot_mode == S("Free")
-			 and 'free' or 'exercice')
+		area_data[name] = area_data[name] or {}
+		local data = area_data[name]
 
-		if fields.worldedit_gui_protect_areas then
-			area_datas[name].last_selected_area = fields.worldedit_gui_protect_areas
-			area_datas[name].last_dd_idx = dd_idx or 1
-			if reload_page(fields) then
-				worldedit.show_page(name, "worldedit_gui_protect")
-				return true
-			end
-		end
-
-
-		local datas = {
-			name = name,
-			area_name = area_name,
-			pos1 = pos1,
-			pos2 = pos2,
-			parent = nil,
-			timer = timer,
-			can_dig = can_dig,
-			can_place = can_place,
-			kidsbot_mode = kidsbot_mode,
-		}
+		data.name = fields.worldedit_gui_protect_player_name
+		data.area_name = fields.worldedit_gui_protect_name
+		data.timer = fields.worldedit_gui_protect_chrono and
+				(fields.worldedit_gui_protect_chrono:find("^%d+$")) and
+				tonumber(fields.worldedit_gui_protect_chrono) or ""
 
 		if fields.worldedit_gui_protect_submit then
-			save_area(fields, datas)
+			local update = data.area_id and areas.areas[data.area_id]
+
+			if not update then
+				data.pos1 = worldedit.pos1[name]
+				data.pos2 = worldedit.pos2[name]
+			end
+
+			if not area_check_pos(data.pos1, data.pos2, name) then
+				return false
+			end
+
+			if data.area_name == "" then
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Area name required")))
+				return false
+			end
+
+			-- In case of update, remove old area before creating new one
+			if update then
+				areas:remove(data.area_id)
+			end
+
+			data.area_id = areas:add(table.copy(data))
+			areas:save()
+
+			minetest.chat_send_player(name,
+					minetest.colorize("#FFFF00", update and
+							S("Area '@1' has been updated.", data.area_name) or
+							S("Area '@1' has been protected.", data.area_name)
+					))
 			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
 
 		elseif fields.worldedit_gui_protect_add_owner then
-			if not area_check_pos(pos1, pos2, name) then
+			if not area_check_pos(data.pos1, data.pos2, name) then
 				return false
 			end
 
-			local player_name = fields.worldedit_gui_protect_player_name
-			if player_name == "" then
+			if data.name == "" then
 				minetest.chat_send_player(name,
 					minetest.colorize("#FF0000", S("ERROR: Player name required")))
 				return false
 			end
 
-			area_name = fields.worldedit_gui_protect_areas
-			datas.name = player_name
-			datas.text = nil
+			if not data.area_id or not areas.areas[data.area_id] then
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Select an area first")))
+				return false
+			end
 
-			local id = areas:add(datas)
+			if data.name == areas.areas[data.area_id].owner then
+				minetest.chat_send_player(name,
+					minetest.colorize("#FF0000", S("ERROR: Another player name is required")))
+				return false
+			end
+
+			data.area_id = areas:add(table.copy(data))
 			areas:save()
 
 			minetest.chat_send_player(name,
 				minetest.colorize("#FFFF00",
-					S("Player '" .. player_name ..
-					  "' added to ownership of area '" .. area_name .. "'")))
+					S("Player '@1' added to ownership of area '@2'",
+						data.name, data.area_name)))
 
 			worldedit.show_page(name, "worldedit_gui_protect")
 			return true
 
 		elseif fields.worldedit_gui_protect_remove then
-			area_name = fields.worldedit_gui_protect_areas:match("^(.*)%s%(")
-			local id
-
-			for k, v in pairs(areas.areas) do
-				if area_name == v.name .. " [" .. k .. "]" then
-					id = k
-				end
-			end
-
-			if id then
-				areas:remove(id)
+			if data.area_id and areas.areas[data.area_id] then
+				local area_name = areas.areas[data.area_id].name or ""
+				areas:remove(data.area_id)
 				areas:save()
-
+				data.area_id = nil
 				minetest.chat_send_player(name,
 					minetest.colorize("#FFFF00",
-						S("The area '" .. area_name .. "' has been removed")))
-
-				worldedit.show_page(name, "worldedit_gui_protect")
-
-				return true
+						S("The area '@1' has been removed", area_name)))
 			else
 				minetest.chat_send_player(name,
 					minetest.colorize("#FF0000", S("ERROR: Select an area first")))
-				return false
 			end
+
+			worldedit.show_page(name, "worldedit_gui_protect")
+			return true
+
+		elseif fields.worldedit_gui_protect_areas then
+			select_area(name,
+				tonumber(fields.worldedit_gui_protect_areas:match("%[(%d+)%]%s%(")))
+			worldedit.show_page(name, "worldedit_gui_protect")
+			return true
+
+		elseif fields.worldedit_gui_protect_can_dig then
+			data.can_dig =
+					fields.worldedit_gui_protect_can_dig == S("User can dig")
+					and 'true' or nil
+			worldedit.show_page(name, "worldedit_gui_protect")
+			return true
+
+		elseif fields.worldedit_gui_protect_can_place then
+			data.can_place =
+					fields.worldedit_gui_protect_can_place == S("User can place")
+					and 'true' or nil
+			worldedit.show_page(name, "worldedit_gui_protect")
+			return true
+
+		elseif fields.worldedit_gui_protect_kidsbot_mode then
+			data.kidsbot_mode =
+					fields.worldedit_gui_protect_kidsbot_mode == S("Free")
+					and 'free' or 'exercice'
+			worldedit.show_page(name, "worldedit_gui_protect")
+			return true
 		end
 
 		return false
