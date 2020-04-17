@@ -1,0 +1,34 @@
+# textdomain: worldedit_commands
+
+
+### hammer.lua ###
+
+WorldEdit Hammer. Left-click to set 1st position, right-click to set 2nd=
+
+
+### init.lua ###
+
+@1 nodes loaded=
+@1 nodes saved=
+@1 nodes set=
+Area deleted.=
+Could not save file to "@1"=
+Disallowed file name: @1=
+File is invalid!=
+File was created with newer version of WorldEdit!=
+There was an error during deletion of the area.=
+You are not allowed to use any WorldEdit commands.=
+invalid node name: @1=
+invalid usage: @1=
+no position 1 selected=
+no region selected=
+position 1 not set=
+position 1 set to @1=
+position 2 not set=
+position 2 set to @1=
+region marked=
+region unmarked=
+select position 1 by punching a node=
+select position 2 by punching a node=
+select positions by punching two nodes=
+unknown subcommand: @1=

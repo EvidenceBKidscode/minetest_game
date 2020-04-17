@@ -1,0 +1,34 @@
+# textdomain: worldedit_commands
+
+
+### hammer.lua ###
+
+WorldEdit Hammer. Left-click to set 1st position, right-click to set 2nd=Marteau Worldedit. Clic gauche pour définir la 1ère position, clic droit pour définir la 2nde.
+
+
+### init.lua ###
+
+@1 nodes loaded=@1 blocs chargés
+@1 nodes saved=@1 blocs sauvegardés
+@1 nodes set=@1 blocs définis
+Area deleted.=Aire supprimée.
+Could not save file to "@1"=Impossible de sauvegarder le fichier "@1"
+Disallowed file name: @1=Nom de fichier interdit : @1
+File is invalid!=Le fichier est invalide !
+File was created with newer version of WorldEdit!=Le fichier a été créé avec une nouvelle version de WorldEdit !
+There was an error during deletion of the area.=Il y a eu une erreur durant la suppression de cette aire.
+You are not allowed to use any WorldEdit commands.=Vous n'êtes pas autorisé à utiliser une commande WorldEdit.
+invalid node name: @1=nom de bloc invalide : @1
+invalid usage: @1=usage invalide : @1
+no position 1 selected=aucune position 1 définie
+no region selected=aucune région sélectionnée
+position 1 not set=position 1 indéfinie
+position 1 set to @1=position 1 définie à @1
+position 2 not set=position 2 indéfinie
+position 2 set to @1=position 2 définie à @2
+region marked=Région sélectionnée
+region unmarked=Région déselectionnée
+select position 1 by punching a node=sélectionnez la position 1 en tapant sur un bloc
+select position 2 by punching a node=sélectionnez la position 2 en tapant sur un bloc
+select positions by punching two nodes=selectionnez les positions en tapant sur deux blocs
+unknown subcommand: @1=commande inconnue : @1
