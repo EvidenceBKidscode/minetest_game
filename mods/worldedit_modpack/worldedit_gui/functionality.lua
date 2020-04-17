@@ -1342,6 +1342,9 @@ if minetest.get_modpath("areas") then
 
 	local function select_area(name, id)
 		local data = area_data[name]
+		if data.area_id == id then
+			return
+		end
 		if areas.areas[id] then
 			data.area_id = id
 			data.area_name = areas.areas[id].name
