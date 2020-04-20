@@ -145,15 +145,12 @@ local function get_formspec_str(main, y, columns, width, buttons, name)
 		"item_image_button[" .. (columns * (width / 2) - 0.5) ..
 			",0.2;1,1;worldedit:hammer;worldedit_hammer;]" ..
 		--"image[" .. (columns * (width / 2) - 0.5) .. ",0.2;1,1;worldedit_hammer.png]" ..
-		"label[" .. (mode[name] == "default" and 3.8 or 2.2) .. ",1.2;" ..
-			S("Click on the hammer button to get your WorldEdit tool") .. "]" ..
-		"button[0,0;" .. (main and 3 or 2) .. ",0.5;worldedit_gui_exit" ..
-			(main and "" or "_") .. ";< " ..
-			S("Back") .. "]" ..
-		table.concat(buttons) ..
-		"button[" .. (math.max(columns * width, 5) - 2) ..
-			",0;2,0.5;worldedit_gui_advanced;" ..
-			(mode[name] == "default" and S("Basic") or S("Advanced")) .. "]"
+		"label[3,1.2;" .. S("Click on the hammer button to get your WorldEdit tool") .. "]" ..
+		"button[0,0;2,0.5;worldedit_gui_exit" .. (main and "" or "_") .. ";< " .. S("Back") .. "]" ..
+		table.concat(buttons)
+		-- .. "button[" .. (math.max(columns * width, 5) - 2) ..
+		--	",0;2,0.5;worldedit_gui_advanced;" ..
+		--	(mode[name] == "default" and S("Basic") or S("Advanced")) .. "]"
 end
 
 worldedit.register_gui_function("worldedit_gui", {

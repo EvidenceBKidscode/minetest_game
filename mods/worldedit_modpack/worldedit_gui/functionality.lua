@@ -189,7 +189,7 @@ end)
 ]]
 
 worldedit.register_gui_function("worldedit_gui_set", {
-	type = "advanced",
+	type = "default",
 	name = S("Set Nodes"),
 	privs = we_privs("set"),
 	get_formspec = function(name)
@@ -805,7 +805,7 @@ worldedit.register_gui_handler("worldedit_gui_spiral", function(name, fields)
 end)
 
 worldedit.register_gui_function("worldedit_gui_copy_move", {
-	type = "advanced",
+	type = "default",
 	name = S("Copy / Move"),
 	privs = combine_we_privs({"copy", "move"}),
 	get_formspec = function(name)
