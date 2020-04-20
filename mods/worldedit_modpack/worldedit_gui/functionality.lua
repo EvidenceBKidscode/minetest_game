@@ -812,9 +812,9 @@ worldedit.register_gui_function("worldedit_gui_copy_move", {
 		local axis = gui_axis1[name] or 4
 		local amount = gui_distance1[name] or "10"
 		return "size[6.5,3]" .. worldedit.get_formspec_header("worldedit_gui_copy_move") ..
-			string.format("field[0.5,1.5;4,0.8;worldedit_gui_copy_move_amount;" ..
+			string.format("field[0.32,1.5;2,0.8;worldedit_gui_copy_move_amount;" ..
 				S("Amount") .. ";%s]", minetest.formspec_escape(amount)) ..
-			string.format("dropdown[4,1.18;2.5;worldedit_gui_copy_move_axis;" ..
+			string.format("dropdown[2,1.16;2.5;worldedit_gui_copy_move_axis;" ..
 				S("X axis") .. "," .. S("Y axis") .. "," .. S("Z axis") .. "," ..
 				S("Look direction") .. ";%d]", axis) ..
 			"button_exit[0,2.5;3,0.8;worldedit_gui_copy_move_copy;" ..
