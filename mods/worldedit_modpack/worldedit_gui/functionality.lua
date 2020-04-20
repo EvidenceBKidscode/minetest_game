@@ -209,11 +209,11 @@ worldedit.register_gui_function("worldedit_gui_set", {
 			string.format("field[0.3,5.82;3,0.8;worldedit_gui_set_node;" ..
 				S("Name") .. ";%s]", minetest.formspec_escape(node)) ..
 			items_list ..
+			"scrollbaroptions[min=0;max=" ..
+				(inv_size - (inv_size % ipp)) ..
+				";smallstep=" .. ipp .. ";largestep=" .. ipp .."]" ..
 			"scrollbar[4,4.25;3.6,0.5;horizontal;set_sb_h;" ..
-				start_i .. ",0," ..
-				(inv_size - (inv_size % ipp)) .. "," ..
-				ipp .. "," .. ipp .."," .. ipp ..
-				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
+				start_i .. ";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			"button_exit[3,5.5;3,0.8;worldedit_gui_set_submit;" .. S("Set Nodes") .. "]"
 	end,
 })
@@ -293,11 +293,11 @@ worldedit.register_gui_function("worldedit_gui_replace", {
 				S("Search") .. ";%s]", minetest.formspec_escape(filter)) ..
 			string.format("field[0.3,5.8;4,0.8;worldedit_gui_replace_node;" ..
 				S("Replace") .. ";%s]", minetest.formspec_escape(search)) ..
+			"scrollbaroptions[min=0;max=" ..
+				(inv_size - (inv_size % ipp)) ..
+				";smallstep=" .. ipp .. ";largestep=" .. ipp .."]" ..
 			"scrollbar[4,4.25;3.6,0.5;horizontal;replace_sb_h;" ..
-				start_i .. ",0," ..
-				(inv_size - (inv_size % ipp)) .. "," ..
-				ipp .. "," .. ipp .."," .. ipp ..
-				";#999999;#777777;#FFFFFFFF;#808080FF]" ..
+				start_i .. ";#999999;#777777;#FFFFFFFF;#808080FF]" ..
 			string.format("field[4.3,5.8;4,0.8;worldedit_gui_replace_replace;" ..
 				S("By") .. ";%s]", minetest.formspec_escape(replace)) ..
 			"button_exit[1,6.5;3,0.8;worldedit_gui_replace_submit;" ..
