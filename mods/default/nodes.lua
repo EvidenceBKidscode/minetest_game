@@ -2278,6 +2278,17 @@ minetest.register_node("default:water_source", {
 	tiles = {
 		{
 			name = "default_water_source_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2.0,
+			},
+		},
+	},
+	special_tiles = { -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
+		{
+			name = "default_water_source_animated.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -2293,20 +2304,10 @@ minetest.register_node("default:water_source", {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 2.0,
-			},
-		},
-		{
-			name = "default_water_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
 				length = 0.8,
 			},
-			backface_culling = true,
 		},
-	},
+	}, -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
 	alpha = 191,
 	paramtype = "light",
 	walkable = false,
@@ -2382,6 +2383,17 @@ minetest.register_node("default:river_water_source", {
 	tiles = {
 		{
 			name = "default_river_water_source_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2.0,
+			},
+		},
+	},
+	special_tiles = { -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
+		{
+			name = "default_river_water_source_animated.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -2399,16 +2411,6 @@ minetest.register_node("default:river_water_source", {
 				aspect_h = 16,
 				length = 2.0,
 			},
-		},
-		{
-			name = "default_river_water_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 2.0,
-			},
-			backface_culling = true,
 		},
 	},
 	alpha = 160,
@@ -2489,6 +2491,17 @@ minetest.register_node("default:lava_source", {
 	tiles = {
 		{
 			name = "default_lava_source_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.0,
+			},
+		},
+	},
+	special_tiles = { -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
+		{
+			name = "default_lava_source_animated.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -2507,17 +2520,7 @@ minetest.register_node("default:lava_source", {
 				length = 3.0,
 			},
 		},
-		{
-			name = "default_lava_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-			backface_culling = true,
-		},
-	},
+	}, -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
 	paramtype = "light",
 	light_source = default.LIGHT_MAX - 1,
 	walkable = false,
