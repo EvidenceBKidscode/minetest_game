@@ -1,10 +1,34 @@
 # textdomain: creative
+
+
+### init.lua ###
+
+# textdomain: creative
 Allow player to use creative inventory=Benarkan pemain menggunakan inventori kreatif
+
+### inventory.lua ###
+
+All=Semua
+Building Blocks=
+Decoration Blocks=
+
+ERROR: Privilege 'mapmaker' or 'teacher' required to get this item=
+
+ERROR: You cannot use any other item on this map except the kidsbot=
+
+Interactive=
+Items=Item
+Items & Tools=
+Nodes=Nod
+Search Items=
+Storage=
+Tools=Alatan
+Trash All=
+
+
+##### not used anymore #####
+
 Search=Cari
 Reset=Set semula
 Previous page=Halaman sebelumnya
 Next page=Halaman seterusnya
-All=Semua
-Nodes=Nod
-Tools=Alatan
-Items=Item

@@ -1,10 +1,34 @@
 # textdomain: creative
+
+
+### init.lua ###
+
+# textdomain: creative
 Allow player to use creative inventory=允許玩家使用創造模式物品欄
+
+### inventory.lua ###
+
+All=所有
+Building Blocks=
+Decoration Blocks=
+
+ERROR: Privilege 'mapmaker' or 'teacher' required to get this item=
+
+ERROR: You cannot use any other item on this map except the kidsbot=
+
+Interactive=
+Items=物品
+Items & Tools=
+Nodes=節點
+Search Items=
+Storage=
+Tools=工具
+Trash All=
+
+
+##### not used anymore #####
+
 Search=搜索
 Reset=重置
 Previous page=上一頁
 Next page=下一頁
-All=所有
-Nodes=節點
-Tools=工具
-Items=物品
