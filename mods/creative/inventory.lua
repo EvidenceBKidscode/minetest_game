@@ -140,8 +140,7 @@ function creative.update_creative_inventory(player_name, tab_content,
 
 	table.sort(creative_list, function(a, b) return order[a] < order[b] end)
 
-	player_inv:set_size("main", #creative_list)
-	player_inv:set_list("main", creative_list)
+	inv.items = creative_list
 	inv.size = #creative_list
 end
 
@@ -177,10 +176,6 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			creative.update_creative_inventory(player_name, items, drawtype, group)
 			local inv = player_inventory[player_name]
 
-			-->> KIDSCODE - Specific inventory
-			local inv_items =
-				minetest.get_inventory({type = "detached", name = "creative_" .. player_name}):get_list("main")
-
 			local formspec =
 				"label[0,-0.1;" .. title .. "]" .. [[
 				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
@@ -215,11 +210,22 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 				local first_item = (pagenum - 1) * ipp
 				for i = first_item, first_item + ipp - 1 do
-					local item = inv_items[i + 1]
+					local item = inv.items[i + 1]
 					if not item then break end
-					local item_name = item:get_name()
-					local X = i % 8
-					local Y
+
+					local more_items = (item ~= inv.items[i] and
+						workbench and workbench.nodes[item]) and
+						"\n\n\t\t\t\t" or ""
+
+					if more_items ~= "" then
+						if workbench.nodes[item].state then
+							more_items = more_items .. "-"
+						else
+							more_items = more_items .. "+"
+						end
+					end
+
+					local X, Y = i % 8
 
 					if name == "search" then
 						Y = (i % ipp - X) / 7 + 1
@@ -233,7 +239,8 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 							((Y - (name == "search" and 0.4 or 0.5)) -
 							 (Y * (name == "search" and 0.2 or 0.1))) ..
 							";1,1;" ..
-							item_name .. ";" .. item_name .. "_inv;;#c0d3e1]"
+							item .. ";" .. item .. "_inv#" .. (i + 1) ..
+							";" .. more_items .. ";#c0d3e1]"
 				end
 			end
 
@@ -336,13 +343,40 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 							return
 						end
 
-						if item:sub(-4) == "_inv" then
-							item = item:sub(1,-5)
+						local idx = tonumber(item:match("#(%d+)"))
+						local expand = fields[item]:find"%+"
+						local sign = fields[item]:find"\9"
+
+						if item:find("_inv#%d+") then
+							item = item:match("(.*)_inv")
 						end
 
-						local stack = ItemStack(item)
-						player_inv:add_item("main",
-							item .. " " .. stack:get_stack_max())
+						if not sign then
+							local stack = ItemStack(item)
+							player_inv:add_item("main", item .. " " .. stack:get_stack_max())
+						end
+
+						if workbench.nodes[item] and sign then
+							if expand then
+								workbench.nodes[item].state = true
+
+								local i = 1
+								for _, add_item in pairs(workbench.nodes[item]) do
+									if dump(add_item):find":" then
+										table.insert(inv.items, idx + i, add_item)
+										i = i + 1
+									end
+								end
+							else
+								workbench.nodes[item].state = false
+
+								for i = 13, 1, -1 do
+									table.remove(inv.items, idx + i)
+								end
+							end
+
+							sfinv.set_player_inventory_formspec(player, context)
+						end
 					end
 				end
 			end
