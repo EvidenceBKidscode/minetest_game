@@ -117,8 +117,8 @@ function creative.update_creative_inventory(player_name, tab_content,
 	for name, def in pairs(items) do
 		local m = match(def.description, inv.filter) or match(def.name, inv.filter)
 		-->> KIDSCODE filter on drawtype and/or groups
-		if m and (not drawtype or def.drawtype == drawtype)
-				and (not group or def.groups[group]) then
+		if m and (not drawtype or def.drawtype == drawtype) and
+				(not group or def.groups[group]) then
 		-- if m then
 		--<< KIDSCODE filter on drawtype and/or groups
 			creative_list[#creative_list+1] = name
@@ -263,8 +263,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 			-->> KIDSCODE - Search on every key press
 			if fields.creative_filter and
-					fields.creative_filter ~= (inv.last_search or "")
-			then
+					fields.creative_filter ~= (inv.last_search or "") then
 				inv.start_i = 0
 				inv.filter = fields.creative_filter:lower()
 				inv.last_search = inv.filter
