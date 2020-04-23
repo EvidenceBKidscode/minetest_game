@@ -1,10 +1,34 @@
 # textdomain: creative
+
+
+### init.lua ###
+
+# textdomain: creative
 Allow player to use creative inventory=Разрешить игроку использовать творческий инвентарь
+
+### inventory.lua ###
+
+All=Всё
+Building Blocks=
+Decoration Blocks=
+
+ERROR: Privilege 'mapmaker' or 'teacher' required to get this item=
+
+ERROR: You cannot use any other item on this map except the kidsbot=
+
+Interactive=
+Items=Предметы
+Items & Tools=
+Nodes=Ноды
+Search Items=
+Storage=
+Tools=Инструменты
+Trash All=
+
+
+##### not used anymore #####
+
 Search=Поиск
 Reset=Сброс
 Previous page=Предыдущая страница
 Next page=Следующая страница
-All=Всё
-Nodes=Ноды
-Tools=Инструменты
-Items=Предметы
