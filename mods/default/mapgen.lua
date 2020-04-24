@@ -136,7 +136,6 @@ function default.register_mgv6_blob_ores()
 	-- Scatter ores
 
 	-- Coal
---[[ KIDSCODE
 	minetest.register_ore({
 		ore_type       = "scatter",
 		ore            = "default:stone_with_coal",
@@ -403,7 +402,6 @@ function default.register_mgv6_blob_ores()
 		y_max          = -1024,
 		y_min          = -31000,
 	})
-]]-- KIDSCODE
 end
 
 
@@ -2486,6 +2484,7 @@ minetest.clear_registered_biomes()
 minetest.clear_registered_ores()
 minetest.clear_registered_decorations()
 
+--[[ KIDSCODE - No Mapgen used
 local mg_name = minetest.get_mapgen_setting("mg_name")
 if mg_name == "v6" then
 	default.register_mgv6_blob_ores()
@@ -2496,3 +2495,4 @@ else
 	default.register_ores()
 	default.register_decorations()
 end
+-- KIDSCODE - No Mapgen used ]]
