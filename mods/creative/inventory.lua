@@ -17,6 +17,7 @@ local function init_creative_cache(items)
 			i_cache[name] = def
 		end
 	end
+
 	table.sort(i_cache)
 	return i_cache
 end
@@ -100,8 +101,7 @@ function creative.update_creative_inventory(player_name, tab_content,
 	-- << KIDSCODE - Search on translated string
 
 	local inv = player_inventory[player_name] or
-			creative.init_creative_inventory(minetest.get_player_by_name(player_name))
-	local player_inv = minetest.get_inventory({type = "detached", name = "creative_" .. player_name})
+		creative.init_creative_inventory(minetest.get_player_by_name(player_name))
 
 	-- >> KIDSCODE - Allow to merge lists of content
 	if tab_content and #tab_content > 1 then
@@ -123,7 +123,8 @@ function creative.update_creative_inventory(player_name, tab_content,
 	local creative_list = {}
 	local order = {}
 	for name, def in pairs(items) do
-		local description = minetest.get_lang_translation(def.description, lang_code) -- KIDSCODE - Search on translated string
+		local description = minetest.get_lang_translation(
+			def.description, lang_code) -- KIDSCODE - Search on translated string
 		local m = match(def.description, inv.filter) or match(def.name, inv.filter)
 			or match(description, inv.filter) -- KIDSCODE - Search on translated string
 
@@ -215,7 +216,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 					local more_items = (item ~= inv.items[i] and
 						workbench and workbench.nodes[item]) and
-						"\n\n\t\t\t\t" or ""
+						"\n\n\t\t\t\t\t" or ""
 
 					if more_items ~= "" then
 						if workbench.nodes[item].state then
