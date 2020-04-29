@@ -93,11 +93,7 @@ function creative.update_creative_inventory(player_name, tab_content,
 		drawtype, group) -- KIDSCODE filter on drawtype and/or groups
 
 	-- >> KIDSCODE - Search on translated string
-	local player = minetest.get_player_by_name(player_name)
-	if not player then
-		return
-	end
-	local lang_code = player:get_player_language()
+	local lang_code = minetest.get_player_information(player_name).lang_code
 	-- << KIDSCODE - Search on translated string
 
 	local inv = player_inventory[player_name] or
@@ -123,8 +119,8 @@ function creative.update_creative_inventory(player_name, tab_content,
 	local creative_list = {}
 	local order = {}
 	for name, def in pairs(items) do
-		local description = minetest.get_lang_translation(
-			def.description, lang_code) -- KIDSCODE - Search on translated string
+		local description = minetest.get_translated_string(
+			lang_code, def.description) -- KIDSCODE - Search on translated string
 		local m = match(def.description, inv.filter) or match(def.name, inv.filter)
 			or match(description, inv.filter) -- KIDSCODE - Search on translated string
 
