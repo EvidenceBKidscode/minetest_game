@@ -353,7 +353,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 							player_inv:add_item("main", item .. " " .. stack:get_stack_max())
 						end
 
-						if workbench.nodes[item] and sign then
+						if workbench and workbench.nodes[item] and sign then
 							if expand then
 								workbench.nodes[item].state = true
 
