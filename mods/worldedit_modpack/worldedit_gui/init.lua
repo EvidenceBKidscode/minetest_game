@@ -65,6 +65,12 @@ worldedit.register_gui_handler = function(identifier, handler)
 		local name = player:get_player_name()
 
 		if fields.worldedit_gui then
+			-- >> KIDSCODE - Make sfinv aware when worldedit handles menu
+			local context = sfinv.get_or_create_context(player)
+			context.external_menu = "worldedit"
+			sfinv.set_context(player, context)
+			-- << KIDSCODE - Make sfinv aware when worldedit handles menu
+
 			worldedit.show_page(name, "worldedit_gui")
 			return true
 		end
@@ -124,6 +130,12 @@ if rawget(_G, "sfinv") then
 			worldedit.show_page(player_name, "worldedit_gui")
 			return true
 		elseif fields.worldedit_gui_exit then --return to original page
+			-- >> KIDSCODE - Make sfinv aware when worldedit handles menu
+			local context = sfinv.get_or_create_context(player)
+			context.external_menu = nil
+			sfinv.set_context(player, context)
+			-- << KIDSCODE - Make sfinv aware when worldedit handles menu
+
 			sfinv.set_player_inventory_formspec(player, sfinv.get_or_create_context(player))
 			return true
 		end
