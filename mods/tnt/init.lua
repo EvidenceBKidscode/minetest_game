@@ -91,6 +91,18 @@ local function add_drop(drops, item)
 end
 
 local basic_flame_on_construct -- cached value
+
+-- >> KIDSCODE - Make TNT work without basic_flame
+local c_fire
+if minetest.registered_nodes["fire:basic_flame"] then
+	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
+	c_fire = minetest.get_content_id("fire:basic_flame")
+else
+	basic_flame_on_construct = minetest.remove_node
+	c_fire = minetest.get_content_id("air")
+end
+-- << KIDSCODE - Make TNT work without basic_flame
+
 local function destroy(drops, npos, cid, c_air, c_fire,
 		on_blast_queue, on_construct_queue,
 		ignore_protection, ignore_on_blast, owner)
@@ -341,9 +353,13 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local drops = {}
 	local on_blast_queue = {}
 	local on_construct_queue = {}
-	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
 
-	local c_fire = minetest.get_content_id("fire:basic_flame")
+-- >> KIDSCODE - Make TNT work without basic_flame
+--	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
+--
+--	local c_fire = minetest.get_content_id("fire:basic_flame")
+-- << KIDSCODE - Make TNT work without basic_flame
+
 	for z = -radius, radius do
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
