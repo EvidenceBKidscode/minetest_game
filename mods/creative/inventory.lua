@@ -190,28 +190,40 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				]] ..
 				"button[5,3.5;3,1;trash_all;" .. S("Trash All") .. ";#88acc5]"
 			else
+				ipp = name == "search" and 8*7 or 8*8
 				local start_i = inv.start_i or 0
-				local pagenum = math.floor(start_i / ipp + 1)
+
 				formspec = formspec ..
 					"scrollbaroptions[min=0;max=" ..
 						(inv.size - (inv.size % ipp)) ..
-						";smallstep=" .. ipp .. ";largestep=" .. ipp .."]" ..
+						";smallstep=" .. ipp .. ";largestep=" .. ipp .. "]" ..
 					"scrollbar[7.23,0.4;0.6,7.18;vertical;sb_v;" ..
-					inv.start_i .. ";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
+						inv.start_i .. ";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
+				
+				local first_item = inv.start_i
+				local last_item = (inv.start_i + ipp) - 1
+				print("first_item", first_item)
+				print("last_item", last_item)
+				print()
 
-				if name == "search" then
-					ipp = 8*7
-				else
-					ipp = 8*8
-				end
-
-				local first_item = (pagenum - 1) * ipp
-				for i = first_item, first_item + ipp - 1 do
+				for i = first_item, last_item do
 					local item = inv.items[i + 1]
+					print(item)
 					if not item then break end
 
-					local more_items = (item ~= inv.items[i] and
-						workbench and workbench.nodes[item]) and
+					local cuttable_nodes = workbench and workbench.nodes[item]
+					local O = 0
+
+					if cuttable_nodes then
+						for _, it in ipairs(workbench.nodes[item]) do
+							if minetest.registered_items[it] then
+								O = O + 1
+							end
+						end
+					end
+
+					local more_items =
+						(item ~= inv.items[i] and cuttable_nodes and O > 1) and
 						"\n\n\t\t\t\t\t" or ""
 
 					if more_items ~= "" then
@@ -263,10 +275,10 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			if self.name ~= "creative:" .. name then return end
 			--print(dump(fields))
 
+			ipp = name == "search" and 8*7 or 8*8
 			local player_name = player:get_player_name()
 			local inv = player_inventory[player_name]
 			local player_inv = player:get_inventory()
-			local is_mapmaker = minetest.check_player_privs(player_name, "mapmaker")
 			local is_teacher = minetest.check_player_privs(player_name, "teacher")
 			assert(inv)
 
@@ -289,26 +301,10 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 			-->> KIDSCODE - Manage scrollbar instead of buttons
 			elseif fields.sb_v and fields.sb_v:sub(1,3) == "CHG" then
 				local start_i = tonumber(fields.sb_v:match(":(%d+)"))
-				if math.floor(start_i / ipp + 1) ~= math.floor(inv.start_i / ipp + 1)
-				then
+				if math.floor(start_i / ipp + 1) ~= math.floor(inv.start_i / ipp + 1) then
 					inv.start_i = start_i
 					sfinv.set_player_inventory_formspec(player, context)
 				end
-			--[[
-			if fields.creative_prev then
-				start_i = start_i - 4*8
-				if start_i < 0 then
-					start_i = inv.size - (inv.size % (4*8))
-					if inv.size == start_i then
-						start_i = math.max(0, inv.size - (4*8))
-					end
-				end
-			elseif fields.creative_next then
-				start_i = start_i + 4*8
-				if start_i >= inv.size then
-					start_i = 0
-				end
-			]]
 			--<< KIDSCODE - Manage scrollbar instead of buttons
 
 			elseif fields.trash_all then
@@ -321,8 +317,7 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 						local sandbox = utils_installed and
 								utils.worldname:sub(1,6) == "build_"
 
-						if not is_mapmaker and not is_teacher and
-						  (utils_installed and not sandbox) then
+						if not is_teacher and (utils_installed and not sandbox) then
 							if utils_installed and
 							  (utils.worldname == "coding_schools" or
 							   utils.worldname == "science_factory") then
@@ -355,17 +350,25 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 						if workbench and workbench.nodes[item] and sign then
 							if expand then
+								print()
+								print("clicked:", idx)
 								workbench.nodes[item].state = true
 
 								local i = 1
 								for _, add_item in pairs(workbench.nodes[item]) do
-									if dump(add_item):find":" then
+									if minetest.registered_items[add_item] then
+										print("insert to:", idx + i)
 										table.insert(inv.items, idx + i, add_item)
 										i = i + 1
 									end
 								end
+
+								if idx + #workbench.nodes[item] > inv.start_i + ipp then
+									inv.start_i = inv.start_i + #workbench.nodes[item]
+								end
 							else
 								workbench.nodes[item].state = false
+								inv.start_i = inv.start_i - #workbench.nodes[item]
 
 								for i = 13, 1, -1 do
 									table.remove(inv.items, idx + i)
