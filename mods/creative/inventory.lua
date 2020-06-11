@@ -1,4 +1,4 @@
-local ipp = 8*8
+local fmt = string.format
 -- creative/inventory.lua
 
 -- support for MT game translation.
@@ -23,8 +23,8 @@ local function init_creative_cache(items)
 end
 
 function creative.init_creative_inventory(player)
-	local player_name = player:get_player_name()
-	player_inventory[player_name] = {
+	local pname = player:get_player_name()
+	player_inventory[pname] = {
 		size = 0,
 		filter = "",
 		start_i = 0,
@@ -32,7 +32,7 @@ function creative.init_creative_inventory(player)
 		old_content = nil
 	}
 
-	minetest.create_detached_inventory("creative_" .. player_name, {
+	minetest.create_detached_inventory("creative_" .. pname, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player2)
 			local name = player2 and player2:get_player_name() or ""
 			if not creative.is_enabled_for(name) or
@@ -55,12 +55,12 @@ function creative.init_creative_inventory(player)
 		end,
 		on_take = function(inv, listname, index, stack, player2)
 			if stack and stack:get_count() > 0 then
-				minetest.log("action", player_name .. " takes " .. stack:get_name().. " from creative inventory")
+				minetest.log("action", pname .. " takes " .. stack:get_name().. " from creative inventory")
 			end
 		end,
-	}, player_name)
+	}, pname)
 
-	return player_inventory[player_name]
+	return player_inventory[pname]
 end
 
 local function match(s, filter)
@@ -89,15 +89,15 @@ local function table_concat(...)
 end
 --<< KIDSCODE - Allow to merge lists of content
 
-function creative.update_creative_inventory(player_name, tab_content,
+function creative.update_creative_inventory(pname, tab_content,
 		drawtype, group) -- KIDSCODE filter on drawtype and/or groups
 
 	-- >> KIDSCODE - Search on translated string
-	local lang_code = minetest.get_player_information(player_name).lang_code
+	local lang_code = minetest.get_player_information(pname).lang_code
 	-- << KIDSCODE - Search on translated string
 
-	local inv = player_inventory[player_name] or
-		creative.init_creative_inventory(minetest.get_player_by_name(player_name))
+	local inv = player_inventory[pname] or
+		creative.init_creative_inventory(minetest.get_player_by_name(pname))
 
 	-- >> KIDSCODE - Allow to merge lists of content
 	if tab_content and #tab_content > 1 then
@@ -156,8 +156,8 @@ trash:set_size("main", 1)
 
 creative.formspec_add = ""
 
-function creative.register_tab(name, image, title, items, drawtype, group)
-	sfinv.register_page("creative:" .. name, {
+function creative.register_tab(tabname, image, title, items, drawtype, group)
+	sfinv.register_page("creative:" .. tabname, {
 		image = image,
 		title = title,
 		dir = "top",
@@ -169,11 +169,12 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 		end,
 
 		get = function(self, player, context)
-			local player_name = player:get_player_name()
-			creative.update_creative_inventory(player_name, items, drawtype, group)
-			local inv = player_inventory[player_name]
+			local pname = player:get_player_name()
+			creative.update_creative_inventory(pname, items, drawtype, group)
+			local inv = player_inventory[pname]
+			local fs = {}
 
-			local formspec =
+			 fs[#fs + 1] =
 				"label[0,-0.1;" .. title .. "]" .. [[
 				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
 				list[current_player;main;0,7.8;7,1;0;0.2,0.0;1.0]
@@ -183,39 +184,30 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				listring[current_player;main]
 			]]
 
-			if name == "storage" then
-				formspec = formspec .. [[
+			if tabname == "storage" then
+				 fs[#fs + 1] = [[
 					image[0.3,0.8;9,3;kidscode_logo.png]
 					list[current_player;main;0,4.5;8,3;8]
 				]] ..
 				"button[5,3.5;3,1;trash_all;" .. S("Trash All") .. ";#88acc5]"
 			else
-				ipp = name == "search" and 8*7 or 8*8
 				local start_i = inv.start_i or 0
 
-				formspec = formspec ..
-					"scrollbaroptions[min=0;max=" ..
-						(inv.size - (inv.size % ipp)) ..
-						";smallstep=" .. ipp .. ";largestep=" .. ipp .. "]" ..
-					"scrollbar[7.23,0.4;0.6,7.18;vertical;sb_v;" ..
-						inv.start_i .. ";#c0d3e1;#88acc5;#FFFFFFFF;#808080FF]"
-				
-				local first_item = inv.start_i
-				local last_item = (inv.start_i + ipp) - 1
-				print("first_item", first_item)
-				print("last_item", last_item)
-				print()
+				 fs[#fs + 1] =
+					"scroll_container[0,0.8;9.2," ..
+						(tabname == "search" and 7.4 or 8.4) .. ";sb_v;vertical]" ..
+					"scrollbaroptions[max=" .. ((#inv.items / 7) * 10 - 60) .. "]"
 
-				for i = first_item, last_item do
+				for i = 0, #inv.items do
 					local item = inv.items[i + 1]
-					print(item)
 					if not item then break end
 
 					local cuttable_nodes = workbench and workbench.nodes[item]
 					local O = 0
 
 					if cuttable_nodes then
-						for _, it in ipairs(workbench.nodes[item]) do
+						for j = 1, #workbench.nodes[item] do
+							local it = workbench.nodes[item][j]
 							if minetest.registered_items[it] then
 								O = O + 1
 							end
@@ -227,64 +219,64 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 						"\n\n\t\t\t\t\t" or ""
 
 					if more_items ~= "" then
-						if workbench.nodes[item].state then
-							more_items = more_items .. "-"
-						else
-							more_items = more_items .. "+"
-						end
+						more_items = more_items ..
+							(workbench.nodes[item].state and "-" or "+")
 					end
 
-					local X, Y = i % 8
+					local X = i % 8
+					local Y = (i - X) / 8
+					X = X - (X * 0.12)
+					Y = Y - (Y * 0.02)
 
-					if name == "search" then
-						Y = (i % ipp - X) / 7 + 1
-					else
-						Y = (i % ipp - X) / 8 + 1
-					end
-
-					formspec = formspec ..
-						"item_image_button[" ..
-							(X - (X * 0.12)) .. "," ..
-							((Y - (name == "search" and 0.4 or 0.5)) -
-							 (Y * (name == "search" and 0.2 or 0.1))) ..
-							";1,1;" ..
-							item .. ";" .. item .. "_inv#" .. (i + 1) ..
-							";" .. more_items .. ";#c0d3e1]"
+					 fs[#fs + 1] =
+						fmt("item_image_button[%f,%f;1,1;%s;%s_inv#%u;%s;#c0d3e1]",
+							X, Y, item, item, i + 1, more_items)
 				end
+
+				 fs[#fs + 1] =
+					"scroll_container_end[]" ..
+					fmt("scrollbar[7.23,0.4;0.6,7.18;vertical;sb_v;%u]", start_i)
 			end
 
-			if name == "search" then
-				formspec = formspec ..
+			if tabname == "search" then
+				 fs[#fs + 1] =
 					"field[0.3,7.15;7.17,1;!creative_filter;;" ..
 						minetest.formspec_escape(inv.filter) .. "]"
 			end
 
-			return sfinv.make_formspec(player, context, formspec, false)
+			return sfinv.make_formspec(player, context, table.concat(fs), false)
 			--<< KIDSCODE - Specific inventory
 		end,
 
 		on_enter = function(self, player, context)
-			local player_name = player:get_player_name()
-			local inv = player_inventory[player_name]
+			local pname = player:get_player_name()
+			local inv = player_inventory[pname]
 			if inv then
 				inv.start_i = 0
 			end
 		end,
 
 		on_player_receive_fields = function(self, player, context, fields)
-			if self.name ~= "creative:" .. name then return end
-			--print(dump(fields))
+			if self.name ~= "creative:" .. tabname then return end
+		--	print(dump(fields))
 
-			ipp = name == "search" and 8*7 or 8*8
-			local player_name = player:get_player_name()
-			local inv = player_inventory[player_name]
+			local pname = player:get_player_name()
+			local inv = player_inventory[pname]
 			local player_inv = player:get_inventory()
-			local is_teacher = minetest.check_player_privs(player_name, "teacher")
+			local is_teacher = minetest.check_player_privs(pname, "teacher")
 			assert(inv)
+
+			if fields.sfinv_nav_tabs and workbench then
+				for _, item in ipairs(inv.items) do
+					if workbench.nodes[item] and workbench.nodes[item].state then
+						workbench.nodes[item].state = nil
+					end
+				end
+			end
 
 			if self.name ~= "creative:search" then
 				inv.filter = ""
-				creative.update_creative_inventory(player_name, items, drawtype, group)
+				creative.update_creative_inventory(pname, items, drawtype, group)
 				sfinv.set_player_inventory_formspec(player, context)
 			end
 
@@ -294,18 +286,9 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 				inv.start_i = 0
 				inv.filter = fields.creative_filter:lower()
 				inv.last_search = inv.filter
-				creative.update_creative_inventory(player_name, items, drawtype, group)
+				creative.update_creative_inventory(pname, items, drawtype, group)
 				sfinv.set_player_inventory_formspec(player, context)
 			--<< KIDSCODE - Search on every key press
-
-			-->> KIDSCODE - Manage scrollbar instead of buttons
-			elseif fields.sb_v and fields.sb_v:sub(1,3) == "CHG" then
-				local start_i = tonumber(fields.sb_v:match(":(%d+)"))
-				if math.floor(start_i / ipp + 1) ~= math.floor(inv.start_i / ipp + 1) then
-					inv.start_i = start_i
-					sfinv.set_player_inventory_formspec(player, context)
-				end
-			--<< KIDSCODE - Manage scrollbar instead of buttons
 
 			elseif fields.trash_all then
 				player_inv:set_list("main", {})
@@ -321,12 +304,12 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 							if utils_installed and
 							  (utils.worldname == "coding_schools" or
 							   utils.worldname == "science_factory") then
-							       minetest.chat_send_player(player_name,
+							       minetest.chat_send_player(pname,
 									minetest.colorize("#FF0000",
 										S("ERROR: You cannot use any other item " ..
 										"on this map except the kidsbot")))
 							else
-								minetest.chat_send_player(player_name,
+								minetest.chat_send_player(pname,
 									minetest.colorize("#FF0000",
 										S("ERROR: Privilege 'mapmaker' or 'teacher'" ..
 										" required to get this item")))
@@ -350,31 +333,24 @@ function creative.register_tab(name, image, title, items, drawtype, group)
 
 						if workbench and workbench.nodes[item] and sign then
 							if expand then
-								print()
-								print("clicked:", idx)
 								workbench.nodes[item].state = true
 
 								local i = 1
 								for _, add_item in pairs(workbench.nodes[item]) do
 									if minetest.registered_items[add_item] then
-										print("insert to:", idx + i)
 										table.insert(inv.items, idx + i, add_item)
 										i = i + 1
 									end
 								end
-
-								if idx + #workbench.nodes[item] > inv.start_i + ipp then
-									inv.start_i = inv.start_i + #workbench.nodes[item]
-								end
 							else
 								workbench.nodes[item].state = false
-								inv.start_i = inv.start_i - #workbench.nodes[item]
 
 								for i = 13, 1, -1 do
 									table.remove(inv.items, idx + i)
 								end
 							end
 
+							inv.start_i = tonumber(string.match(fields.sb_v, "%d+"))
 							sfinv.set_player_inventory_formspec(player, context)
 						end
 					end
