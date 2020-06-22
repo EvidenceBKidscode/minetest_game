@@ -78,7 +78,8 @@ function sfinv.make_formspec(player, context, content, show_inv, size)
 end
 
 function sfinv.get_homepage_name(player)
-	return "sfinv:crafting"
+	return "creative:storage" -- KIDSCODE - Specific inventory
+	--return "sfinv:crafting"
 end
 
 function sfinv.get_formspec(player, context)
