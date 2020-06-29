@@ -194,6 +194,7 @@ function creative.register_tab(tabname, image, title, items, drawtype, group)
 				local start_i = inv.start_i or 0
 
 				 fs[#fs + 1] =
+				 	"style_type[item_image_button;border=false;bgimg_hovered=creative_selected.png;bgimg_pressed=creative_selected.png]" ..
 					"scroll_container[0,0.8;9.2," ..
 						(tabname == "search" and 7.4 or 8.4) .. ";sb_v;vertical]" ..
 					"scrollbaroptions[max=" .. ((#inv.items / 7) * 10 - 60) .. "]"
