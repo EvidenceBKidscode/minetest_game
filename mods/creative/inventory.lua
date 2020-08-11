@@ -63,6 +63,7 @@ function creative.init_creative_inventory(player)
 	return player_inventory[pname]
 end
 
+local NO_MATCH = 999
 local function match(s, filter)
 	if filter == "" then
 		return 0
@@ -70,7 +71,15 @@ local function match(s, filter)
 	if s:lower():find(filter, 1, true) then
 		return #s - #filter
 	end
-	return nil
+	return NO_MATCH
+end
+
+local function description(def, lang_code)
+	local s = def.description
+	if lang_code then
+		s = minetest.get_translated_string(lang_code, s)
+	end
+	return s:gsub("\n.*", "") -- First line only
 end
 
 -->> KIDSCODE - Allow to merge lists of content
@@ -116,21 +125,30 @@ function creative.update_creative_inventory(pname, tab_content,
 
 	local items = inventory_cache[tab_content] or init_creative_cache(tab_content)
 
+	local lang
+	local player_info = minetest.get_player_information(pname)
+	if player_info and player_info.lang_code ~= "" then
+		lang = player_info.lang_code
+	end
+
 	local creative_list = {}
 	local order = {}
 	for name, def in pairs(items) do
-		local description = minetest.get_translated_string(
-			lang_code, def.description) -- KIDSCODE - Search on translated string
-		local m = match(def.description, inv.filter) or match(def.name, inv.filter)
-			or match(description, inv.filter) -- KIDSCODE - Search on translated string
+		local m = match(description(def), inv.filter)
+		if m > 0 then
+			m = math.min(m, match(description(def, lang), inv.filter))
+		end
+		if m > 0 then
+			m = math.min(m, match(name, inv.filter))
+		end
 
 		-->> KIDSCODE filter on drawtype and/or groups
-		if m and (not drawtype or def.drawtype == drawtype) and
+		if  m < NO_MATCH and (not drawtype or def.drawtype == drawtype) and
 				(not group or def.groups[group]) then
-		-- if m then
+		-- if m < NO_MATCH then
 		--<< KIDSCODE filter on drawtype and/or groups
 			creative_list[#creative_list+1] = name
-			-- Sort by description length first so closer matches appear earlier
+			-- Sort by match value first so closer matches appear earlier
 			order[name] = string.format("%02d", m) .. name
 		end
 	end
@@ -230,7 +248,7 @@ function creative.register_tab(tabname, image, title, items, drawtype, group)
 					Y = Y - (Y * 0.02)
 
 					 fs[#fs + 1] =
-						fmt("item_image_button[%f,%f;1,1;%s;%s_inv#%u;%s;#c0d3e1]",
+						fmt("item_image_button[%f,%f;1,1;%s;%s_inv#%u;%s]",
 							X, Y, item, item, i + 1, more_items)
 				end
 
@@ -405,11 +423,32 @@ creative.register_tab("search",
 	minetest.registered_items
 )
 --[[
+-- Sort registered items
+local registered_nodes = {}
+local registered_tools = {}
+local registered_craftitems = {}
+
+minetest.register_on_mods_loaded(function()
+	for name, def in pairs(minetest.registered_items) do
+		local group = def.groups or {}
+
+		local nogroup = not (group.node or group.tool or group.craftitem)
+		if group.node or (nogroup and minetest.registered_nodes[name]) then
+			registered_nodes[name] = def
+		elseif group.tool or (nogroup and minetest.registered_tools[name]) then
+			registered_tools[name] = def
+		elseif group.craftitem or (nogroup and minetest.registered_craftitems[name]) then
+			registered_craftitems[name] = def
+		end
+	end
+end)
+
 creative.register_tab("all", S("All"), minetest.registered_items)
-creative.register_tab("nodes", S("Nodes"), minetest.registered_nodes)
-creative.register_tab("tools", S("Tools"), minetest.registered_tools)
-creative.register_tab("craftitems", S("Items"), minetest.registered_craftitems)
+creative.register_tab("nodes", S("Nodes"), registered_nodes)
+creative.register_tab("tools", S("Tools"), registered_tools)
+creative.register_tab("craftitems", S("Items"), registered_craftitems)
 --]]
+
 --<< KIDSCODE - Specific inventory
 
 --[[ TODO:CHECK

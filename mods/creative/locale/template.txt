@@ -1,13 +1,9 @@
 # textdomain: creative
-
-
-### init.lua ###
-
-# textdomain: creative
 Allow player to use creative inventory=
-
-### inventory.lua ###
-
+Search=
+Reset=
+Previous page=
+Next page=
 All=
 Building Blocks=
 Decoration Blocks=
@@ -24,3 +20,5 @@ Search Items=
 Storage=
 Tools=
 Trash All=
+Items=
+Allow player to use creative inventory=
