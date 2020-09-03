@@ -649,7 +649,7 @@ function tnt.register_tnt(def)
 			after_place_node = function(pos, placer)
 				if placer:is_player() then
 					local snows = utils.nodes_in_range(pos, 8, {"default:snowblock"})
-					if #tnt.placed < 3 and snows > 100 then
+					if #tnt.placed < 3 and snows > 10 then
 						tnt.placed[#tnt.placed + 1] = pos
 					end
 
