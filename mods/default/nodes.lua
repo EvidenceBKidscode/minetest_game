@@ -2491,17 +2491,6 @@ minetest.register_node("default:lava_source", {
 	tiles = {
 		{
 			name = "default_lava_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-		},
-	},
-	special_tiles = { -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
-		{
-			name = "default_lava_source_animated.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -2520,7 +2509,7 @@ minetest.register_node("default:lava_source", {
 				length = 3.0,
 			},
 		},
-	}, -- KIDSCODE uses special tiles for sources as they are drawn like flowing liquids
+	},
 	paramtype = "light",
 	light_source = default.LIGHT_MAX - 1,
 	walkable = false,
@@ -2537,7 +2526,7 @@ minetest.register_node("default:lava_source", {
 	liquid_renewable = false,
 	damage_per_second = 4 * 2,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1, building = 1},
+	groups = {lava = 3, liquid = 2, igniter = 1},
 })
 
 minetest.register_node("default:lava_flowing", {
