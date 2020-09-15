@@ -19,7 +19,10 @@ minetest.register_on_joinplayer(function(player)
 	local formspec = [[
 			bgcolor[#080808BB;true]
 			background[5,5;1,1;gui_formbg.png;true]
-			listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF] ]]
+			listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
+			style_type[button;bgcolor=#4f8636]
+			style_type[field;bgcolor=#4f8636]
+	]]
 --[=[
 	local formspec = [[
 			bgcolor[#080808BB;true]
