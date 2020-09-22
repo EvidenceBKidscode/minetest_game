@@ -192,26 +192,35 @@ function creative.register_tab(tabname, image, title, items, drawtype, group)
 			local inv = player_inventory[pname]
 			local fs = {}
 
-			 fs[#fs + 1] =
-				"label[0,-0.1;" .. title .. "]" .. [[
+			local invpos = tabname == "storage" and 6.5 or 7.8
+
+			fs[#fs + 1] = ([[
+				label[0,-0.1;%s]
 				listcolors[#00000069;#c0d3e1;#141318;#30434C;#FFF]
-				list[current_player;main;0,7.8;7,1;0;0.2,0.0;1.0]
-				image[7.06,7.9;0.8,0.8;creative_trash_icon.png]
-				list[detached:creative_trash;main;7,7.8;1,1;]
+				list[detached:creative_trash;main;-1,-1;1,1;]
+				list[current_player;main;0,%.2f;8,1;0;0.2,0.0;1.0]
 				listring[]
-				listring[current_player;main]
-			]]
+			]]):format(title, invpos)
 
 			if tabname == "storage" then
-				 fs[#fs + 1] = [[
-					image[0.3,0.8;9,3;kidscode_logo.png]
-					list[current_player;main;0,4.5;8,3;8]
-				]] ..
-				"button[5,3.5;3,1;trash_all;" .. S("Trash All") .. ";#88acc5]"
+				local helptext =
+					"Maintenez Shift Gauche et faites un click gauche sur un\n"..
+					"objet pour le supprimer définitivement.\n"..
+					"L'apperçu de l'inventaire vous montre les premiers blocs\n"..
+					"situés dans l'inventaire rapide (tout en bas de l'écran)."
+
+				fs[#fs + 1] = ([[
+					label[0,0.7;Vos objets/blocs récupérés]
+					list[current_player;main;0,1.5;8,3;8]
+					label[0,5.7;Aperçu de l'inventaire rapide]
+					button[5,7.8;3,1;trash_all;%s]
+					button[7,0.5;1,1;help;?]
+					tooltip[help;%s]
+				]]):format(S("Trash All"), helptext)
 			else
 				local start_i = inv.start_i or 0
 
-				 fs[#fs + 1] =
+				fs[#fs + 1] =
 				 	"style_type[item_image_button;border=false;bgimg_hovered=creative_selected.png;bgimg_pressed=creative_selected.png]" ..
 					"scroll_container[0,0.8;9.2," ..
 						(tabname == "search" and 7.4 or 8.4) .. ";sb_v;vertical]" ..
